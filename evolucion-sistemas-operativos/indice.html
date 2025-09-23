@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolución de los Sistemas Operativos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+            background-attachment: fixed;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(30,60,114,0.4));
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: clamp(2em, 6vw, 3.5em);
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(255,107,107,0.5)); }
+            100% { filter: drop-shadow(0 0 20px rgba(78,205,196,0.8)); }
+        }
+
+        .header p {
+            font-size: clamp(1em, 3vw, 1.4em);
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px auto;
+            max-width: 800px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 2px solid transparent;
+            font-weight: 600;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .timeline-container {
+            padding: 40px 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline-section {
+            margin-bottom: 60px;
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section-title {
+            font-size: clamp(2em, 5vw, 2.8em);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .section-description {
+            font-size: clamp(1em, 2.5vw, 1.2em);
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .desktop-icon, .mobile-icon {
+            font-size: 1.2em;
+            padding: 15px;
+            border-radius: 15px;
+            flex-shrink: 0;
+        }
+
+        .desktop-icon {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            box-shadow: 0 8px 20px rgba(52,152,219,0.3);
+        }
+
+        .mobile-icon {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            box-shadow: 0 8px 20px rgba(231,76,60,0.3);
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            color: #333;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: all 0.8s ease;
+            z-index: 1;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        }
+
+        .card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .year {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            z-index: 3;
+        }
+
+        .os-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .os-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .desktop .os-icon { 
+            background: linear-gradient(45deg, #3498db, #2980b9); 
+            color: white;
+        }
+        
+        .mobile .os-icon { 
+            background: linear-gradient(45deg, #e74c3c, #c0392b); 
+            color: white;
+        }
+
+        .linux .os-icon {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .os-title {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .os-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .os-version {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 3px;
+        }
+
+        .os-type {
+            font-size: 0.8em;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #95a5a6;
+        }
+
+        .features {
+            margin: 15px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .feature-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .feature-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+        }
+
+        .anecdote {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(155,89,182,0.1));
+            border-left: 4px solid #3498db;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            line-height: 1.5;
+            font-size: 0.9em;
+            position: relative;
+        }
+
+        .anecdote::before {
+            content: "💡";
+            font-style: normal;
+            font-size: 1.2em;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+
+        .simulator-link {
+            margin-top: 15px;
+            display: inline-block;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+            box-shadow: 0 4px 12px rgba(39,174,96,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .simulator-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(39,174,96,0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .simulator-link::before {
+            content: "🖥️ ";
+            font-size: 1em;
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .timeline-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .section-title {
+                font-size: 2em;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .toggle-container {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .toggle-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .card {
+                padding: 20px;
+                min-height: auto;
+            }
+
+            .os-name {
+                font-size: 1.3em;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .os-header {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 15px;
+            }
+
+            .timeline-container {
+                padding: 20px 15px;
+            }
+
+            .section-header {
+                padding: 20px;
+            }
+
+            .year {
+                font-size: 0.9em;
+                padding: 6px 12px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+
+    <div class="header">
+        <h1>🖥️📱 Evolución de los Sistemas Operativos</h1>
+        <p>Un viaje completo a través de la historia de la computación personal y móvil</p>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <span class="stat-number">40+</span>
+                <div class="stat-label">Años de Historia</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">25+</span>
+                <div class="stat-label">Sistemas Operativos</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">15+</span>
+                <div class="stat-label">Simuladores Online</div>
+            </div>
+        </div>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" data-section="desktop">
+                🖥️ Sistemas de Escritorio
+            </button>
+            <button class="toggle-btn" data-section="mobile">
+                📱 Sistemas Móviles
+            </button>
+        </div>
+    </div>
+
+    <div class="timeline-container">
+        <!-- SISTEMAS DE ESCRITORIO -->
+        <div id="desktop" class="timeline-section active">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <div class="desktop-icon">🖥️</div>
+                    <span>Sistemas Operativos de Escritorio</span>
+                </h2>
+                <p class="section-description">
+                    Desde los primeros sistemas de línea de comandos hasta las modernas interfaces con inteligencia artificial, 
+                    explora la evolución de los sistemas que han definido la computación personal.
+                </p>
+            </div>
+
+            <div class="timeline-grid">
+                <div class="timeline-item desktop loading">
+                    <div class="year">1981</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">MS</div>
+                            <div class="os-title">
+                                <div class="os-name">MS-DOS</div>
+                                <div class="os-version">Versión 1.0</div>
+                                <div class="os-type">Sistema de línea de comandos</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Línea de comandos</span>
+                            <span class="feature-tag">16-bit</span>
+                            <span class="feature-tag">FAT12</span>
+                            <span class="feature-tag">Sistema monousuario</span>
+                        </div>
+                        <div class="anecdote">
+                            Microsoft compró QDOS (Quick and Dirty OS) por $50,000 de Seattle Computer Products y lo renombró como MS-DOS. Esta compra estableció las bases del imperio Microsoft y cambió la historia de la computación.
+                        </div>
+                        <a href="https://www.pcjs.org/software/pcx86/sys/dos/microsoft/1.00/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar MS-DOS 1.0 Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop loading">
+                    <div class="year">1984</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🍎</div>
+                            <div class="os-title">
+                                <div class="os-name">Mac OS System 1.0</div>
+                                <div class="os-version">System Software 1.0</div>
+                                <div class="os-type">Primera GUI comercial exitosa</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Interfaz gráfica</span>
+                            <span class="feature-tag">Ratón obligatorio</span>
+                            <span class="feature-tag">Ventanas superpuestas</span>
+                            <span class="feature-tag">Iconos y carpetas</span>
+                        </div>
+                        <div class="anecdote">
+                            Steve Jobs se inspiró en el trabajo de Xerox PARC para crear la primera interfaz gráfica comercial exitosa. La presentación del Mac original incluía la famosa frase "Hello, I'm Macintosh" sintetizada por el propio ordenador.
+                        </div>
+                        <a href="https://macos8.app/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Mac OS Classic Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop loading">
+                    <div class="year">1985</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🪟</div>
+                            <div class="os-title">
+                                <div class="os-name">Windows 1.0</div>
+                                <div class="os-version">Primera versión</div>
+                                <div class="os-type">Entorno gráfico sobre MS-DOS</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Ventanas superpuestas</span>
+                            <span class="feature-tag">MS-DOS base</span>
+                            <span class="feature-tag">Paint</span>
+                            <span class="feature-tag">Calculator</span>
+                            <span class="feature-tag">Notepad</span>
+                        </div>
+                        <div class="anecdote">
+                            Inicialmente fue un fracaso comercial vendiendo solo 500,000 copias en dos años. Apple demandó a Microsoft alegando que copiaron el concepto de Mac OS, pero perdieron porque habían licenciado la tecnología GUI anteriormente.
+                        </div>
+                        <a href="https://win1.krnl.eu/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Windows 1.0 Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop linux loading">
+                    <div class="year">1991</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🐧</div>
+                            <div class="os-title">
+                                <div class="os-name">Linux</div>
+                                <div class="os-version">Kernel 0.01</div>
+                                <div class="os-type">Sistema Unix-like open source</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Código abierto</span>
+                            <span class="feature-tag">Unix-like</span>
+                            <span class="feature-tag">Multitarea real</span>
+                            <span class="feature-tag">Multiusuario</span>
+                            <span class="feature-tag">Gratuito</span>
+                        </div>
+                        <div class="anecdote">
+                            Linus Torvalds, estudiante finlandés de 21 años, creó Linux como hobby personal. Su primer anuncio en Usenet decía: "Estoy haciendo un sistema operativo (gratis) (solo como hobby, no será grande ni profesional como GNU)". Hoy Linux impulsa el 96.3% de los servidores web mundiales.
+                        </div>
+                        <a href="https://bellard.org/jslinux/vm.html?url=alpine-x86.cfg&mem=192" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Linux Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop loading">
+                    <div class="year">1995</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🪟</div>
+                            <div class="os-title">
+                                <div class="os-name">Windows 95</div>
+                                <div class="os-version">Versión 4.0</div>
+                                <div class="os-type">Sistema operativo híbrido</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Botón Inicio</span>
+                            <span class="feature-tag">Barra de tareas</span>
+                            <span class="feature-tag">32-bit</span>
+                            <span class="feature-tag">Plug & Play</span>
+                            <span class="feature-tag">Internet Explorer</span>
+                        </div>
+                        <div class="anecdote">
+                            Su lanzamiento fue un evento mediático histórico. Microsoft gastó $300 millones en marketing, compró el Empire State Building por una noche y usó "Start Me Up" de Rolling Stones como tema oficial. Las colas para comprarlo llegaron a ser de varias horas.
+                        </div>
+                        <a href="https://win95.ajf.me/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Windows 95 Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop linux loading">
+                    <div class="year">2004</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🔶</div>
+                            <div class="os-title">
+                                <div class="os-name">Ubuntu</div>
+                                <div class="os-version">4.10 Warty Warthog</div>
+                                <div class="os-type">Linux user-friendly</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Debian base</span>
+                            <span class="feature-tag">GNOME desktop</span>
+                            <span class="feature-tag">LiveCD</span>
+                            <span class="feature-tag">APT package manager</span>
+                            <span class="feature-tag">Instalación fácil</span>
+                        </div>
+                        <div class="anecdote">
+                            Mark Shuttleworth invirtió $10 millones de su fortuna personal para crear Ubuntu, distribuyendo CDs gratuitos por correo a todo el mundo. "Ubuntu" significa "humanidad hacia otros" en lenguas africanas.
+                        </div>
+                        <a href="https://distrotest.net/Ubuntu" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Ubuntu Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop loading">
+                    <div class="year">2009</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🪟</div>
+                            <div class="os-title">
+                                <div class="os-name">Windows 7</div>
+                                <div class="os-version">NT 6.1</div>
+                                <div class="os-type">Sistema refinado</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Aero Glass</span>
+                            <span class="feature-tag">Taskbar mejorada</span>
+                            <span class="feature-tag">Bibliotecas</span>
+                            <span class="feature-tag">Estabilidad</span>
+                            <span class="feature-tag">Performance</span>
+                        </div>
+                        <div class="anecdote">
+                            Redimió a Microsoft después del fracaso de Vista. Se convirtió en el Windows más querido desde XP y muchos usuarios se resistieron a actualizarse hasta que Microsoft terminó el soporte en 2020.
+                        </div>
+                        <a href="https://win7simu.visnalize.com/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Windows 7 Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop loading">
+                    <div class="year">2015</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🪟</div>
+                            <div class="os-title">
+                                <div class="os-name">Windows 10</div>
+                                <div class="os-version">NT 10.0</div>
+                                <div class="os-type">Windows as a Service</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Cortana</span>
+                            <span class="feature-tag">Edge browser</span>
+                            <span class="feature-tag">Escritorios virtuales</span>
+                            <span class="feature-tag">Windows Subsystem for Linux</span>
+                            <span class="feature-tag">Updates automáticos</span>
+                        </div>
+                        <div class="anecdote">
+                            Microsoft saltó de Windows 8 a 10 (sin Windows 9) por problemas de compatibilidad con código legacy que buscaba "Windows 9*" confundiéndolo con Windows 95/98. Se convirtió en "el último Windows" hasta que llegó Windows 11.
+                        </div>
+                        <a href="https://win10.blueedge.me/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Windows 10 Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item desktop loading">
+                    <div class="year">2021</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🪟</div>
+                            <div class="os-title">
+                                <div class="os-name">Windows 11</div>
+                                <div class="os-version">NT 10.0.22000</div>
+                                <div class="os-type">Sistema moderno y seguro</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Menú centrado</span>
+                            <span class="feature-tag">Snap Layouts</span>
+                            <span class="feature-tag">Microsoft Teams integrado</span>
+                            <span class="feature-tag">TPM 2.0 requerido</span>
+                            <span class="feature-tag">Android apps</span>
+                        </div>
+                        <div class="anecdote">
+                            Después de decir que Windows 10 sería "la última versión de Windows", Microsoft sorprendió con Windows 11, generando controversia por sus altos requisitos de hardware que dejaron fuera millones de PCs.
+                        </div>
+                        <a href="https://win11.blueedge.me/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Windows 11 Online
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SISTEMAS MÓVILES -->
+        <div id="mobile" class="timeline-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <div class="mobile-icon">📱</div>
+                    <span>Sistemas Operativos Móviles</span>
+                </h2>
+                <p class="section-description">
+                    La revolución móvil que cambió cómo interactuamos con la tecnología. 
+                    Desde los primeros PDA hasta los smartphones con IA, la historia de la computación de bolsillo.
+                </p>
+            </div>
+
+            <div class="timeline-grid">
+                <div class="timeline-item mobile loading">
+                    <div class="year">1996</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">📱</div>
+                            <div class="os-title">
+                                <div class="os-name">Palm OS</div>
+                                <div class="os-version">1.0</div>
+                                <div class="os-type">PDA Operating System</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Stylus input</span>
+                            <span class="feature-tag">Graffiti writing</span>
+                            <span class="feature-tag">HotSync</span>
+                            <span class="feature-tag">Calendar</span>
+                            <span class="feature-tag">Contacts</span>
+                        </div>
+                        <div class="anecdote">
+                            El primer sistema operativo móvil exitoso. Palm Pilot revolucionó la computación móvil con su simplicidad. Jeff Hawkins diseñó el interfaz llevando un bloque de madera del tamaño ideal durante semanas para probar la ergonomía.
+                        </div>
+                        <a href="https://palm.arcanadevelopment.com/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Palm OS Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item mobile loading">
+                    <div class="year">2002</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🔷</div>
+                            <div class="os-title">
+                                <div class="os-name">BlackBerry OS</div>
+                                <div class="os-version">1.0</div>
+                                <div class="os-type">Business Mobile OS</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Push email</span>
+                            <span class="feature-tag">QWERTY keyboard</span>
+                            <span class="feature-tag">BBM messaging</span>
+                            <span class="feature-tag">Enterprise security</span>
+                            <span class="feature-tag">Efficient multitasking</span>
+                        </div>
+                        <div class="anecdote">
+                            Dominó el mercado empresarial durante una década. Fue tan adictivo que se le llamó "CrackBerry". Barack Obama tuvo que luchar para mantener su BlackBerry como Presidente, siendo el primer presidente con smartphone.
+                        </div>
+                        <a href="https://simulator.bbmobility.ca/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar BlackBerry OS Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item mobile loading">
+                    <div class="year">2007</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">📱</div>
+                            <div class="os-title">
+                                <div class="os-name">iPhone OS</div>
+                                <div class="os-version">1.0</div>
+                                <div class="os-type">Revolución táctil</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Multi-touch</span>
+                            <span class="feature-tag">Interfaz táctil</span>
+                            <span class="feature-tag">Safari móvil</span>
+                            <span class="feature-tag">Visual Voicemail</span>
+                            <span class="feature-tag">Sin teclado físico</span>
+                        </div>
+                        <div class="anecdote">
+                            Steve Jobs revolucionó los smartphones para siempre. "Hoy Apple reinventa el teléfono" - la presentación del iPhone cambió toda la industria. No tenía App Store, copy/paste ni MMS, pero redefinió qué podía ser un teléfono.
+                        </div>
+                        <a href="https://ios4.tejaskumar.dev/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar iPhone OS Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item mobile loading">
+                    <div class="year">2008</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🤖</div>
+                            <div class="os-title">
+                                <div class="os-name">Android</div>
+                                <div class="os-version">1.0 Apple Pie</div>
+                                <div class="os-type">Open Source Mobile OS</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Open source</span>
+                            <span class="feature-tag">Google services</span>
+                            <span class="feature-tag">Notificaciones</span>
+                            <span class="feature-tag">Widgets</span>
+                            <span class="feature-tag">Multitasking</span>
+                        </div>
+                        <div class="anecdote">
+                            Google compró Android Inc. por $50 millones en 2005. Andy Rubin originalmente quería crear un SO para cámaras digitales, pero pivotó hacia smartphones. Hoy Android tiene más del 70% del mercado global.
+                        </div>
+                        <a href="https://android-10.vercel.app/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Android Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item mobile loading">
+                    <div class="year">2010</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">📱</div>
+                            <div class="os-title">
+                                <div class="os-name">iOS 4</div>
+                                <div class="os-version">iPhone OS rebranded</div>
+                                <div class="os-type">Multitasking móvil</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Multitarea real</span>
+                            <span class="feature-tag">FaceTime</span>
+                            <span class="feature-tag">Retina Display</span>
+                            <span class="feature-tag">iBooks</span>
+                            <span class="feature-tag">Folders</span>
+                        </div>
+                        <div class="anecdote">
+                            Primera versión en llamarse iOS oficialmente. Introdujo la multitarea real y FaceTime, popularizando las videollamadas móviles años antes de Zoom. "Antennagate" del iPhone 4 fue el primer gran escándalo de Apple.
+                        </div>
+                        <a href="https://ios6.netlify.app/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar iOS 6 Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item mobile loading">
+                    <div class="year">2014</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🤖</div>
+                            <div class="os-title">
+                                <div class="os-name">Android 5.0</div>
+                                <div class="os-version">Lollipop</div>
+                                <div class="os-type">Material Design debut</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Material Design</span>
+                            <span class="feature-tag">ART runtime</span>
+                            <span class="feature-tag">Notifications mejoradas</span>
+                            <span class="feature-tag">Multi-user</span>
+                            <span class="feature-tag">64-bit support</span>
+                        </div>
+                        <div class="anecdote">
+                            Google introdujo Material Design, su respuesta al flat design de Apple pero con profundidad y animaciones físicamente correctas. Fue inspirado por papel y tinta, creando una metáfora visual consistente.
+                        </div>
+                        <a href="https://android-lollipop.netlify.app/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Android Lollipop Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item mobile loading">
+                    <div class="year">2019</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">🤖</div>
+                            <div class="os-title">
+                                <div class="os-name">Android 10</div>
+                                <div class="os-version">Sin nombre de postre</div>
+                                <div class="os-type">Gestos y privacidad</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Gesture navigation</span>
+                            <span class="feature-tag">Dark theme</span>
+                            <span class="feature-tag">Privacy controls</span>
+                            <span class="feature-tag">Live captions</span>
+                            <span class="feature-tag">5G ready</span>
+                        </div>
+                        <div class="anecdote">
+                            Google terminó con la tradición de nombres de postres después de 10 años (Cupcake a Pie). Fue por problemas de marca registrada y confusión internacional. Introdujo navegación por gestos similar al iPhone.
+                        </div>
+                        <a href="https://android10-demo.netlify.app/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar Android 10 Online
+                        </a>
+                    </div>
+                </div>
+
+                <div class="timeline-item mobile loading">
+                    <div class="year">2024</div>
+                    <div class="card">
+                        <div class="os-header">
+                            <div class="os-icon">📱</div>
+                            <div class="os-title">
+                                <div class="os-name">iOS 18</div>
+                                <div class="os-version">Apple Intelligence era</div>
+                                <div class="os-type">IA y personalización avanzada</div>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <span class="feature-tag">Apple Intelligence</span>
+                            <span class="feature-tag">Home Screen personalizable</span>
+                            <span class="feature-tag">Control Center flexible</span>
+                            <span class="feature-tag">Apps por defecto</span>
+                            <span class="feature-tag">RCS messaging</span>
+                        </div>
+                        <div class="anecdote">
+                            Después de años de resistencia, Apple finalmente permite personalización avanzada del home screen y cambio de apps por defecto, respondiendo a la presión competitiva de Android. Apple Intelligence marca su entrada seria en IA generativa.
+                        </div>
+                        <a href="https://ios18-simulator.app/" target="_blank" class="simulator-link" rel="noopener noreferrer">
+                            Probar iOS 18 Online
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript completamente funcional y optimizado
+        (function() {
+            'use strict';
+
+            // Variables globales
+            let isInitialized = false;
+            
+            // Función principal de inicialización
+            function initializeApp() {
+                if (isInitialized) return;
+                
+                try {
+                    createFloatingParticles();
+                    setupSectionToggle();
+                    setupCardEffects();
+                    setupScrollAnimations();
+                    setupLinkHandlers();
+                    
+                    isInitialized = true;
+                    console.log('App initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing app:', error);
+                }
+            }
+
+            // Crear partículas flotantes
+            function createFloatingParticles() {
+                const particlesContainer = document.getElementById('particles');
+                if (!particlesContainer) return;
+                
+                const particleCount = Math.min(30, Math.max(10, Math.floor(window.innerWidth / 50)));
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const size = Math.random() * 3 + 2;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 20 + 's';
+                    particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            // Configurar navegación entre secciones
+            function setupSectionToggle() {
+                const toggleButtons = document.querySelectorAll('.toggle-btn');
+                const sections = document.querySelectorAll('.timeline-section');
+                
+                if (!toggleButtons.length || !sections.length) return;
+                
+                toggleButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const targetSection = this.getAttribute('data-section');
+                        if (!targetSection) return;
+                        
+                        // Remover clases activas
+                        toggleButtons.forEach(btn => btn.classList.remove('active'));
+                        sections.forEach(section => section.classList.remove('active'));
+                        
+                        // Añadir clase activa
+                        this.classList.add('active');
+                        const targetElement = document.getElementById(targetSection);
+                        if (targetElement) {
+                            targetElement.classList.add('active');
+                            
+                            // Scroll suave hacia la sección
+                            setTimeout(() => {
+                                const container = document.querySelector('.timeline-container');
+                                if (container) {
+                                    container.scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'start'
+                                    });
+                                }
+                            }, 100);
+                        }
+                    });
+                });
+            }
+
+            // Configurar efectos de hover para las tarjetas
+            function setupCardEffects() {
+                const cards = document.querySelectorAll('.card');
+                
+                cards.forEach(card => {
+                    let hoverTimeout;
+                    
+                    card.addEventListener('mouseenter', function() {
+                        clearTimeout(hoverTimeout);
+                        this.style.transform = 'translateY(-8px) scale(1.02)';
+                        this.style.boxShadow = '0 25px 50px rgba(0,0,0,0.25)';
+                    });
+                    
+                    card.addEventListener('mouseleave', function() {
+                        hoverTimeout = setTimeout(() => {
+                            this.style.transform = 'translateY(0) scale(1)';
+                            this.style.boxShadow = '0 15px 35px rgba(0,0,0,0.15)';
+                        }, 50);
+                    });
+
+                    // Efecto para touch devices
+                    card.addEventListener('touchstart', function() {
+                        this.style.transform = 'translateY(-4px) scale(1.01)';
+                    });
+
+                    card.addEventListener('touchend', function() {
+                        setTimeout(() => {
+                            this.style.transform = 'translateY(0) scale(1)';
+                        }, 150);
+                    });
+                });
+            }
+
+            // Configurar animaciones de scroll
+            function setupScrollAnimations() {
+                if (!('IntersectionObserver' in window)) {
+                    // Fallback para navegadores antiguos
+                    document.querySelectorAll('.loading').forEach(el => {
+                        el.classList.remove('loading');
+                        el.classList.add('loaded');
+                    });
+                    return;
+                }
+
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -20px 0px'
+                };
+
+                const observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.remove('loading');
+                            entry.target.classList.add('loaded');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                // Observar todos los elementos con clase loading
+                document.querySelectorAll('.loading').forEach(el => {
+                    observer.observe(el);
+                });
+            }
+
+            // Configurar manejadores de enlaces
+            function setupLinkHandlers() {
+                document.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('simulator-link')) {
+                        e.preventDefault();
+                        const url = e.target.getAttribute('href');
+                        if (url && url.startsWith('http')) {
+                            try {
+                                window.open(url, '_blank', 'noopener,noreferrer');
+                            } catch (error) {
+                                console.error('Error opening link:', error);
+                                // Fallback
+                                window.location.href = url;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Optimización de rendimiento para scroll
+            let ticking = false;
+            function handleScroll() {
+                if (!ticking) {
+                    requestAnimationFrame(function() {
+                        const scrolled = window.pageYOffset;
+                        const header = document.querySelector('.header');
+                        
+                        if (header && scrolled < window.innerHeight) {
+                            header.style.transform = `translateY(${scrolled * 0.3}px)`;
+                        }
+                        
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }
+
+            // Event listeners
+            document.addEventListener('DOMContentLoaded', initializeApp);
+            
+            // Fallback si DOMContentLoaded ya se disparó
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeApp);
+            } else {
+                initializeApp();
+            }
+
+            // Scroll optimizado
+            window.addEventListener('scroll', handleScroll, { passive: true });
+
+            // Redimensionar ventana
+            window.addEventListener('resize', function() {
+                // Recrear partículas si es necesario
+                const particles = document.getElementById('particles');
+                if (particles && particles.children.length !== Math.min(30, Math.max(10, Math.floor(window.innerWidth / 50)))) {
+                    particles.innerHTML = '';
+                    createFloatingParticles();
+                }
+            }, { passive: true });
+
+        })();
+    </script>
+</body>
+</html>
