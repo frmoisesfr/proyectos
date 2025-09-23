@@ -1,1 +1,1424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolución de la Web: De 1.0 a 4.0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            margin-bottom: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(64, 224, 255, 0.1), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #40E0FF, #FF6B9D, #FFE66D);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(64, 224, 255, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 30px rgba(64, 224, 255, 0.3); }
+            to { text-shadow: 0 0 50px rgba(64, 224, 255, 0.6), 0 0 70px rgba(255, 107, 157, 0.4); }
+        }
+
+        .header p {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin: 40px 0 60px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .legend-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .legend-1 { background: linear-gradient(135deg, #40E0FF, #3FBDF0); }
+        .legend-2 { background: linear-gradient(135deg, #FF6B9D, #FF4081); }
+        .legend-3 { background: linear-gradient(135deg, #FFE66D, #FFC107); }
+        .legend-4 { background: linear-gradient(135deg, #B794F6, #9F7AEA); }
+
+        .legend-color::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 60%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+        }
+
+        .legend-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-container {
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: linear-gradient(to bottom, 
+                #40E0FF 0%, 
+                #40E0FF 25%, 
+                #FF6B9D 25%, 
+                #FF6B9D 50%, 
+                #FFE66D 50%, 
+                #FFE66D 75%, 
+                #B794F6 75%, 
+                #B794F6 100%);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 3px;
+            box-shadow: 0 0 20px rgba(64, 224, 255, 0.5);
+            animation: timeline-glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes timeline-glow {
+            from { box-shadow: 0 0 20px rgba(64, 224, 255, 0.5); }
+            to { box-shadow: 0 0 40px rgba(64, 224, 255, 0.8), 0 0 60px rgba(255, 107, 157, 0.4); }
+        }
+
+        .timeline-item {
+            padding: 30px 50px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            opacity: 0;
+            transform: translateX(-100px) rotateY(-15deg);
+            animation: slideInTimeline 1s ease-out forwards;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.5s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.8s; }
+        .timeline-item:nth-child(4) { animation-delay: 1.1s; }
+        .timeline-item:nth-child(5) { animation-delay: 1.4s; }
+        .timeline-item:nth-child(6) { animation-delay: 1.7s; }
+        .timeline-item:nth-child(7) { animation-delay: 2.0s; }
+        .timeline-item:nth-child(8) { animation-delay: 2.3s; }
+
+        @keyframes slideInTimeline {
+            to {
+                opacity: 1;
+                transform: translateX(0) rotateY(0deg);
+            }
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            right: -25px;
+            background: linear-gradient(135deg, #40E0FF, #FF6B9D);
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            top: 30px;
+            border-radius: 50%;
+            z-index: 3;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(64, 224, 255, 0.6);
+        }
+
+        .timeline-item:hover::after {
+            transform: scale(1.4) rotate(360deg);
+            box-shadow: 0 0 40px rgba(64, 224, 255, 0.9);
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .right {
+            left: 50%;
+            transform: translateX(100px) rotateY(15deg);
+        }
+
+        .left::after {
+            right: -24px;
+        }
+
+        .right::after {
+            left: -24px;
+            background: linear-gradient(135deg, #FF6B9D, #FFE66D);
+        }
+
+        .right:hover::after {
+            box-shadow: 0 0 40px rgba(255, 107, 157, 0.9);
+        }
+
+        .timeline-item:nth-child(5)::after,
+        .timeline-item:nth-child(6)::after {
+            background: linear-gradient(135deg, #FFE66D, #B794F6);
+        }
+
+        .timeline-item:nth-child(7)::after,
+        .timeline-item:nth-child(8)::after {
+            background: linear-gradient(135deg, #B794F6, #40E0FF);
+        }
+
+        .content {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            position: relative;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+        .content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .content:hover::before {
+            left: 100%;
+        }
+
+        .content:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .web-version {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .web-1-0 { 
+            background: linear-gradient(135deg, #40E0FF, #3FBDF0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .web-2-0 { 
+            background: linear-gradient(135deg, #FF6B9D, #FF4081);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .web-3-0 { 
+            background: linear-gradient(135deg, #FFE66D, #FFC107);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .web-4-0 { 
+            background: linear-gradient(135deg, #B794F6, #9F7AEA);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .period {
+            background: linear-gradient(135deg, rgba(64, 224, 255, 0.2), rgba(255, 107, 157, 0.2));
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .key-dates {
+            margin: 20px 0;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border-left: 4px solid #40E0FF;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .key-dates h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-item {
+            margin: 12px 0;
+            padding: 8px 0;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding-left: 10px;
+        }
+
+        .date-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+            color: white;
+        }
+
+        .date-year {
+            font-weight: 700;
+            color: #40E0FF;
+            text-shadow: 0 0 10px rgba(64, 224, 255, 0.5);
+        }
+
+        .characteristics {
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .characteristics h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .char-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .char-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+
+        .char-list li:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+            color: white;
+        }
+
+        .char-list li::before {
+            content: "▶";
+            position: absolute;
+            left: 8px;
+            top: 10px;
+            color: #40E0FF;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .char-list li:hover::before {
+            transform: translateX(3px);
+            text-shadow: 0 0 10px rgba(64, 224, 255, 0.8);
+        }
+
+        /* Tech icons floating animation */
+        .tech-icon {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            opacity: 0.1;
+            animation: techFloat 8s ease-in-out infinite;
+            font-size: 1.5rem;
+        }
+
+        @keyframes techFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.3; }
+        }
+
+        /* Responsive Design - Mobile First Approach */
+        @media screen and (max-width: 1200px) {
+            .container {
+                max-width: 100%;
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 3rem;
+            }
+            
+            .timeline-item {
+                padding: 25px 40px;
+            }
+            
+            .content {
+                padding: 35px;
+            }
+        }
+
+        @media screen and (max-width: 992px) {
+            .header h1 {
+                font-size: 2.8rem;
+            }
+            
+            .header p {
+                font-size: 1.3rem;
+            }
+            
+            .timeline-item {
+                padding: 20px 30px;
+            }
+            
+            .content {
+                padding: 30px;
+            }
+            
+            .web-version {
+                font-size: 2.2rem;
+            }
+            
+            .legend {
+                gap: 20px;
+                padding: 25px;
+            }
+            
+            .legend-item {
+                padding: 12px 20px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .header {
+                padding: 40px 15px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+                line-height: 1.2;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+                line-height: 1.4;
+            }
+            
+            .timeline::after {
+                left: 30px;
+                width: 4px;
+                margin-left: -2px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding: 15px 20px 15px 70px;
+                transform: translateX(0);
+            }
+            
+            .timeline-item.left,
+            .timeline-item.right {
+                left: 0;
+                transform: translateX(0);
+            }
+            
+            .timeline-item::after {
+                left: 17px;
+                width: 25px;
+                height: 25px;
+                top: 20px;
+            }
+            
+            .timeline-item::before {
+                display: none;
+            }
+            
+            .content {
+                padding: 25px 20px;
+                margin-left: 0;
+            }
+            
+            .web-version {
+                font-size: 1.8rem;
+            }
+            
+            .period {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+            
+            .key-dates {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+            
+            .key-dates h4 {
+                font-size: 1.1rem;
+            }
+            
+            .date-item {
+                font-size: 0.95rem;
+                padding: 6px 0;
+            }
+            
+            .characteristics h4 {
+                font-size: 1.1rem;
+            }
+            
+            .char-list li {
+                font-size: 0.95rem;
+                padding: 8px 0;
+                padding-left: 25px;
+            }
+            
+            .legend {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                padding: 20px 15px;
+                margin: 30px 0 40px 0;
+            }
+            
+            .legend-item {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+                padding: 15px 20px;
+            }
+            
+            .legend-text {
+                font-size: 1rem;
+            }
+            
+            .tech-icon {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 30px 10px;
+                margin-bottom: 30px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 15px;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .timeline::after {
+                left: 25px;
+                width: 3px;
+                margin-left: -1.5px;
+            }
+            
+            .timeline-item {
+                padding: 12px 15px 12px 60px;
+            }
+            
+            .timeline-item::after {
+                left: 12px;
+                width: 20px;
+                height: 20px;
+                top: 15px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+                border-radius: 15px;
+            }
+            
+            .web-version {
+                font-size: 1.6rem;
+                margin-bottom: 10px;
+            }
+            
+            .period {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+                margin-bottom: 15px;
+            }
+            
+            .key-dates {
+                padding: 15px 12px;
+                margin: 12px 0;
+            }
+            
+            .key-dates h4 {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .date-item {
+                font-size: 0.85rem;
+                padding: 5px 0;
+                line-height: 1.4;
+            }
+            
+            .date-year {
+                display: block;
+                margin-bottom: 2px;
+            }
+            
+            .characteristics {
+                margin-top: 15px;
+            }
+            
+            .characteristics h4 {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+            
+            .char-list li {
+                font-size: 0.85rem;
+                padding: 6px 0;
+                padding-left: 20px;
+                line-height: 1.4;
+            }
+            
+            .char-list li::before {
+                left: 5px;
+                top: 6px;
+                font-size: 0.7rem;
+            }
+            
+            .legend {
+                margin: 20px 0 30px 0;
+                padding: 15px 10px;
+            }
+            
+            .legend-item {
+                padding: 12px 15px;
+            }
+            
+            .legend-color {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .legend-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media screen and (max-width: 360px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .timeline-item {
+                padding: 10px 12px 10px 50px;
+            }
+            
+            .timeline-item::after {
+                left: 8px;
+                width: 18px;
+                height: 18px;
+            }
+            
+            .content {
+                padding: 15px 12px;
+            }
+            
+            .web-version {
+                font-size: 1.4rem;
+            }
+            
+            .period {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+            }
+            
+            .key-dates,
+            .characteristics {
+                padding: 12px 10px;
+            }
+            
+            .date-item,
+            .char-list li {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media screen and (max-height: 600px) and (orientation: landscape) {
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .timeline-item {
+                padding: 15px 30px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .particles {
+                display: none;
+            }
+        }
+
+        /* High DPI displays */
+        @media screen and (min-resolution: 2dppx) {
+            .timeline::after {
+                box-shadow: 0 0 30px rgba(64, 224, 255, 0.6);
+            }
+            
+            .timeline-item::after {
+                box-shadow: 0 0 25px rgba(64, 224, 255, 0.7);
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .particles,
+            .tech-icon {
+                display: none;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .particles,
+            .tech-icon {
+                display: none;
+            }
+            
+            .timeline-item {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .content {
+                box-shadow: none;
+                border: 1px solid #333;
+            }
+        }
+
+        /* Additional modern effects */
+        .shimmer {
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            background-size: 200% 200%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% -200%; }
+            100% { background-position: 200% 200%; }
+        }
+
+        .timeline-item:nth-child(odd) .content {
+            background: rgba(64, 224, 255, 0.05);
+        }
+
+        .timeline-item:nth-child(even) .content {
+            background: rgba(255, 107, 157, 0.05);
+        }
+
+        .timeline-item:nth-child(5) .content,
+        .timeline-item:nth-child(6) .content {
+            background: rgba(255, 230, 109, 0.05);
+        }
+
+        .timeline-item:nth-child(7) .content,
+        .timeline-item:nth-child(8) .content {
+            background: rgba(183, 148, 246, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="particles"></div>
+
+    <div class="container">
+        <div class="header shimmer">
+            <div class="header-content">
+                <h1>🌐 Evolución de la Web</h1>
+                <p>Del Web 1.0 al Web 4.0: Una revolución digital extraordinaria</p>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color legend-1"></div>
+                <span class="legend-text">Web 1.0 - Era Estática</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-2"></div>
+                <span class="legend-text">Web 2.0 - Era Social</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-3"></div>
+                <span class="legend-text">Web 3.0 - Era Semántica</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-4"></div>
+                <span class="legend-text">Web 4.0 - Era Inteligente</span>
+            </div>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline">
+                <!-- Web 1.0 Early -->
+                <div class="timeline-item left">
+                    <div class="content">
+                        <div class="web-version web-1-0">🔗 Web 1.0</div>
+                        <div class="period">1989-1995: Los Inicios Revolucionarios</div>
+                        <div class="key-dates">
+                            <h4>📅 Fechas Clave Históricas:</h4>
+                            <div class="date-item">
+                                <span class="date-year">1989:</span> Tim Berners-Lee inventa la World Wide Web en el CERN
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">1991:</span> Primer sitio web público se hace accesible
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">1993:</span> Navegador Mosaic democratiza el acceso
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">1995:</span> Internet Explorer y Netscape inician la guerra de navegadores
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🔍 Características Fundamentales:</h4>
+                            <ul class="char-list">
+                                <li>Páginas estáticas de solo lectura (contenido inmutable)</li>
+                                <li>HTML básico con enlaces simples de hipertexto</li>
+                                <li>Comunicación unidireccional (servidor → usuario)</li>
+                                <li>Sitios principalmente académicos y corporativos</li>
+                                <li>Diseño minimalista con texto e imágenes básicas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web 1.0 Mature -->
+                <div class="timeline-item right">
+                    <div class="content">
+                        <div class="web-version web-1-0">💼 Web 1.0</div>
+                        <div class="period">1995-2001: Consolidación Comercial</div>
+                        <div class="key-dates">
+                            <h4>📅 Hitos Comerciales:</h4>
+                            <div class="date-item">
+                                <span class="date-year">1995:</span> Amazon y eBay revolucionan el comercio electrónico
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">1998:</span> Google transforma la búsqueda web con PageRank
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">1999:</span> Napster cambia el intercambio de archivos P2P
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2001:</span> Wikipedia democratiza el conocimiento colaborativo
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🚀 Evolución Tecnológica:</h4>
+                            <ul class="char-list">
+                                <li>E-commerce emerge como fuerza económica dominante</li>
+                                <li>Motores de búsqueda sofisticados mejoran la navegación</li>
+                                <li>Páginas web más complejas con CSS y JavaScript</li>
+                                <li>Primeros sistemas de gestión de contenido (CMS)</li>
+                                <li>Banners publicitarios y monetización digital</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web 2.0 Early -->
+                <div class="timeline-item left">
+                    <div class="content">
+                        <div class="web-version web-2-0">👥 Web 2.0</div>
+                        <div class="period">2001-2005: La Revolución Social</div>
+                        <div class="key-dates">
+                            <h4>📅 Nacimiento de la Era Social:</h4>
+                            <div class="date-item">
+                                <span class="date-year">2003:</span> MySpace pionera en redes sociales masivas
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2003:</span> WordPress democratiza la creación de blogs
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2004:</span> Facebook nace en Harvard y expande globalmente
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2005:</span> YouTube transforma el consumo de video digital
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🌟 Innovaciones Disruptivas:</h4>
+                            <ul class="char-list">
+                                <li>Contenido generado por usuarios (UGC) se masifica</li>
+                                <li>Redes sociales emergen como nuevo paradigma social</li>
+                                <li>Blogs y wikis democratizan la publicación</li>
+                                <li>Interacción bidireccional y colaboración en línea</li>
+                                <li>AJAX permite experiencias web más dinámicas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web 2.0 Peak -->
+                <div class="timeline-item right">
+                    <div class="content">
+                        <div class="web-version web-2-0">📱 Web 2.0</div>
+                        <div class="period">2005-2010: La Era Dorada Social</div>
+                        <div class="key-dates">
+                            <h4>📅 Explosión de Plataformas:</h4>
+                            <div class="date-item">
+                                <span class="date-year">2006:</span> Twitter revoluciona la comunicación en tiempo real
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2007:</span> iPhone redefine la web móvil y las apps
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2008:</span> Google Chrome acelera la evolución web
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2010:</span> Instagram transforma la fotografía social
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🔥 Transformación Digital:</h4>
+                            <ul class="char-list">
+                                <li>Plataformas sociales alcanzan escala masiva global</li>
+                                <li>Web móvil se expande exponencialmente</li>
+                                <li>APIs y mashups permiten integración de servicios</li>
+                                <li>Cloud computing emerge como infraestructura clave</li>
+                                <li>Streaming y multimedia se vuelven omnipresentes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web 3.0 Early -->
+                <div class="timeline-item left">
+                    <div class="content">
+                        <div class="web-version web-3-0">🧠 Web 3.0</div>
+                        <div class="period">2010-2015: Web Semántica e IA</div>
+                        <div class="key-dates">
+                            <h4>📅 Era de la Inteligencia:</h4>
+                            <div class="date-item">
+                                <span class="date-year">2009:</span> Bitcoin introduce blockchain y criptomonedas
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2011:</span> Siri presenta IA conversacional mainstream
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2012:</span> Google Knowledge Graph estructura información
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2015:</span> Ethereum habilita contratos inteligentes
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🤖 Inteligencia Artificial Integrada:</h4>
+                            <ul class="char-list">
+                                <li>Web semántica estructura datos significativamente</li>
+                                <li>IA y machine learning se integran nativamente</li>
+                                <li>Personalización avanzada basada en comportamiento</li>
+                                <li>Tecnologías blockchain emergen como alternativa</li>
+                                <li>Internet de las Cosas (IoT) conecta dispositivos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web 3.0 Mature -->
+                <div class="timeline-item right">
+                    <div class="content">
+                        <div class="web-version web-3-0">⛓️ Web 3.0</div>
+                        <div class="period">2015-2020: Descentralización Total</div>
+                        <div class="key-dates">
+                            <h4>📅 Revolución Descentralizada:</h4>
+                            <div class="date-item">
+                                <span class="date-year">2017:</span> Boom de ICOs y finanzas descentralizadas (DeFi)
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2018:</span> GDPR transforma la privacidad y protección de datos
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2020:</span> NFTs democratizan la propiedad digital
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2021:</span> El metaverso se populariza masivamente
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🌐 Ecosistema Descentralizado:</h4>
+                            <ul class="char-list">
+                                <li>Aplicaciones descentralizadas (DApps) proliferan</li>
+                                <li>Usuarios poseen y controlan sus propios datos</li>
+                                <li>Economía de tokens y criptomonedas se establecen</li>
+                                <li>Web3 y wallets cripto se vuelven mainstream</li>
+                                <li>DAOs (Organizaciones Autónomas Descentralizadas)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web 4.0 Current -->
+                <div class="timeline-item left">
+                    <div class="content">
+                        <div class="web-version web-4-0">🤖 Web 4.0</div>
+                        <div class="period">2020-Presente: Web Simbiótica IA</div>
+                        <div class="key-dates">
+                            <h4>📅 Era de la IA Generativa:</h4>
+                            <div class="date-item">
+                                <span class="date-year">2020:</span> GPT-3 revoluciona la generación de texto por IA
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2022:</span> ChatGPT democratiza la IA conversacional
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2023:</span> IA generativa se masifica (Midjourney, DALL-E)
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2024:</span> Agentes AI autónomos y multimodales
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🚀 Superinteligencia Integrada:</h4>
+                            <ul class="char-list">
+                                <li>IA ultra-inteligente integrada en todo el ecosistema</li>
+                                <li>Interfaces naturales: voz, gestos y pensamiento</li>
+                                <li>Realidad aumentada y virtual inmersivas</li>
+                                <li>Web móvil, ubicua y siempre conectada</li>
+                                <li>Asistentes AI personalizados y especializados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Web 4.0 Future -->
+                <div class="timeline-item right">
+                    <div class="content">
+                        <div class="web-version web-4-0">🌌 Web 4.0</div>
+                        <div class="period">Presente-Futuro: Web Consciente</div>
+                        <div class="key-dates">
+                            <h4>📅 Horizonte Tecnológico:</h4>
+                            <div class="date-item">
+                                <span class="date-year">2024+:</span> Agentes AI autónomos y ecosistemas inteligentes
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">2025+:</span> Web espacial, metaverso y realidades paralelas
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">Futuro:</span> Internet de las Cosas masivo y omnipresente
+                            </div>
+                            <div class="date-item">
+                                <span class="date-year">Futuro:</span> Interfaces cerebro-ordenador y telepresencia
+                            </div>
+                        </div>
+                        <div class="characteristics">
+                            <h4>🧬 Web Simbiótica del Futuro:</h4>
+                            <ul class="char-list">
+                                <li>Web consciente, predictiva y auto-evolutiva</li>
+                                <li>Integración total con Internet de las Cosas (IoT)</li>
+                                <li>Realidades mixtas completamente inmersivas</li>
+                                <li>Conexión directa humano-máquina sin interfaces</li>
+                                <li>Ecosistemas digitales que aprenden y se adaptan</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced responsive particle system
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            const isMobile = window.innerWidth <= 768;
+            const particleCount = isMobile ? 25 : 50;
+
+            // Clear existing particles
+            particlesContainer.innerHTML = '';
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random position
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay and duration
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                
+                // Smaller particles on mobile
+                if (isMobile) {
+                    particle.style.width = '1px';
+                    particle.style.height = '1px';
+                }
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Responsive tech icons
+        function addTechIcons() {
+            const icons = ['💻', '📱', '🌐', '🤖', '⚡', '🔗', '📡', '🛰️', '💎', '🚀'];
+            const container = document.querySelector('.container');
+            const isMobile = window.innerWidth <= 768;
+            
+            // Don't add tech icons on mobile for performance
+            if (isMobile) return;
+
+            // Remove existing tech icons
+            const existingIcons = container.querySelectorAll('.tech-icon');
+            existingIcons.forEach(icon => icon.remove());
+
+            const iconCount = window.innerWidth <= 992 ? 5 : 10;
+
+            icons.slice(0, iconCount).forEach((icon, index) => {
+                const techIcon = document.createElement('div');
+                techIcon.className = 'tech-icon';
+                techIcon.textContent = icon;
+                techIcon.style.left = Math.random() * 90 + '%';
+                techIcon.style.top = Math.random() * 80 + 20 + '%';
+                techIcon.style.animationDelay = index * 0.8 + 's';
+                container.appendChild(techIcon);
+            });
+        }
+
+        // Responsive intersection observer
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: window.innerWidth <= 768 ? 0.05 : 0.1,
+                rootMargin: window.innerWidth <= 768 ? '20px' : '50px'
+            });
+
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        // Enhanced interactive effects with touch support
+        function setupInteractiveEffects() {
+            const isMobile = 'ontouchstart' in window;
+            
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                if (isMobile) {
+                    // Touch events for mobile
+                    item.addEventListener('touchstart', () => {
+                        item.style.zIndex = '10';
+                        item.style.transform = 'scale(1.02)';
+                    });
+                    
+                    item.addEventListener('touchend', () => {
+                        setTimeout(() => {
+                            item.style.zIndex = '1';
+                            item.style.transform = '';
+                        }, 300);
+                    });
+                } else {
+                    // Mouse events for desktop
+                    item.addEventListener('mouseenter', () => {
+                        item.style.zIndex = '10';
+                    });
+                    
+                    item.addEventListener('mouseleave', () => {
+                        item.style.zIndex = '1';
+                    });
+                }
+            });
+
+            // Enhanced legend interactions
+            document.querySelectorAll('.legend-item').forEach(item => {
+                const handleInteraction = () => {
+                    const text = item.querySelector('.legend-text').textContent;
+                    const version = text.split(' ')[1];
+                    
+                    // Highlight corresponding timeline items
+                    document.querySelectorAll('.timeline-item').forEach(timelineItem => {
+                        const webVersion = timelineItem.querySelector('.web-version').textContent;
+                        if (webVersion.includes(version)) {
+                            const scale = window.innerWidth <= 768 ? '1.02' : '1.05';
+                            timelineItem.style.transform = `scale(${scale})`;
+                            timelineItem.style.zIndex = '15';
+                            setTimeout(() => {
+                                timelineItem.style.transform = '';
+                                timelineItem.style.zIndex = '';
+                            }, 2000);
+                        }
+                    });
+                };
+
+                if (isMobile) {
+                    item.addEventListener('touchstart', handleInteraction);
+                } else {
+                    item.addEventListener('click', handleInteraction);
+                }
+            });
+        }
+
+        // Responsive resize handler
+        function handleResize() {
+            // Debounce resize events
+            clearTimeout(window.resizeTimeout);
+            window.resizeTimeout = setTimeout(() => {
+                createParticles();
+                addTechIcons();
+                setupScrollAnimations();
+                
+                // Reset any active transformations
+                document.querySelectorAll('.timeline-item').forEach(item => {
+                    item.style.transform = '';
+                    item.style.zIndex = '';
+                });
+            }, 250);
+        }
+
+        // Performance optimization for mobile
+        function optimizeForMobile() {
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Reduce animation complexity on mobile
+                document.documentElement.style.setProperty('--animation-duration', '0.6s');
+                
+                // Disable some heavy effects
+                const header = document.querySelector('.header');
+                if (header && header.style) {
+                    header.style.animation = 'none';
+                }
+            } else {
+                document.documentElement.style.setProperty('--animation-duration', '1s');
+            }
+        }
+
+        // Initialize with proper error handling
+        function initializeTimeline() {
+            try {
+                optimizeForMobile();
+                createParticles();
+                addTechIcons();
+                setupScrollAnimations();
+                setupInteractiveEffects();
+                
+                // Add resize listener
+                window.addEventListener('resize', handleResize);
+                
+                // Add orientation change listener for mobile
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(handleResize, 100);
+                });
+                
+            } catch (error) {
+                console.warn('Timeline initialization error:', error);
+                // Fallback: at least show the content without animations
+                document.querySelectorAll('.timeline-item').forEach(item => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'none';
+                });
+            }
+        }
+
+        // Initialize all animations and effects
+        document.addEventListener('DOMContentLoaded', initializeTimeline);
+
+        // Handle page visibility changes for performance
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause animations when tab is not visible
+                document.querySelectorAll('.particle, .tech-icon').forEach(el => {
+                    el.style.animationPlayState = 'paused';
+                });
+            } else {
+                // Resume animations when tab becomes visible
+                document.querySelectorAll('.particle, .tech-icon').forEach(el => {
+                    el.style.animationPlayState = 'running';
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
