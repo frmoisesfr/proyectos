@@ -305,6 +305,37 @@
             overflow: hidden;
         }
 
+        /* Estilos para las imágenes */
+        .content-image {
+            width: 90%;
+            object-fit: cover;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .content-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        @media screen and (max-width: 768px) {
+            .content-image {
+                max-width: 150px;
+                height: 120px;
+            }
+        }
+
         .content::before {
             content: '';
             position: absolute;
@@ -941,6 +972,10 @@
                     <div class="content">
                         <div class="web-version web-1-0">🔗 Web 1.0</div>
                         <div class="period">1989-1995: Los Inicios Revolucionarios</div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop&crop=center" 
+                                 alt="Computadora vintage con navegador web primitivo" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Fechas Clave Históricas:</h4>
                             <div class="date-item">
@@ -974,6 +1009,10 @@
                     <div class="content">
                         <div class="web-version web-1-0">💼 Web 1.0</div>
                         <div class="period">1995-2001: Consolidación Comercial</div>
+                        <div class="image-container">
+                            <img src="./img/web1.png" 
+                                 alt="E-commerce y sitios web comerciales" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Hitos Comerciales:</h4>
                             <div class="date-item">
@@ -1007,6 +1046,10 @@
                     <div class="content">
                         <div class="web-version web-2-0">👥 Web 2.0</div>
                         <div class="period">2001-2005: La Revolución Social</div>
+                        <div class="image-container">
+                            <img src="./img/web2.png" 
+                                 alt="Redes sociales y plataformas de contenido social" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Nacimiento de la Era Social:</h4>
                             <div class="date-item">
@@ -1040,6 +1083,10 @@
                     <div class="content">
                         <div class="web-version web-2-0">📱 Web 2.0</div>
                         <div class="period">2005-2010: La Era Dorada Social</div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1611262588024-d12430b98920?w=300&h=200&fit=crop&crop=center" 
+                                 alt="Dispositivos móviles con aplicaciones sociales" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Explosión de Plataformas:</h4>
                             <div class="date-item">
@@ -1073,6 +1120,10 @@
                     <div class="content">
                         <div class="web-version web-3-0">🧠 Web 3.0</div>
                         <div class="period">2010-2015: Web Semántica e IA</div>
+                        <div class="image-container">
+                            <img src="./img/web3.jpg" 
+                                 alt="Blockchain y tecnologías descentralizadas" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Era de la Inteligencia:</h4>
                             <div class="date-item">
@@ -1106,6 +1157,10 @@
                     <div class="content">
                         <div class="web-version web-3-0">⛓️ Web 3.0</div>
                         <div class="period">2015-2020: Descentralización Total</div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=300&h=200&fit=crop&crop=center" 
+                                 alt="Criptomonedas y finanzas descentralizadas" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Revolución Descentralizada:</h4>
                             <div class="date-item">
@@ -1139,6 +1194,10 @@
                     <div class="content">
                         <div class="web-version web-4-0">🤖 Web 4.0</div>
                         <div class="period">2020-Presente: Web Simbiótica IA</div>
+                        <div class="image-container">
+                            <img src="./img/web4.jpg" 
+                                 alt="Inteligencia artificial generativa y ChatGPT" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Era de la IA Generativa:</h4>
                             <div class="date-item">
@@ -1172,6 +1231,10 @@
                     <div class="content">
                         <div class="web-version web-4-0">🌌 Web 4.0</div>
                         <div class="period">Presente-Futuro: Web Consciente</div>
+                        <div class="image-container">
+                            <img src="https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=300&h=200&fit=crop&crop=center" 
+                                 alt="Realidad virtual y metaverso inmersivo" class="content-image">
+                        </div>
                         <div class="key-dates">
                             <h4>📅 Horizonte Tecnológico:</h4>
                             <div class="date-item">
