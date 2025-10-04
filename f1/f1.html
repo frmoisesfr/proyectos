@@ -66,6 +66,49 @@
             touch-action: manipulation;
         }
    
+        /* Estilos para los sliders de volumen */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #dc2626;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #dc2626;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        }
+
+        input[type="range"]:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        input[type="range"]:disabled::-webkit-slider-thumb {
+            background: #6b7280;
+            box-shadow: none;
+        }
+
+        input[type="range"]:disabled::-moz-range-thumb {
+            background: #6b7280;
+            box-shadow: none;
+        }
+
         .racing-bg {
             position: relative;
             z-index: 1;
@@ -757,6 +800,19 @@
         </div>
     </div>
 
+    <div id="audioSettingsModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-500">
+                    CONFIGURACIÓN DE AUDIO
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-600 text-3xl font-bold">&times;</button>
+            </div>
+            <div id="audioSettingsContent"></div>
+        </div>
+    </div>
+
+
     <script>
         let gameData = {
             state: 'main-menu',
@@ -815,7 +871,11 @@
             seasonsHistory: [], // Nuevo
             pressEvents: [], 
             teamOffers: [] ,
-            raceEvents: []  
+            raceEvents: [] ,
+            raceMode: 'auto',  // 'auto' o 'interactive'
+            racePaused: false,
+            currentLapView: 0,
+            pendingDecision: null
         };
 
         // Sistema de noticias
@@ -1037,6 +1097,211 @@
             'Valtteri Bottas': 85, 'Zhou Guanyu': 79, 'Kevin Magnussen': 80, 'Nico Hulkenberg': 83
         };
 
+        // Perfiles de IA para cada piloto
+        const driverProfiles = {
+            'Max Verstappen': { 
+                style: 'aggressive', 
+                consistency: 0.95, 
+                rainBonus: 10, 
+                qualifyingBonus: 8,
+                circuitPreferences: { traditional: 5, oval: 8, street: 6, mountain: 7 }
+            },
+            'Sergio Pérez': { 
+                style: 'conservative', 
+                consistency: 0.85, 
+                rainBonus: 5, 
+                qualifyingBonus: 3,
+                circuitPreferences: { traditional: 6, oval: 6, street: 8, mountain: 5 }
+            },
+            'Charles Leclerc': { 
+                style: 'aggressive', 
+                consistency: 0.88, 
+                rainBonus: 6, 
+                qualifyingBonus: 9,
+                circuitPreferences: { traditional: 7, oval: 5, street: 9, mountain: 6 }
+            },
+            'Carlos Sainz': { 
+                style: 'strategist', 
+                consistency: 0.92, 
+                rainBonus: 7, 
+                qualifyingBonus: 5,
+                circuitPreferences: { traditional: 7, oval: 6, street: 6, mountain: 7 }
+            },
+            'Lewis Hamilton': { 
+                style: 'strategist', 
+                consistency: 0.96, 
+                rainBonus: 12, 
+                qualifyingBonus: 10,
+                circuitPreferences: { traditional: 9, oval: 7, street: 8, mountain: 7 }
+            },
+            'George Russell': { 
+                style: 'aggressive', 
+                consistency: 0.87, 
+                rainBonus: 6, 
+                qualifyingBonus: 7,
+                circuitPreferences: { traditional: 7, oval: 6, street: 7, mountain: 6 }
+            },
+            'Lando Norris': { 
+                style: 'aggressive', 
+                consistency: 0.86, 
+                rainBonus: 5, 
+                qualifyingBonus: 6,
+                circuitPreferences: { traditional: 7, oval: 7, street: 7, mountain: 6 }
+            },
+            'Oscar Piastri': { 
+                style: 'conservative', 
+                consistency: 0.84, 
+                rainBonus: 4, 
+                qualifyingBonus: 5,
+                circuitPreferences: { traditional: 6, oval: 6, street: 6, mountain: 6 }
+            },
+            'Fernando Alonso': { 
+                style: 'strategist', 
+                consistency: 0.94, 
+                rainBonus: 11, 
+                qualifyingBonus: 7,
+                circuitPreferences: { traditional: 8, oval: 7, street: 10, mountain: 8 }
+            },
+            'Lance Stroll': { 
+                style: 'conservative', 
+                consistency: 0.80, 
+                rainBonus: 3, 
+                qualifyingBonus: 2,
+                circuitPreferences: { traditional: 5, oval: 5, street: 6, mountain: 5 }
+            },
+            'Pierre Gasly': { 
+                style: 'aggressive', 
+                consistency: 0.83, 
+                rainBonus: 6, 
+                qualifyingBonus: 6,
+                circuitPreferences: { traditional: 6, oval: 6, street: 7, mountain: 6 }
+            },
+            'Esteban Ocon': { 
+                style: 'conservative', 
+                consistency: 0.82, 
+                rainBonus: 5, 
+                qualifyingBonus: 4,
+                circuitPreferences: { traditional: 6, oval: 5, street: 6, mountain: 6 }
+            },
+            'Alex Albon': { 
+                style: 'strategist', 
+                consistency: 0.85, 
+                rainBonus: 5, 
+                qualifyingBonus: 4,
+                circuitPreferences: { traditional: 6, oval: 6, street: 7, mountain: 5 }
+            },
+            'Logan Sargeant': { 
+                style: 'conservative', 
+                consistency: 0.75, 
+                rainBonus: 2, 
+                qualifyingBonus: 1,
+                circuitPreferences: { traditional: 5, oval: 5, street: 5, mountain: 4 }
+            },
+            'Yuki Tsunoda': { 
+                style: 'aggressive', 
+                consistency: 0.78, 
+                rainBonus: 4, 
+                qualifyingBonus: 5,
+                circuitPreferences: { traditional: 6, oval: 6, street: 6, mountain: 5 }
+            },
+            'Nyck de Vries': { 
+                style: 'conservative', 
+                consistency: 0.79, 
+                rainBonus: 3, 
+                qualifyingBonus: 3,
+                circuitPreferences: { traditional: 5, oval: 5, street: 6, mountain: 5 }
+            },
+            'Valtteri Bottas': { 
+                style: 'strategist', 
+                consistency: 0.90, 
+                rainBonus: 7, 
+                qualifyingBonus: 6,
+                circuitPreferences: { traditional: 7, oval: 6, street: 6, mountain: 6 }
+            },
+            'Zhou Guanyu': { 
+                style: 'conservative', 
+                consistency: 0.77, 
+                rainBonus: 3, 
+                qualifyingBonus: 3,
+                circuitPreferences: { traditional: 5, oval: 5, street: 6, mountain: 5 }
+            },
+            'Kevin Magnussen': { 
+                style: 'aggressive', 
+                consistency: 0.81, 
+                rainBonus: 5, 
+                qualifyingBonus: 4,
+                circuitPreferences: { traditional: 6, oval: 6, street: 6, mountain: 5 }
+            },
+            'Nico Hulkenberg': { 
+                style: 'strategist', 
+                consistency: 0.88, 
+                rainBonus: 7, 
+                qualifyingBonus: 5,
+                circuitPreferences: { traditional: 7, oval: 6, street: 6, mountain: 6 }
+            }
+        };
+
+        // Forma actual del piloto (varía entre carreras)
+        let driverForm = {};
+
+        function initializeDriverForm() {
+            Object.keys(driverSkills).forEach(driver => {
+                driverForm[driver] = 1.0; // Forma base
+            });
+        }
+
+        function updateDriverForm() {
+            Object.keys(driverSkills).forEach(driver => {
+                const profile = driverProfiles[driver] || { consistency: 0.85 };
+                // Variación aleatoria basada en consistencia
+                const variation = (Math.random() - 0.5) * (1 - profile.consistency) * 0.3;
+                driverForm[driver] = Math.max(0.8, Math.min(1.2, 1.0 + variation));
+            });
+        }
+
+        function calculateAIPerformance(driver, race, weather) {
+            const baseSkill = driverSkills[driver] || 75;
+            const profile = driverProfiles[driver] || { 
+                style: 'conservative', 
+                consistency: 0.85,
+                rainBonus: 5,
+                qualifyingBonus: 5,
+                circuitPreferences: { traditional: 5, oval: 5, street: 5, mountain: 5 }
+            };
+            
+            let performance = baseSkill;
+            
+            // Forma actual
+            performance *= driverForm[driver] || 1.0;
+            
+            // Bonus por circuito preferido
+            const circuitType = circuitTypes[race.type];
+            const circuitBonus = profile.circuitPreferences[race.type] || 5;
+            performance += circuitBonus;
+            
+            // Bonus por clima
+            if (weather === 'rainy') {
+                performance += profile.rainBonus;
+            }
+            
+            // Estilo de pilotaje
+            if (profile.style === 'aggressive') {
+                // Más rápido pero menos consistente
+                performance += Math.random() * 10 - 3;
+            } else if (profile.style === 'conservative') {
+                // Más consistente pero menos picos
+                performance += Math.random() * 4;
+            } else if (profile.style === 'strategist') {
+                // Equilibrado con bonus en carreras largas
+                performance += Math.random() * 6 + 2;
+            }
+            
+            // Dificultad
+            performance *= difficultyLevels[gameData.difficulty].aiSkillMultiplier;
+            
+            return performance;
+        }
+
         const pressQuestions = [
             {
                 question: "¿Cómo evalúas tu rendimiento en la última carrera?",
@@ -1132,6 +1397,16 @@
             }
         };
 
+        function goToMainMenu() {
+            if (confirm('¿Volver al menú principal? Tu progreso se guardará automáticamente.')) {
+                saveGame();
+                stopMusic();
+                gameData.state = 'main-menu';
+                closeModal();
+                render();
+            }
+        }
+
         // ============ SISTEMA DE AUDIO ============
         let audioContext = null;
         let currentMusic = null;
@@ -1197,6 +1472,21 @@
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.5);
         }
+
+        function updateMusicVolume(value) {
+            audioSettings.musicVolume = value / 100;
+            if (audioElement) {
+                audioElement.volume = audioSettings.musicVolume;
+            }
+            localStorage.setItem('audioSettings', JSON.stringify(audioSettings));
+        }
+
+        function updateSFXVolume(value) {
+            audioSettings.sfxVolume = value / 100;
+            localStorage.setItem('audioSettings', JSON.stringify(audioSettings));
+            // Reproducir sonido de prueba
+            playSound('click');
+        }        
 
         // Sistema de partículas
         function createParticlesContainer() {
@@ -1614,6 +1904,90 @@
             document.getElementById('themeSelectorModal').classList.add('show');
         }
 
+        function showAudioSettings() {
+            const musicVol = Math.round(audioSettings.musicVolume * 100);
+            const sfxVol = Math.round(audioSettings.sfxVolume * 100);
+            
+            document.getElementById('audioSettingsContent').innerHTML = `
+                <div class="space-y-6">
+                    <p class="text-gray-400 text-sm">Personaliza la experiencia de audio del simulador</p>
+                    
+                    <!-- Control de Música -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-bold text-yellow-400">Música de Fondo</h3>
+                            <button 
+                                onclick="toggleMusic(); showAudioSettings();" 
+                                class="px-4 py-2 rounded font-semibold ${audioSettings.musicEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'}"
+                            >
+                                ${audioSettings.musicEnabled ? 'Activada' : 'Desactivada'}
+                            </button>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm text-gray-400">Volumen</label>
+                                <span id="music-volume-display" class="text-sm text-yellow-400 font-bold">${musicVol}%</span>
+                            </div>
+                            <input 
+                                type="range" 
+                                min="0" 
+                                max="100" 
+                                value="${musicVol}"
+                                onchange="updateMusicVolume(this.value); document.getElementById('music-volume-display').textContent = this.value + '%';"
+                                oninput="document.getElementById('music-volume-display').textContent = this.value + '%';"
+                                ${!audioSettings.musicEnabled ? 'disabled' : ''}
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                style="accent-color: #dc2626;"
+                            />
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            ${audioSettings.musicEnabled ? 'La música de fondo está sonando' : 'Activa la música para cambiar el volumen'}
+                        </p>
+                    </div>
+
+                    <!-- Control de Efectos de Sonido -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-bold text-blue-400">Efectos de Sonido</h3>
+                            <button 
+                                onclick="toggleSFX(); showAudioSettings();" 
+                                class="px-4 py-2 rounded font-semibold ${audioSettings.sfxEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'}"
+                            >
+                                ${audioSettings.sfxEnabled ? 'Activados' : 'Desactivados'}
+                            </button>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm text-gray-400">Volumen</label>
+                                <span id="sfx-volume-display" class="text-sm text-blue-400 font-bold">${sfxVol}%</span>
+                            </div>
+                            <input 
+                                type="range" 
+                                min="0" 
+                                max="100" 
+                                value="${sfxVol}"
+                                onchange="updateSFXVolume(this.value); document.getElementById('sfx-volume-display').textContent = this.value + '%';"
+                                oninput="document.getElementById('sfx-volume-display').textContent = this.value + '%';"
+                                ${!audioSettings.sfxEnabled ? 'disabled' : ''}
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                style="accent-color: #dc2626;"
+                            />
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            ${audioSettings.sfxEnabled ? 'Los efectos suenan en clicks, victorias y eventos' : 'Activa los efectos para cambiar el volumen'}
+                        </p>
+                    </div>
+
+                    <div class="text-center text-xs text-gray-500">
+                        Los cambios se guardan automáticamente
+                    </div>
+                </div>
+            `;
+            document.getElementById('audioSettingsModal').classList.add('show');
+        }        
+
         // ============ SISTEMA DE DAÑOS PROGRESIVOS ============
         const damageTypes = {
             'front-wing': {
@@ -1659,16 +2033,17 @@
         };
 
         function generateDamage() {
-            const damageChance = 0.12; // 12% de probabilidad por carrera
+            const damageChance = 0.15 * difficultyLevels[gameData.difficulty].eventProbabilityMultiplier;
             
             if (Math.random() < damageChance) {
-                const damageType = Object.keys(damageTypes)[Math.floor(Math.random() * 4)];
-                const severity = Math.floor(Math.random() * 30) + 20; // 20-50 puntos de daño
+                const damageTypes = ['front-wing', 'rear-wing', 'engine', 'suspension'];
+                const damageType = damageTypes[Math.floor(Math.random() * damageTypes.length)];
+                const severity = Math.floor(Math.random() * 40) + 15; // 15-55 puntos de daño
                 
                 return {
                     type: damageType,
                     severity: severity,
-                    lap: Math.floor(Math.random() * 20) + 10 // Entre vuelta 10-30
+                    lap: Math.floor(Math.random() * 25) + 5 // Entre vuelta 5-30
                 };
             }
             
@@ -1816,6 +2191,57 @@
             gameData.currentDamage = damageEvent;
         }
 
+        // ============ SISTEMA DE ALERTAS METEOROLÓGICAS ============
+        function checkWeatherWarnings(currentLap, totalLaps) {
+            if (!gameData.weatherWarnings) gameData.weatherWarnings = [];
+            
+            const race = calendar[gameData.currentRace];
+            const midRaceStart = Math.floor(totalLaps * 0.3);
+            const midRaceEnd = Math.floor(totalLaps * 0.7);
+            
+            // Probabilidad de cambio meteorológico
+            if (currentLap >= midRaceStart && currentLap <= midRaceEnd && gameData.weatherWarnings.length === 0) {
+                if (Math.random() < race.rainChance * 1.5) {
+                    const possibleWeathers = Object.keys(weatherConditions).filter(w => w !== gameData.currentWeather);
+                    const newWeather = possibleWeathers[Math.floor(Math.random() * possibleWeathers.length)];
+                    const warningLap = currentLap + Math.floor(Math.random() * 5) + 3; // Entre 3-7 vueltas
+                    
+                    gameData.weatherWarnings.push({
+                        warningLap: currentLap,
+                        changeLap: warningLap,
+                        from: gameData.currentWeather,
+                        to: newWeather,
+                        acknowledged: false
+                    });
+                    
+                    return {
+                        warning: true,
+                        message: `⚠️ Alerta meteorológica: ${weatherConditions[newWeather].name} esperado en ${warningLap - currentLap} vueltas`,
+                        newWeather: newWeather,
+                        lapsUntilChange: warningLap - currentLap
+                    };
+                }
+            }
+            
+            return null;
+        }
+
+        function applyWeatherChange(lap) {
+            if (!gameData.weatherWarnings || gameData.weatherWarnings.length === 0) return null;
+            
+            const warning = gameData.weatherWarnings.find(w => w.changeLap === lap);
+            if (warning) {
+                gameData.currentWeather = warning.to;
+                return {
+                    changed: true,
+                    message: `🌦️ Cambio climático: Ahora ${weatherConditions[warning.to].name} ${weatherConditions[warning.to].icon}`,
+                    weather: warning.to
+                };
+            }
+            
+            return null;
+        }
+
         function simulateWeatherChange(currentWeather, lap, totalLaps) {
             // Probabilidad de cambio aumenta en carreras largas
             const changeProbability = 0.15;
@@ -1838,20 +2264,118 @@
             return null;
         }        
 
+        // ============ VALIDACIÓN DE DATOS ============
+        function validateGameData(data) {
+            const defaultData = {
+                state: 'main-menu',
+                player: {
+                    name: '',
+                    age: 20,
+                    nationality: '',
+                    experience: 0,
+                    championships: 0,
+                    reputation: 50,
+                    points: 0,
+                    skills: {
+                        speed: 50,
+                        control: 50,
+                        strategy: 50,
+                        overtaking: 50,
+                        streetSpecialist: 50,
+                        ovalSpecialist: 50,
+                        mountainSpecialist: 50,
+                        rainMastery: 50
+                    }
+                },
+                selectedTeam: null,
+                currentRace: 0,
+                racePhase: 'practice',
+                trainingDone: false,
+                qualifyingPos: null,
+                raceResults: [],
+                raceClassification: [],
+                raceTimes: [],
+                isProcessing: false,
+                selectedTireCompound: 'medium',
+                pitStops: 0,
+                tireWear: 0,
+                currentWeather: 'sunny',
+                driverStandings: {},
+                devBudget: 500,
+                carUpgrades: { power: 0, aerodynamics: 0, reliability: 0, chassis: 0 },
+                pitStopPlanned: false,
+                pitStopLap: 0,
+                pitStopNewTire: 'medium',
+                currentLap: 0,
+                totalLaps: 0,
+                achievements: {},
+                newAchievements: [],
+                difficulty: 'normal',
+                activeTab: 'info',
+                currentDamage: null,
+                damageRepaired: false,
+                seasonsHistory: [],
+                pressEvents: [],
+                teamOffers: [],
+                raceEvents: [],
+                weatherWarnings: [] // NUEVO
+            };
+
+            // Crear copia profunda
+            const validated = JSON.parse(JSON.stringify(defaultData));
+            
+            // Copiar datos existentes
+            Object.keys(data).forEach(key => {
+                if (data[key] !== undefined && data[key] !== null) {
+                    if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
+                        validated[key] = { ...defaultData[key], ...data[key] };
+                    } else {
+                        validated[key] = data[key];
+                    }
+                }
+            });
+            
+            // Validar rangos
+            validated.player.experience = Math.max(0, validated.player.experience);
+            validated.player.reputation = Math.max(0, Math.min(100, validated.player.reputation));
+            validated.player.points = Math.max(0, validated.player.points);
+            validated.currentRace = Math.max(0, Math.min(calendar.length, validated.currentRace));
+            validated.devBudget = Math.max(0, validated.devBudget);
+            
+            // Validar habilidades
+            Object.keys(validated.player.skills).forEach(skill => {
+                validated.player.skills[skill] = Math.max(0, Math.min(100, validated.player.skills[skill]));
+            });
+            
+            // Validar mejoras del coche
+            Object.keys(validated.carUpgrades).forEach(upgrade => {
+                validated.carUpgrades[upgrade] = Math.max(0, Math.min(10, validated.carUpgrades[upgrade]));
+            });
+            
+            // Validar dificultad
+            if (!difficultyLevels[validated.difficulty]) {
+                validated.difficulty = 'normal';
+            }
+            
+            return validated;
+        }
+
         // ============ SISTEMA DE GUARDADO ============
         function saveGame() {
             try {
+                const validatedData = validateGameData(gameData);
                 const saveData = {
-                    gameData: gameData,
+                    gameData: validatedData,
                     teammateComparison: teammateComparison,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    version: '1.1.0'
                 };
                 localStorage.setItem('f1SimulatorSave', JSON.stringify(saveData));
-                showNotification('Partida guardada correctamente', 'success');
+                showNotification('Partida guardada correctamente', 'success', false); // <-- false = sin sonido
                 return true;
             } catch (error) {
                 console.error('Error al guardar:', error);
-                showNotification('Error al guardar la partida', 'error');
+                showNotification('Error al guardar la partida', 'error', false); // <-- false = sin sonido
                 return false;
             }
         }
@@ -1859,59 +2383,26 @@
         function loadGame() {
             try {
                 const saved = localStorage.getItem('f1SimulatorSave');
-                if (!saved) {
-                    return false;
-                }
+                if (!saved) return false;
                 
                 const saveData = JSON.parse(saved);
                 
-                // Cargar gameData
+                // Validar y cargar gameData
                 if (saveData.gameData) {
-                    gameData = saveData.gameData;
-                } else {
-                    // Fallback para guardados antiguos sin estructura
-                    Object.keys(gameData).forEach(key => {
-                        if (saveData[key] !== undefined) {
-                            gameData[key] = saveData[key];
-                        }
-                    });
+                    gameData = validateGameData(saveData.gameData);
                 }
                 
                 // Cargar teammateComparison
                 if (saveData.teammateComparison) {
                     teammateComparison = saveData.teammateComparison;
-                } else {
-                    teammateComparison = {
-                        qualifyingBattles: { player: 0, teammate: 0 },
-                        raceBattles: { player: 0, teammate: 0 },
-                        pointsGap: 0
-                    };
                 }
-                
-                // Validar propiedades críticas
-                if (!gameData.pressEvents) gameData.pressEvents = [];
-                if (!gameData.teamOffers) gameData.teamOffers = [];
-                if (!gameData.driverStandings) gameData.driverStandings = {};
-                if (!gameData.raceEvents) gameData.raceEvents = [];
-                if (!gameData.activeTab) gameData.activeTab = 'info';
-                if (!gameData.achievements) gameData.achievements = {};
-                if (!gameData.newAchievements) gameData.newAchievements = [];
-                if (!gameData.difficulty || !difficultyLevels[gameData.difficulty]) {
-                    gameData.difficulty = 'normal';
-                }
-                if (!gameData.seasonsHistory) gameData.seasonsHistory = [];
-                if (!gameData.currentDamage) gameData.currentDamage = null;
-                if (!gameData.carUpgrades) {
-                    gameData.carUpgrades = { power: 0, aerodynamics: 0, reliability: 0, chassis: 0 };
-                }
-                if (!gameData.devBudget) gameData.devBudget = 500;
                 
                 showNotification('Partida cargada correctamente', 'success');
                 return true;
                 
             } catch (error) {
                 console.error('Error al cargar:', error);
-                showNotification('Error al cargar la partida', 'error');
+                showNotification('Archivo guardado corrupto - iniciando partida nueva', 'error');
                 return false;
             }
         }
@@ -1929,7 +2420,7 @@
             return localStorage.getItem('f1SimulatorSave') !== null;
         }
 
-        function showNotification(message, type = 'info') {
+        function showNotification(message, type = 'info', playAudio = true) {
             const colors = {
                 success: 'bg-green-600',
                 error: 'bg-red-600',
@@ -1937,17 +2428,21 @@
             };
             
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in`;
+            notification.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in`;
+            notification.style.maxWidth = '90%';
             notification.textContent = message;
             document.body.appendChild(notification);
-            playSound('notification');
+            
+            if (playAudio) {
+                playSound('notification');
+            }
             
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transition = 'opacity 0.3s';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
-        }
+        }        
 
         // ============ FINAL DE TEMPORADA ============
         function checkSeasonEnd() {
@@ -2037,7 +2532,6 @@
             gameData.currentWeather = generateWeather();
             // Mostrar ofertas de equipos
             gameData.state = 'team-offers';
-            saveGame();
             render();
         }
 
@@ -2064,7 +2558,6 @@
             if (gameData.soundEnabled) {
                 playSound('click');
             }
-            saveGame();
             render();
         }
 
@@ -2081,7 +2574,6 @@
 
         function updateReputation(change) {
             gameData.player.reputation = Math.max(0, Math.min(100, gameData.player.reputation + change));
-            saveGame();
         }
 
         function getReputationLevel() {
@@ -2267,12 +2759,7 @@
             const finalTime = baseTime + skillModifier + teamModifier + weatherModifier + tireModifier + randomModifier;
             
             return Math.max(75000, finalTime); // Mínimo 1:15
-        }
-
-        function updateReputation(change) {
-            gameData.player.reputation = Math.max(0, Math.min(100, gameData.player.reputation + change));
-            saveGame();
-        }       
+        }      
 
     function renderCircuitMap(type) {
         const circuits = {
@@ -2494,11 +2981,11 @@
             teams[teamId].drivers[1] = gameData.player.name;
             gameData.state = 'main-game';
             gameData.currentWeather = generateWeather();
-            gameData.devBudget = 500; // Presupuesto inicial
+            gameData.devBudget = 500;
             gameData.carUpgrades = { power: 0, aerodynamics: 0, reliability: 0, chassis: 0 };
             initializeDriverStandings();
+            initializeDriverForm(); // NUEVO
             gameData.driverStandings[gameData.player.name] = { points: 0, team: teamId, wins: 0, podiums: 0 };
-            saveGame();
             render();
             setTimeout(() => {
                 createSmokeEffect();
@@ -2536,7 +3023,6 @@
             gameData.devBudget -= cost;
             playSound('success');
             showNotification(`${upgrade.name} mejorado a nivel ${gameData.carUpgrades[component]}`, 'success');
-            saveGame();
             render();
         }
 
@@ -2647,7 +3133,6 @@
             
             gameData.racePhase = 'qualifying';
             gameData.isProcessing = true;
-            saveGame();
             render();
             
             setTimeout(() => {
@@ -2699,7 +3184,6 @@
                     }                    
 
                     gameData.isProcessing = false;
-                    saveGame();
                     render();
                 } catch (error) {
                     console.error('Error detallado en clasificación:', error);
@@ -2733,7 +3217,6 @@
                     // Generar noticia de entrenamiento
                     generateTrainingNews();
                     playSound('success'); 
-                    saveGame();
                     render(); // Renderizar completo
                 } catch (error) {
                     console.error('Error en entrenamiento:', error);
@@ -2750,8 +3233,6 @@
                 event.preventDefault();
             }
             gameData.selectedTireCompound = compound;
-            playSound('click');
-            saveGame();
             render();
         }
 
@@ -2762,8 +3243,10 @@
             gameData.isProcessing = true;
             gameData.tireWear = 0;
             gameData.pitStops = 0;
+            gameData.currentLapView = 0;
+            gameData.racePaused = false;
+            gameData.pendingDecision = null;
             
-            // Asegurar que tenemos un compuesto de neumáticos válido
             if (!gameData.selectedTireCompound || !tireCompounds[gameData.selectedTireCompound]) {
                 gameData.selectedTireCompound = 'medium';
             }
@@ -2772,7 +3255,11 @@
             
             setTimeout(() => {
                 try {
-                    simulateRace();
+                    if (gameData.raceMode === 'interactive') {
+                        simulateRaceInteractive();
+                    } else {
+                        simulateRace();
+                    }
                 } catch (error) {
                     console.error('Error iniciando carrera:', error);
                     gameData.isProcessing = false;
@@ -2782,30 +3269,528 @@
             }, 2000);
         }
 
+        function simulateRaceInteractive() {
+            // Preparación igual que simulateRace()
+            const classification = [];
+            const race = calendar[gameData.currentRace];
+            const circuitType = circuitTypes[race.type];
+            let weather = weatherConditions[gameData.currentWeather];
+            const totalLaps = race.laps;
+            
+            gameData.totalLaps = totalLaps;
+            gameData.raceEvents = [];
+            gameData.weatherWarnings = [];
+            gameData.currentLap = 0;
+            
+            // Preparar pilotos (igual que en simulateRace)
+            updateDriverForm();
+            
+            Object.entries(teams).forEach(([teamId, team]) => {
+                team.drivers.forEach(driver => {
+                    const isPlayer = driver === gameData.player.name;
+                    let basePerf;
+                    
+                    if (isPlayer) {
+                        basePerf = Object.values(gameData.player.skills).reduce((sum, skill) => sum + skill, 0) / Object.keys(gameData.player.skills).length;
+                        if (gameData.trainingDone) basePerf += 12;
+                        if (gameData.qualifyingPos) basePerf += Math.max(-10, (21 - gameData.qualifyingPos) * 1.5);
+                        if (circuitType.skillBonus && gameData.player.skills[circuitType.skillBonus]) {
+                            basePerf += (gameData.player.skills[circuitType.skillBonus] - 50) * 0.5;
+                        }
+                        if (weather.skillBonus && gameData.player.skills[weather.skillBonus]) {
+                            basePerf += (gameData.player.skills[weather.skillBonus] - 50) * 0.6;
+                        }
+                    } else {
+                        basePerf = calculateAIPerformance(driver, race, gameData.currentWeather);
+                    }
+                    
+                    const teamBonus = teams[teamId].power * 0.2;
+                    const difficultyPenalty = race.difficulty * 3;
+                    const weatherPenalty = Math.abs(weather.modifier);
+                    
+                    let finalScore = basePerf + teamBonus - difficultyPenalty - weatherPenalty;
+                    
+                    classification.push({
+                        name: driver,
+                        team: teamId,
+                        score: finalScore,
+                        baseScore: finalScore,
+                        isPlayer,
+                        bestLap: 999999,
+                        totalTime: 0,
+                        pitStops: 0,
+                        tire: isPlayer ? gameData.selectedTireCompound : ['soft', 'medium', 'hard'][Math.floor(Math.random() * 3)],
+                        lapsCompleted: 0,
+                        incidents: []
+                    });
+                });
+            });
+            
+            gameData.raceClassification = classification;
+            continueRaceLoop();
+        }
+
+        function continueRaceLoop() {
+            const race = calendar[gameData.currentRace];
+            const totalLaps = race.laps;
+            const classification = gameData.raceClassification;
+            let weather = weatherConditions[gameData.currentWeather];
+            
+            // Simular en bloques de 5 vueltas para más control
+            const lapsToSimulate = Math.min(5, totalLaps - gameData.currentLap);
+            
+            for (let i = 0; i < lapsToSimulate; i++) {
+                gameData.currentLap++;
+                const lap = gameData.currentLap;
+                
+                // ============ EVENTOS CADA 5-10 VUELTAS ============
+                
+                // Daño detectado
+                if (gameData.currentDamage && lap === gameData.currentDamage.lap && !gameData.damageRepaired) {
+                    const playerDriver = classification.find(d => d.isPlayer);
+                    const damageInfo = damageTypes[gameData.currentDamage.type];
+                    
+                    gameData.raceEvents.push({
+                        lap: lap,
+                        icon: damageInfo.icon,
+                        text: `¡Daño en ${damageInfo.name}! Severidad: ${gameData.currentDamage.severity}%`,
+                        type: 'damage'
+                    });
+                    
+                    // Aplicar penalización
+                    const modifiedStats = calculateDamageEffect(gameData.currentDamage, {
+                        power: teams[playerDriver.team].power,
+                        aerodynamics: teams[playerDriver.team].aerodynamics,
+                        chassis: 50
+                    });
+                    
+                    playerDriver.score -= (gameData.currentDamage.severity / 100) * 20;
+                    
+                    // PAUSAR para decisión
+                    const decision = createRaceDecision('damage-repair', {
+                        lap: lap,
+                        damageType: gameData.currentDamage.type,
+                        severity: gameData.currentDamage.severity,
+                        repairTime: damageInfo.repairTime
+                    });
+                    
+                    showRaceDecision(decision);
+                    return; // Detener hasta que se tome la decisión
+                }
+                
+                // Safety Car (cada 10 vueltas, 10% probabilidad)
+                if (lap % 10 === 0 && lap < totalLaps - 5 && Math.random() < 0.10) {
+                    gameData.raceEvents.push({
+                        lap: lap,
+                        icon: '🚨',
+                        text: 'Safety Car desplegado - Oportunidad de pit stop',
+                        type: 'safety-car'
+                    });
+                    
+                    // Comprimir el pelotón
+                    classification.forEach((driver, idx) => {
+                        driver.score += (20 - idx) * 0.3;
+                    });
+                    
+                    // PAUSAR para decisión
+                    const playerDriver = classification.find(d => d.isPlayer);
+                    const currentPos = classification.findIndex(d => d.isPlayer) + 1;
+                    const recommendedTire = playerDriver.tire === 'soft' ? 'medium' : 
+                                        playerDriver.tire === 'medium' ? 'hard' : 'medium';
+                    
+                    const decision = createRaceDecision('safety-car-pitstop', {
+                        lap: lap,
+                        currentTire: playerDriver.tire,
+                        recommendedTire: recommendedTire,
+                        position: currentPos
+                    });
+                    
+                    showRaceDecision(decision);
+                    return; // Detener hasta que se tome la decisión
+                }
+                
+                // Accidente/Colisión (5% probabilidad cada 10 vueltas)
+                if (lap % 10 === 5 && Math.random() < 0.05) {
+                    const affectedDrivers = classification.slice(5, 12);
+                    if (affectedDrivers.length > 0) {
+                        const victim = affectedDrivers[Math.floor(Math.random() * affectedDrivers.length)];
+                        victim.score -= 15;
+                        
+                        gameData.raceEvents.push({
+                            lap: lap,
+                            icon: '💥',
+                            text: `Incidente en pista - ${victim.name} afectado`,
+                            type: 'collision'
+                        });
+                    }
+                }
+                
+                // Advertencia meteorológica
+                if (lap === 15 || lap === 25) {
+                    const weatherWarning = checkWeatherWarnings(lap, totalLaps);
+                    if (weatherWarning) {
+                        gameData.raceEvents.push({
+                            lap: lap,
+                            icon: '⚠️',
+                            text: weatherWarning.message,
+                            type: 'weather-warning'
+                        });
+                    }
+                }
+                
+                // Cambio de clima
+                const weatherChange = applyWeatherChange(lap);
+                if (weatherChange) {
+                    weather = weatherConditions[gameData.currentWeather];
+                    gameData.raceEvents.push({
+                        lap: lap,
+                        icon: weather.icon,
+                        text: weatherChange.message,
+                        type: 'weather-change'
+                    });
+                    
+                    // Verificar si el jugador necesita cambiar neumáticos
+                    const playerDriver = classification.find(d => d.isPlayer);
+                    const tire = tireCompounds[playerDriver.tire];
+                    
+                    if (weather.name === 'Lluvia' && !tire.wetWeather) {
+                        // PAUSAR para decisión
+                        const decision = createRaceDecision('weather-change-tires', {
+                            lap: lap,
+                            currentTire: playerDriver.tire,
+                            recommendedTire: 'intermediate',
+                            weather: weather.name
+                        });
+                        
+                        showRaceDecision(decision);
+                        return; // Detener hasta que se tome la decisión
+                    }
+                }
+                
+                // Simular vuelta para todos los pilotos
+                classification.forEach(driver => {
+                    const tire = tireCompounds[driver.tire];
+                    const lapTime = generateLapTime(driver.baseScore, teams[driver.team].power, weather, tire, driver.lapsCompleted);
+                    driver.totalTime += lapTime;
+                    driver.lapsCompleted++;
+                    
+                    if (lapTime < driver.bestLap) {
+                        driver.bestLap = lapTime;
+                    }
+                });
+                
+                // Vuelta rápida (12% probabilidad)
+                if (Math.random() < 0.12) {
+                    const topDrivers = classification.slice(0, 5);
+                    const luckyDriver = topDrivers[Math.floor(Math.random() * topDrivers.length)];
+                    luckyDriver.score += 5;
+                    
+                    gameData.raceEvents.push({
+                        lap: lap,
+                        icon: '⭐',
+                        text: `${luckyDriver.name} establece vuelta rápida`,
+                        type: 'fast-lap'
+                    });
+                }
+                
+                // Pit stops programados
+                if (gameData.pitStopPlanned && lap === gameData.pitStopLap) {
+                    const playerDriver = classification.find(d => d.isPlayer);
+                    if (playerDriver) {
+                        playerDriver.tire = gameData.pitStopNewTire;
+                        playerDriver.pitStops++;
+                        playerDriver.totalTime += 25000;
+                        gameData.raceEvents.push({
+                            lap: lap,
+                            icon: '🔧',
+                            text: `Tu pit stop completado - ${tireCompounds[gameData.pitStopNewTire].name}`,
+                            type: 'pit-stop'
+                        });
+                    }
+                }
+                
+                // Pit stops de IA (aleatorio)
+                classification.forEach(driver => {
+                    if (!driver.isPlayer && driver.pitStops === 0 && lap >= 20 && lap <= 40 && Math.random() < 0.03) {
+                        driver.pitStops++;
+                        driver.totalTime += 25000;
+                        const newTire = ['soft', 'medium', 'hard'][Math.floor(Math.random() * 3)];
+                        driver.tire = newTire;
+                        
+                        gameData.raceEvents.push({
+                            lap: lap,
+                            icon: '🔧',
+                            text: `${driver.name} pit stop`,
+                            type: 'ai-pit-stop'
+                        });
+                    }
+                });
+            }
+            
+            // Actualizar clasificación por tiempo
+            classification.sort((a, b) => a.totalTime - b.totalTime);
+            gameData.currentLapView = gameData.currentLap;
+            
+            // ¿Continuar o finalizar?
+            if (gameData.currentLap < totalLaps) {
+                render(); // Actualizar UI
+                // Continuar después de 1.5 segundos
+                setTimeout(() => {
+                    if (!gameData.racePaused) {
+                        continueRaceLoop();
+                    }
+                }, 1500);
+            } else {
+                finishRace();
+            }
+        }        
+
+        function continueRace() {
+            gameData.racePaused = false;
+            gameData.pendingDecision = null;
+            render(); // Actualizar UI
+            // Continuar el bucle después de un breve delay
+            setTimeout(() => continueRaceLoop(), 500);
+        }
+
+        function finishRace() {
+            const classification = gameData.raceClassification;
+            const race = calendar[gameData.currentRace];
+            
+            classification.sort((a, b) => a.totalTime - b.totalTime);
+            classification.forEach((driver, index) => {
+                driver.position = index + 1;
+                driver.gap = index === 0 ? 0 : driver.totalTime - classification[0].totalTime;
+            });
+            
+            const raceTimes = classification.map(d => ({...d}));
+            const playerResult = classification.find(driver => driver.isPlayer);
+            const position = playerResult?.position || 20;
+            
+            if (position <= 3) {
+                setTimeout(() => createConfettiEffect(), 100);
+            }
+            
+            const points = getPointsForPosition(position);
+            const skillPoints = getSkillPointsForPosition(position) * difficultyLevels[gameData.difficulty].experienceMultiplier;
+            
+            // Actualizar clasificación general
+            classification.forEach(driver => {
+                const driverPoints = getPointsForPosition(driver.position);
+                if (!gameData.driverStandings[driver.name]) {
+                    gameData.driverStandings[driver.name] = {
+                        points: 0,
+                        team: driver.team,
+                        wins: 0,
+                        podiums: 0
+                    };
+                }
+                
+                gameData.driverStandings[driver.name].points += driverPoints;
+                if (driver.position === 1) gameData.driverStandings[driver.name].wins++;
+                if (driver.position <= 3) gameData.driverStandings[driver.name].podiums++;
+            });
+            
+            // Reputación
+            if (position === 1) {
+                updateReputation(15);
+                generatePressEvent();
+            } else if (position <= 3) {
+                updateReputation(10);
+                generatePressEvent();
+            } else if (position <= 6) {
+                updateReputation(5);
+            } else if (position <= 10) {
+                updateReputation(2);
+            } else {
+                updateReputation(-2);
+            }
+            
+            if (Math.random() < 0.3 && gameData.player.reputation > 60) {
+                generateTeamOffers();
+            }
+            
+            gameData.raceTimes = raceTimes;
+            
+            const budgetEarned = earnDevBudget(position);
+            gameData.devBudget += budgetEarned;
+            
+            const raceResult = {
+                race: race.name,
+                position,
+                points,
+                budgetEarned: budgetEarned,
+                qualifyingPos: gameData.qualifyingPos,
+                weather: gameData.currentWeather,
+                tireCompound: gameData.selectedTireCompound,
+                pitStops: playerResult.pitStops,
+                circuitType: race.type,
+                bestLap: playerResult.bestLap,
+                totalTime: playerResult.totalTime,
+                gap: playerResult.gap
+            };
+            
+            // Comparación compañero
+            const teammate = teams[gameData.selectedTeam].drivers.find(d => d !== gameData.player.name);
+            const teammateResult = classification.find(d => d.name === teammate);
+            
+            if (teammateResult) {
+                raceResult.teammatePosition = teammateResult.position;
+                
+                if (gameData.qualifyingPos < teammateResult.position) {
+                    teammateComparison.qualifyingBattles.player++;
+                } else {
+                    teammateComparison.qualifyingBattles.teammate++;
+                }
+                
+                if (position < teammateResult.position) {
+                    teammateComparison.raceBattles.player++;
+                } else {
+                    teammateComparison.raceBattles.teammate++;
+                }
+                
+                teammateComparison.pointsGap = gameData.player.points - (gameData.driverStandings[teammate]?.points || 0);
+            }
+            
+            gameData.raceResults.push(raceResult);
+            gameData.player.experience += skillPoints;
+            gameData.player.points = gameData.raceResults.reduce((sum, r) => sum + r.points, 0);
+            gameData.racePhase = 'results';
+            gameData.isProcessing = false;
+            
+            generateRaceNews(position, race);
+            
+            if (gameData.currentRace === calendar.length - 1) {
+                const totalPoints = gameData.raceResults.reduce((sum, r) => sum + r.points, 0);
+                if (totalPoints >= 100) {
+                    gameData.player.championships++;
+                    updateReputation(25);
+                }
+            }
+            
+            checkAchievements();
+            render();
+        }
+
+        // Sistema de decisiones interactivas
+        function createRaceDecision(type, data) {
+            return {
+                type: type,
+                data: data,
+                timestamp: Date.now()
+            };
+        }
+
+        function showRaceDecision(decision) {
+            gameData.racePaused = true;
+            gameData.pendingDecision = decision;
+            render();
+        }
+
+        function makeDecision(choice) {
+            const decision = gameData.pendingDecision;
+            
+            if (decision.type === 'safety-car-pitstop') {
+                if (choice === 'pit') {
+                    const playerDriver = gameData.raceClassification.find(d => d.isPlayer);
+                    if (playerDriver) {
+                        playerDriver.tire = decision.data.recommendedTire;
+                        playerDriver.pitStops++;
+                        playerDriver.totalTime += 15000; // Menos tiempo por safety car
+                        gameData.raceEvents.push({
+                            lap: gameData.currentLap,
+                            icon: '✅',
+                            text: 'Decisión: Pit stop estratégico durante Safety Car',
+                            type: 'player-decision'
+                        });
+                    }
+                } else {
+                    gameData.raceEvents.push({
+                        lap: gameData.currentLap,
+                        icon: '⚠️',
+                        text: 'Decisión: Te quedas en pista arriesgando con los neumáticos',
+                        type: 'player-decision'
+                    });
+                }
+            } else if (decision.type === 'weather-change-tires') {
+                if (choice === 'change') {
+                    const playerDriver = gameData.raceClassification.find(d => d.isPlayer);
+                    if (playerDriver) {
+                        playerDriver.tire = decision.data.recommendedTire;
+                        playerDriver.pitStops++;
+                        playerDriver.totalTime += 25000;
+                        gameData.raceEvents.push({
+                            lap: gameData.currentLap,
+                            icon: '✅',
+                            text: 'Decisión: Cambio preventivo de neumáticos por clima',
+                            type: 'player-decision'
+                        });
+                    }
+                } else {
+                    const playerDriver = gameData.raceClassification.find(d => d.isPlayer);
+                    playerDriver.score -= 10; // Penalización por neumáticos incorrectos
+                    gameData.raceEvents.push({
+                        lap: gameData.currentLap,
+                        icon: '⚠️',
+                        text: 'Decisión: Arriesgando con neumáticos actuales (-10 rendimiento)',
+                        type: 'player-decision'
+                    });
+                }
+            } else if (decision.type === 'damage-repair') {
+                const playerDriver = gameData.raceClassification.find(d => d.isPlayer);
+                if (choice === 'repair') {
+                    const damageInfo = damageTypes[gameData.currentDamage.type];
+                    playerDriver.pitStops++;
+                    playerDriver.totalTime += damageInfo.repairTime * 1000;
+                    gameData.currentDamage = null;
+                    gameData.damageRepaired = true;
+                    gameData.raceEvents.push({
+                        lap: gameData.currentLap,
+                        icon: '✅',
+                        text: `Decisión: Daño reparado (+${damageInfo.repairTime}s)`,
+                        type: 'player-decision'
+                    });
+                } else {
+                    gameData.raceEvents.push({
+                        lap: gameData.currentLap,
+                        icon: '⚠️',
+                        text: 'Decisión: Continuando con daño - Rendimiento muy reducido',
+                        type: 'player-decision'
+                    });
+                    // El daño sigue afectando
+                }
+            }
+            
+            playSound('click');
+            continueRace();
+        }
+
+        function toggleRaceMode() {
+            gameData.raceMode = gameData.raceMode === 'auto' ? 'interactive' : 'auto';
+            render();
+        }
+
         function simulateRace() {
             try {
                 const classification = [];
                 const raceTimes = [];
                 const race = calendar[gameData.currentRace];
                 const circuitType = circuitTypes[race.type];
-                const weather = weatherConditions[gameData.currentWeather];
-
-                // Validar que tenemos los datos necesarios
+                let weather = weatherConditions[gameData.currentWeather];
+                
                 if (!race || !circuitType || !weather) {
                     throw new Error('Datos de carrera incompletos');
                 }
+                
+                const totalLaps = race.laps;
+                gameData.totalLaps = totalLaps;
+                gameData.raceEvents = []; // Reiniciar eventos
+                gameData.weatherWarnings = []; // Reiniciar advertencias
 
-                // Calcular pitstops basado en vueltas y durabilidad real
-                const totalLaps = getLapsForCircuit(race.type);
-                const tireDurability = tireCompounds[gameData.selectedTireCompound].durability;
+                // Actualizar forma de pilotos antes de la carrera
+                updateDriverForm();
 
-                // Calcular cuántos sets de neumáticos se necesitan
-                const requiredSets = Math.ceil(totalLaps / tireDurability);
-                gameData.pitStops = Math.max(0, requiredSets - 1);
-
-                // Simular desgaste proporcional
-                gameData.tireWear = Math.min(100, (totalLaps / tireDurability) * 100);
-
+                // Preparar pilotos
                 Object.entries(teams).forEach(([teamId, team]) => {
                     team.drivers.forEach(driver => {
                         const isPlayer = driver === gameData.player.name;
@@ -2813,72 +3798,155 @@
                         
                         if (isPlayer) {
                             basePerf = Object.values(gameData.player.skills).reduce((sum, skill) => sum + skill, 0) / Object.keys(gameData.player.skills).length;
-                            
                             if (gameData.trainingDone) basePerf += 12;
                             if (gameData.qualifyingPos) basePerf += Math.max(-10, (21 - gameData.qualifyingPos) * 1.5);
-                            
                             if (circuitType.skillBonus && gameData.player.skills[circuitType.skillBonus]) {
                                 basePerf += (gameData.player.skills[circuitType.skillBonus] - 50) * 0.5;
                             }
-                            
                             if (weather.skillBonus && gameData.player.skills[weather.skillBonus]) {
                                 basePerf += (gameData.player.skills[weather.skillBonus] - 50) * 0.6;
                             }
-                            
-                            basePerf += tireCompounds[gameData.selectedTireCompound].speed;
-                            basePerf -= gameData.pitStops * 5;
-                            
                         } else {
-                            basePerf = driverSkills[driver] || 75;
-                            basePerf += (Math.random() - 0.5) * 10;
+                            // NUEVA IA PERSONALIZADA
+                            basePerf = calculateAIPerformance(driver, race, gameData.currentWeather);
                         }
                         
                         const teamBonus = team.power * 0.2;
                         const difficultyPenalty = race.difficulty * 3;
                         const weatherPenalty = Math.abs(weather.modifier);
-                        const randomFactor = (Math.random() - 0.5) * 15;
                         
-                        const finalScore = basePerf + teamBonus - difficultyPenalty - weatherPenalty + randomFactor;
+                        let finalScore = basePerf + teamBonus - difficultyPenalty - weatherPenalty;
                         
-                        // Generar tiempo de vuelta
-                        const lapTime = generateLapTime(basePerf, team.power, weather, tireCompounds[gameData.selectedTireCompound], 0);
-                        
-                        const driverData = {
+                        classification.push({
                             name: driver,
                             team: teamId,
                             score: finalScore,
+                            baseScore: finalScore,
                             isPlayer,
-                            bestLap: lapTime,
-                            pitStops: isPlayer ? gameData.pitStops : Math.floor(Math.random() * 3),
-                            tire: isPlayer ? tireCompounds[gameData.selectedTireCompound].name : ['Blando', 'Medio', 'Duro'][Math.floor(Math.random() * 3)]
-                        };
-                        
-                        classification.push(driverData);
-                        raceTimes.push(driverData);
+                            bestLap: 999999,
+                            totalTime: 0,
+                            pitStops: 0,
+                            tire: isPlayer ? gameData.selectedTireCompound : ['soft', 'medium', 'hard'][Math.floor(Math.random() * 3)],
+                            lapsCompleted: 0,
+                            incidents: []
+                        });
                     });
-                });
-
-                classification.sort((a, b) => b.score - a.score);
+                });                
+                
+                // SIMULACIÓN VUELTA A VUELTA
+                for (let lap = 1; lap <= totalLaps; lap++) {
+                    gameData.currentLap = lap;
+                    
+                    // Verificar advertencias meteorológicas
+                    if (lap % 5 === 0) {
+                        const weatherWarning = checkWeatherWarnings(lap, totalLaps);
+                        if (weatherWarning) {
+                            gameData.raceEvents.push({
+                                lap: lap,
+                                icon: '⚠️',
+                                text: weatherWarning.message,
+                                type: 'weather-warning'
+                            });
+                        }
+                    }
+                    
+                    // Aplicar cambio climático si corresponde
+                    const weatherChange = applyWeatherChange(lap);
+                    if (weatherChange) {
+                        weather = weatherConditions[gameData.currentWeather];
+                        gameData.raceEvents.push({
+                            lap: lap,
+                            icon: weather.icon,
+                            text: weatherChange.message,
+                            type: 'weather-change'
+                        });
+                        
+                        // Penalizar a pilotos con neumáticos incorrectos
+                        classification.forEach(driver => {
+                            const tire = tireCompounds[driver.tire];
+                            if (weather.name === 'Lluvia' && !tire.wetWeather) {
+                                driver.score -= 15;
+                                if (driver.isPlayer) {
+                                    gameData.raceEvents.push({
+                                        lap: lap,
+                                        icon: '⚠️',
+                                        text: '¡Neumáticos incorrectos para lluvia! Perdiendo rendimiento',
+                                        type: 'player-warning'
+                                    });
+                                }
+                            }
+                        }); 
+                    }
+                    
+                    // EVENTOS ALEATORIOS cada 10 vueltas
+                    if (lap % 10 === 0 && lap < totalLaps - 5) {
+                        const eventRoll = Math.random() * difficultyLevels[gameData.difficulty].eventProbabilityMultiplier;
+                        
+                        Object.entries(raceEvents).forEach(([eventId, event]) => {
+                            if (eventRoll < event.probability) {
+                                const result = event.effect(classification, gameData.player.name, gameData);
+                                if (result) {
+                                    gameData.raceEvents.push({
+                                        lap: lap,
+                                        icon: event.icon,
+                                        text: result,
+                                        type: eventId
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Calcular tiempos de vuelta
+                    classification.forEach(driver => {
+                        const tire = tireCompounds[driver.tire];
+                        const lapTime = generateLapTime(driver.baseScore, teams[driver.team].power, weather, tire, driver.lapsCompleted);
+                        driver.totalTime += lapTime;
+                        driver.lapsCompleted++;
+                        
+                        if (lapTime < driver.bestLap) {
+                            driver.bestLap = lapTime;
+                        }
+                    });
+                    
+                    // Pit stops programados
+                    if (gameData.pitStopPlanned && lap === gameData.pitStopLap) {
+                        const playerDriver = classification.find(d => d.isPlayer);
+                        if (playerDriver) {
+                            playerDriver.tire = gameData.pitStopNewTire;
+                            playerDriver.pitStops++;
+                            playerDriver.totalTime += 25000; // 25 segundos
+                            gameData.raceEvents.push({
+                                lap: lap,
+                                icon: '🔧',
+                                text: `Pit stop completado - ${tireCompounds[gameData.pitStopNewTire].name}`,
+                                type: 'pit-stop'
+                            });
+                        }
+                    }
+                }
+                
+                // Ordenar por tiempo total
+                classification.sort((a, b) => a.totalTime - b.totalTime);
                 classification.forEach((driver, index) => {
                     driver.position = index + 1;
+                    driver.gap = index === 0 ? 0 : driver.totalTime - classification[0].totalTime;
                 });
-
-                raceTimes.sort((a, b) => b.score - a.score);
-                raceTimes.forEach((driver, index) => {
-                    driver.position = index + 1;
-                });
-
+                
+                // Copiar para tiempos
+                raceTimes.push(...classification.map(d => ({...d})));
+                
                 const playerResult = classification.find(driver => driver.isPlayer);
                 const position = playerResult?.position || 20;
-                if (position <= 3) {
-                    setTimeout(() => {
-                        createConfettiEffect();
-                    }, 100);
-                }                   
-                const points = getPointsForPosition(position);
-                const skillPoints = getSkillPointsForPosition(position);
                 
-                // Actualizar puntos en la clasificación de pilotos
+                if (position <= 3) {
+                    setTimeout(() => createConfettiEffect(), 100);
+                }
+                
+                const points = getPointsForPosition(position);
+                const skillPoints = getSkillPointsForPosition(position) * difficultyLevels[gameData.difficulty].experienceMultiplier;
+                
+                // Actualizar clasificación general
                 classification.forEach(driver => {
                     const driverPoints = getPointsForPosition(driver.position);
                     if (!gameData.driverStandings[driver.name]) {
@@ -2892,15 +3960,11 @@
                     
                     gameData.driverStandings[driver.name].points += driverPoints;
                     
-                    if (driver.position === 1) {
-                        gameData.driverStandings[driver.name].wins++;
-                    }
-                    if (driver.position <= 3) {
-                        gameData.driverStandings[driver.name].podiums++;
-                    }
+                    if (driver.position === 1) gameData.driverStandings[driver.name].wins++;
+                    if (driver.position <= 3) gameData.driverStandings[driver.name].podiums++;
                 });
-
-                // Sistema de reputación basado en rendimiento
+                
+                // Reputación
                 if (position === 1) {
                     updateReputation(15);
                     generatePressEvent();
@@ -2915,18 +3979,17 @@
                     updateReputation(-2);
                 }
                 
-                // Generar ofertas de equipos ocasionalmente
                 if (Math.random() < 0.3 && gameData.player.reputation > 60) {
                     generateTeamOffers();
                 }
                 
-                
                 gameData.raceClassification = classification;
                 gameData.raceTimes = raceTimes;
-
+                
                 const budgetEarned = earnDevBudget(position);
                 gameData.devBudget += budgetEarned;
-
+                
+                // Resultado de carrera
                 const raceResult = {
                     race: race.name,
                     position,
@@ -2935,46 +3998,43 @@
                     qualifyingPos: gameData.qualifyingPos,
                     weather: gameData.currentWeather,
                     tireCompound: gameData.selectedTireCompound,
-                    pitStops: gameData.pitStops,
-                    circuitType: race.type
+                    pitStops: playerResult.pitStops,
+                    circuitType: race.type,
+                    bestLap: playerResult.bestLap,
+                    totalTime: playerResult.totalTime,
+                    gap: playerResult.gap
                 };
                 
-                // Calcular información del compañero
+                // Comparación compañero
                 const teammate = teams[gameData.selectedTeam].drivers.find(d => d !== gameData.player.name);
                 const teammateResult = classification.find(d => d.name === teammate);
-
+                
                 if (teammateResult) {
                     raceResult.teammatePosition = teammateResult.position;
                     
-                    // Actualizar batallas de clasificación
                     if (gameData.qualifyingPos < teammateResult.position) {
                         teammateComparison.qualifyingBattles.player++;
                     } else {
                         teammateComparison.qualifyingBattles.teammate++;
                     }
                     
-                    // Actualizar batallas de carrera
                     if (position < teammateResult.position) {
                         teammateComparison.raceBattles.player++;
                     } else {
                         teammateComparison.raceBattles.teammate++;
                     }
                     
-                    // Actualizar diferencia de puntos
                     teammateComparison.pointsGap = gameData.player.points - (gameData.driverStandings[teammate]?.points || 0);
                 }
-
-                // AHORA SÍ hacer el push
+                
                 gameData.raceResults.push(raceResult);
-
                 gameData.player.experience += skillPoints;
                 gameData.player.points = gameData.raceResults.reduce((sum, r) => sum + r.points, 0);
                 gameData.racePhase = 'results';
                 gameData.isProcessing = false;
-
-                // Generar noticias
+                
                 generateRaceNews(position, race);
-
+                
                 if (gameData.currentRace === calendar.length - 1) {
                     const totalPoints = gameData.raceResults.reduce((sum, r) => sum + r.points, 0);
                     if (totalPoints >= 100) {
@@ -2983,9 +4043,8 @@
                     }
                 }
                 
-                saveGame();
                 checkAchievements();
-                render(); 
+                render();
                 
             } catch (error) {
                 console.error('Error en simulación de carrera:', error);
@@ -3017,10 +4076,10 @@
             gameData.pitStopNewTire = 'medium';
             gameData.pitStops = 0;
             gameData.raceEvents = [];
-            gameData.currentDamage = null; // Nuevo
-            gameData.damageRepaired = false; // Nuevo
-            gameData.repairPenalty = 0; // Nuevo
-            gameData.activeTab = 'info'; // Resetear a Info en nueva carrera            
+            gameData.currentDamage = generateDamage(); // NUEVO
+            gameData.damageRepaired = false; 
+            gameData.repairPenalty = 0; 
+            gameData.activeTab = 'info'; 
             
             saveGame(); // Auto-guardar
             render();
@@ -3078,14 +4137,16 @@
         function showRaceTimes() {
             if (gameData.raceTimes.length === 0) return;
             
+            const fastestLap = Math.min(...gameData.raceTimes.map(d => d.bestLap));
+            
             const timesHTML = gameData.raceTimes.map((driver, index) => `
-                <tr class="${driver.isPlayer ? 'bg-blue-900/50' : index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'}">
-                    <td class="px-4 py-2 font-bold ${
+                <tr class="${driver.isPlayer ? 'bg-blue-900/50 border-l-4 border-blue-400' : index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'}">
+                    <td class="px-4 py-3 font-bold ${
                         index === 0 ? 'text-yellow-400' :
                         index === 1 ? 'text-gray-300' :
                         index === 2 ? 'text-orange-400' : 'text-white'
                     }">P${driver.position}</td>
-                    <td class="px-4 py-2">
+                    <td class="px-4 py-3">
                         <div class="flex items-center">
                             <div 
                                 class="w-3 h-3 rounded-full mr-2"
@@ -3096,23 +4157,66 @@
                             </span>
                         </div>
                     </td>
-                    <td class="px-4 py-2 text-gray-300">${teams[driver.team]?.name}</td>
+                    <td class="px-4 py-3 text-gray-300 text-xs">${teams[driver.team]?.name}</td>
+                    <td class="px-4 py-3 text-right font-mono text-sm">
+                        ${index === 0 ? formatLapTime(driver.totalTime) : '+' + formatLapTime(driver.gap)}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono text-sm ${driver.bestLap === fastestLap ? 'text-purple-400 font-bold' : 'text-gray-400'}">
+                        ${formatLapTime(driver.bestLap)}
+                        ${driver.bestLap === fastestLap ? ' 🏁' : ''}
+                    </td>
+                    <td class="px-4 py-3 text-center text-xs text-gray-400">${driver.pitStops}</td>
                 </tr>
             `).join('');
             
+            const fastestDriver = gameData.raceTimes.find(d => d.bestLap === fastestLap);
+            
             document.getElementById('raceTimesContent').innerHTML = `
+                <div class="mb-4 bg-purple-900/30 border border-purple-500 p-3 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-400">Vuelta Rápida</div>
+                            <div class="text-lg font-bold text-purple-400">${formatLapTime(fastestLap)}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-400">Piloto</div>
+                            <div class="font-bold ${fastestDriver?.isPlayer ? 'text-blue-300' : 'text-white'}">
+                                ${fastestDriver?.name || '-'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="bg-gray-700">
+                        <thead class="bg-gray-700 sticky top-0">
                             <tr>
                                 <th class="px-4 py-2 text-left">Pos</th>
                                 <th class="px-4 py-2 text-left">Piloto</th>
                                 <th class="px-4 py-2 text-left">Equipo</th>
+                                <th class="px-4 py-2 text-right">Tiempo</th>
+                                <th class="px-4 py-2 text-right">Mejor Vuelta</th>
+                                <th class="px-4 py-2 text-center">Paradas</th>
                             </tr>
                         </thead>
                         <tbody>${timesHTML}</tbody>
                     </table>
                 </div>
+                
+                ${gameData.raceEvents && gameData.raceEvents.length > 0 ? `
+                    <div class="mt-4 bg-gray-800 p-3 rounded-lg">
+                        <h4 class="text-sm font-bold mb-2 text-yellow-500">EVENTOS DE CARRERA</h4>
+                        <div class="space-y-1 max-h-48 overflow-y-auto">
+                            ${gameData.raceEvents.map(event => `
+                                <div class="flex items-center gap-2 text-xs p-2 bg-gray-900 rounded">
+                                    <span class="text-lg">${event.icon}</span>
+                                    <span class="text-gray-500">V${event.lap}</span>
+                                    <span class="text-gray-300 flex-1">${event.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
             `;
             document.getElementById('raceTimesModal').classList.add('show');
         }
@@ -3167,45 +4271,59 @@
                         
             document.getElementById('settingsContent').innerHTML = `
                 <div class="space-y-6">
-                <!-- Acciones Rápidas -->
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- Guardar Partida -->
-                    <div class="bg-green-900/30 border-2 border-green-600 rounded-lg p-4">
-                        <div class="flex flex-col items-center mb-3">
-                            <span class="text-4xl mb-2">💾</span>
-                            <h3 class="text-lg font-bold text-green-400">Guardar</h3>
+                    <!-- Acciones Rápidas -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- Guardar Partida -->
+                        <div class="bg-green-900/30 border-2 border-green-600 rounded-lg p-3">
+                            <div class="flex flex-col items-center mb-2">
+                                <span class="text-3xl mb-1">💾</span>
+                                <h3 class="text-sm font-bold text-green-400">Guardar</h3>
+                            </div>
+                            <button onclick="saveGame(); closeModal();" class="w-full bg-green-600 hover:bg-green-700 p-2 rounded-lg font-semibold transition-all text-sm">
+                                GUARDAR
+                            </button>
+                            <p class="text-xs text-gray-500 mt-1 text-center">
+                                Auto-guardado activo
+                            </p>
                         </div>
-                        <button onclick="saveGame(); closeModal();" class="w-full bg-green-600 hover:bg-green-700 p-3 rounded-lg font-semibold transition-all">
-                            GUARDAR AHORA
-                        </button>
-                        <p class="text-xs text-gray-500 mt-2 text-center">
-                            Auto-guardado activo
-                        </p>
-                    </div>
-                    
-                    <!-- Logros -->
-                    <div class="bg-purple-900/30 border-2 border-purple-600 rounded-lg p-4">
-                        <div class="flex flex-col items-center mb-3">
-                            <div class="relative">
-                                <span class="text-4xl">🏆</span>
+                        
+                        <!-- Logros -->
+                        <div class="bg-purple-900/30 border-2 border-purple-600 rounded-lg p-3">
+                            <div class="flex flex-col items-center mb-2">
+                                <div class="relative">
+                                    <span class="text-3xl">🏆</span>
+                                    ${(() => {
+                                        const progress = getAchievementProgress();
+                                        return progress.unlocked > 0 ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">${progress.unlocked}</span>` : '';
+                                    })()}
+                                </div>
+                                <h3 class="text-sm font-bold text-purple-400 mt-1">Logros</h3>
+                            </div>
+                            <button onclick="closeModal(); showAchievements();" class="w-full bg-purple-600 hover:bg-purple-700 p-2 rounded-lg font-semibold transition-all text-sm">
+                                VER
+                            </button>
+                            <p class="text-xs text-gray-500 mt-1 text-center">
                                 ${(() => {
                                     const progress = getAchievementProgress();
-                                    return progress.unlocked > 0 ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">${progress.unlocked}</span>` : '';
+                                    return `${progress.unlocked}/${progress.total}`;
                                 })()}
-                            </div>
-                            <h3 class="text-lg font-bold text-purple-400 mt-2">Logros</h3>
+                            </p>
                         </div>
-                        <button onclick="closeModal(); showAchievements();" class="w-full bg-purple-600 hover:bg-purple-700 p-3 rounded-lg font-semibold transition-all">
-                            VER LOGROS
-                        </button>
-                        <p class="text-xs text-gray-500 mt-2 text-center">
-                            ${(() => {
-                                const progress = getAchievementProgress();
-                                return `${progress.unlocked}/${progress.total} desbloqueados`;
-                            })()}
-                        </p>
+
+                        <!-- Menú Principal -->
+                        <div class="bg-red-900/30 border-2 border-red-600 rounded-lg p-3">
+                            <div class="flex flex-col items-center mb-2">
+                                <span class="text-3xl mb-1">🏠</span>
+                                <h3 class="text-sm font-bold text-red-400">Menú</h3>
+                            </div>
+                            <button onclick="goToMainMenu()" class="w-full bg-red-600 hover:bg-red-700 p-2 rounded-lg font-semibold transition-all text-sm">
+                                SALIR
+                            </button>
+                            <p class="text-xs text-gray-500 mt-1 text-center">
+                                Guardado auto
+                            </p>
+                        </div>
                     </div>
-                </div>
                     <!-- Navegación interna -->
                     <div class="flex gap-2 border-b border-gray-700 pb-2">
                         <button onclick="document.getElementById('settings-difficulty').scrollIntoView({behavior:'smooth'})" class="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded">
@@ -3674,11 +4792,8 @@
                             </div>
 
                             <div class="flex gap-2 flex-wrap">
-                                <button onclick="initAudio(); toggleMusic();" class="px-3 py-2 rounded font-semibold text-sm ${audioSettings.musicEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'}">
-                                    ${audioSettings.musicEnabled ? '🔊' : '🔇'}
-                                </button>
-                                <button onclick="initAudio(); toggleSFX();" class="px-3 py-2 rounded font-semibold text-sm ${audioSettings.sfxEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'}">
-                                    ${audioSettings.sfxEnabled ? '🔔' : '🔕'}
+                                <button onclick="initAudio(); showAudioSettings();" class="px-3 py-2 rounded font-semibold text-sm bg-green-600 hover:bg-green-700">
+                                    🔊
                                 </button>
                                 <button onclick="showThemeSelector()" class="px-3 py-2 rounded font-semibold text-sm bg-purple-600 hover:bg-purple-700">
                                     ${themes[currentTheme].icon}
@@ -3730,6 +4845,10 @@
                                                 <div class="compact-stat-label">Vueltas</div>
                                                 <div class="compact-stat-value">${race.laps}</div>
                                             </div>
+                                            <div class="compact-stat">
+                                                <div class="compact-stat-label">Calendario</div>
+                                                <div class="compact-stat-value text-yellow-400">${gameData.currentRace + 1}/${calendar.length}</div>
+                                            </div>
                                         </div>
                                         <div class="text-xs text-yellow-400 text-center p-2 bg-gray-900 rounded">
                                             ⚠️ El clima puede cambiar durante la carrera
@@ -3745,6 +4864,19 @@
                                     
                                     <!-- Tab: Neumáticos -->
                                     <div id="tab-tires" class="tab-content ${gameData.activeTab === 'tires' ? 'active' : ''}">
+                                        <!-- Selector de modo de carrera -->
+                                        <div class="bg-gray-900 p-3 rounded-lg mb-3">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-sm font-semibold">Modo de Carrera</span>
+                                                <button onclick="toggleRaceMode()" class="px-3 py-1 rounded text-xs font-bold ${gameData.raceMode === 'interactive' ? 'bg-blue-600' : 'bg-gray-600'}">
+                                                    ${gameData.raceMode === 'interactive' ? 'INTERACTIVO' : 'AUTOMÁTICO'}
+                                                </button>
+                                            </div>
+                                            <p class="text-xs text-gray-400">
+                                                ${gameData.raceMode === 'interactive' ? 'Tomarás decisiones durante la carrera cada 10 vueltas' : 'La carrera se simula completamente'}
+                                            </p>
+                                        </div>
+
                                         <div class="space-y-2">
                                             ${Object.entries(tireCompounds).map(([compound, data]) => {
                                                 const selected = gameData.selectedTireCompound === compound;
@@ -3890,38 +5022,48 @@
                                         ` : '<div class="text-center py-4"><div class="spinner w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full mx-auto"></div></div>'}
                                     </div>
                                 </div>
-                                
-                                <!-- Características del coche compacto -->
+
+                                <!-- Panel Calendario Completo -->
                                 <div class="racing-border rounded-xl">
-                                    <h3 class="text-lg font-bold mb-2 text-yellow-500">COCHE</h3>
-                                    ${(() => {
-                                        const carStats = getCarStats();
-                                        const baseTeam = teams[gameData.selectedTeam];
-                                        return `
-                                        <div class="compact-grid">
-                                            <div class="compact-stat">
-                                                <div class="compact-stat-label">Potencia</div>
-                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.power)}</div>
-                                                <div class="text-xs text-gray-500 line-through">${baseTeam.power}</div>
+                                    <h3 class="text-lg font-bold mb-2 text-yellow-500">CALENDARIO 2025</h3>
+                                    <div class="space-y-1 max-h-64 overflow-y-auto">
+                                        ${calendar.map((gp, index) => {
+                                            const raced = index < gameData.currentRace;
+                                            const current = index === gameData.currentRace;
+                                            const result = gameData.raceResults.find(r => r.race === gp.name);
+                                            
+                                            return `
+                                            <div class="flex items-center justify-between p-2 rounded text-xs ${
+                                                current ? 'bg-red-900/50 border border-red-500' :
+                                                raced ? 'bg-gray-800' : 'bg-gray-900/50 opacity-60'
+                                            }">
+                                                <div class="flex items-center gap-2 flex-1">
+                                                    <span class="font-bold ${current ? 'text-yellow-400' : 'text-gray-400'}">${index + 1}</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-semibold ${current ? 'text-white' : raced ? 'text-gray-300' : 'text-gray-500'}">
+                                                            ${gp.name}
+                                                        </div>
+                                                        <div class="text-gray-500 text-xs">${gp.country}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right">
+                                                    ${result ? `
+                                                        <div class="font-bold ${
+                                                            result.position === 1 ? 'text-yellow-400' :
+                                                            result.position <= 3 ? 'text-orange-400' :
+                                                            result.position <= 10 ? 'text-green-400' : 'text-gray-400'
+                                                        }">P${result.position}</div>
+                                                        <div class="text-gray-500">${result.points} pts</div>
+                                                    ` : current ? `
+                                                        <div class="text-red-400 font-bold">→</div>
+                                                    ` : `
+                                                        <div class="text-gray-600">-</div>
+                                                    `}
+                                                </div>
                                             </div>
-                                            <div class="compact-stat">
-                                                <div class="compact-stat-label">Aero</div>
-                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.aerodynamics)}</div>
-                                                <div class="text-xs text-gray-500 line-through">${baseTeam.aerodynamics}</div>
-                                            </div>
-                                            <div class="compact-stat">
-                                                <div class="compact-stat-label">Fiabilidad</div>
-                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.reliability)}</div>
-                                                <div class="text-xs text-gray-500 line-through">${baseTeam.reliability}</div>
-                                            </div>
-                                            <div class="compact-stat">
-                                                <div class="compact-stat-label">Chasis</div>
-                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.chassis)}</div>
-                                            </div>
-                                        </div>
-                                        `;
-                                    })()}
-                                </div>
+                                        `}).join('')}
+                                    </div>
+                                </div>                                
                             </div>
                             
                             <!-- Columna Central - Habilidades -->
@@ -3977,54 +5119,201 @@
                             </div>
                             
                             <!-- Columna Derecha - Desarrollo -->
-                            <div class="racing-border rounded-xl">
-                                <h3 class="text-lg font-bold mb-3 text-yellow-500">I+D</h3>
-                                <div class="text-center mb-3">
-                                    <div class="text-xs text-gray-400">Presupuesto</div>
-                                    <div class="text-2xl font-bold text-green-400">${gameData.devBudget}</div>
+                            <div class="space-y-4">
+                                <div class="racing-border rounded-xl">
+                                    <h3 class="text-lg font-bold mb-3 text-yellow-500">I+D</h3>
+                                    <div class="text-center mb-3">
+                                        <div class="text-xs text-gray-400">Presupuesto</div>
+                                        <div class="text-2xl font-bold text-green-400">${gameData.devBudget}</div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        ${Object.entries(carDevelopment).map(([key, upgrade]) => {
+                                            const currentLevel = gameData.carUpgrades[key];
+                                            const cost = upgrade.cost * (currentLevel + 1);
+                                            const isMaxed = currentLevel >= upgrade.maxLevel;
+                                            const canAfford = gameData.devBudget >= cost;
+                                            
+                                            return `
+                                            <div class="bg-gray-900 p-2 rounded-lg">
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <span class="text-xs font-semibold">${upgrade.name}</span>
+                                                    <span class="text-xs ${isMaxed ? 'text-green-400' : 'text-gray-400'}">
+                                                        ${currentLevel}/${upgrade.maxLevel}
+                                                    </span>
+                                                </div>
+                                                <div class="w-full bg-gray-700 rounded-full h-1 mb-1">
+                                                    <div class="bg-gradient-to-r from-red-600 to-yellow-500 h-1 rounded-full" style="width: ${(currentLevel / upgrade.maxLevel) * 100}%"></div>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-gray-400">${cost} pts</span>
+                                                    <button 
+                                                    onclick="upgradeCar('${key}')" 
+                                                    ${isMaxed || !canAfford || gameData.racePhase !== 'practice' ? 'disabled' : ''}
+                                                    class="text-sm px-2 py-1 rounded font-bold ${isMaxed ? 'bg-gray-600' : canAfford ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600'} disabled:opacity-50 disabled:cursor-not-allowed min-w-[40px]"
+                                                >
+                                                    ${isMaxed ? 'MAX' : '↑'}
+                                                </button>
+                                                </div>
+                                            </div>
+                                        `}).join('')}
+                                    </div>
+                                    <div class="mt-2 text-xs text-gray-400 text-center">
+                                        ${gameData.racePhase === 'practice' ? '✓ Disponible ahora' : '⏸ Solo en práctica'}
+                                    </div>
                                 </div>
-                                <div class="space-y-2">
-                                    ${Object.entries(carDevelopment).map(([key, upgrade]) => {
-                                        const currentLevel = gameData.carUpgrades[key];
-                                        const cost = upgrade.cost * (currentLevel + 1);
-                                        const isMaxed = currentLevel >= upgrade.maxLevel;
-                                        const canAfford = gameData.devBudget >= cost;
-                                        
+                                <!-- Características del coche compacto -->
+                                <div class="racing-border rounded-xl">
+                                    <h3 class="text-lg font-bold mb-2 text-yellow-500">COCHE</h3>
+                                    ${(() => {
+                                        const carStats = getCarStats();
+                                        const baseTeam = teams[gameData.selectedTeam];
                                         return `
-                                        <div class="bg-gray-900 p-2 rounded-lg">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="text-xs font-semibold">${upgrade.name}</span>
-                                                <span class="text-xs ${isMaxed ? 'text-green-400' : 'text-gray-400'}">
-                                                    ${currentLevel}/${upgrade.maxLevel}
-                                                </span>
+                                        <div class="compact-grid">
+                                            <div class="compact-stat">
+                                                <div class="compact-stat-label">Potencia</div>
+                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.power)}</div>
+                                                <div class="text-xs text-gray-500 line-through">${baseTeam.power}</div>
                                             </div>
-                                            <div class="w-full bg-gray-700 rounded-full h-1 mb-1">
-                                                <div class="bg-gradient-to-r from-red-600 to-yellow-500 h-1 rounded-full" style="width: ${(currentLevel / upgrade.maxLevel) * 100}%"></div>
+                                            <div class="compact-stat">
+                                                <div class="compact-stat-label">Aero</div>
+                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.aerodynamics)}</div>
+                                                <div class="text-xs text-gray-500 line-through">${baseTeam.aerodynamics}</div>
                                             </div>
-                                            <div class="flex justify-between items-center">
-                                                <span class="text-xs text-gray-400">${cost} pts</span>
-                                                <button 
-                                                onclick="upgradeCar('${key}')" 
-                                                ${isMaxed || !canAfford || gameData.racePhase !== 'practice' ? 'disabled' : ''}
-                                                class="text-sm px-2 py-1 rounded font-bold ${isMaxed ? 'bg-gray-600' : canAfford ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600'} disabled:opacity-50 disabled:cursor-not-allowed min-w-[40px]"
-                                            >
-                                                ${isMaxed ? 'MAX' : '↑'}
-                                            </button>
+                                            <div class="compact-stat">
+                                                <div class="compact-stat-label">Fiabilidad</div>
+                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.reliability)}</div>
+                                                <div class="text-xs text-gray-500 line-through">${baseTeam.reliability}</div>
+                                            </div>
+                                            <div class="compact-stat">
+                                                <div class="compact-stat-label">Chasis</div>
+                                                <div class="compact-stat-value text-green-400">${Math.round(carStats.chassis)}</div>
                                             </div>
                                         </div>
-                                    `}).join('')}
-                                </div>
-                                <div class="mt-2 text-xs text-gray-400 text-center">
-                                    ${gameData.racePhase === 'practice' ? '✓ Disponible ahora' : '⏸ Solo en práctica'}
+                                        `;
+                                    })()}
+                                </div>                            
+                            </div>
+
+                        </div> <!-- Cierre de main-game-grid -->
+                        
+                        <!-- OVERLAYS GLOBALES (fuera de tabs y columns) -->
+                        ${gameData.pendingDecision ? `
+                            <div class="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+                                <div class="bg-gray-900 border-4 border-yellow-500 rounded-xl p-6 max-w-md mx-4 animate-fade-in">
+                                    <h3 class="text-2xl font-bold mb-4 text-yellow-400">
+                                        ${gameData.pendingDecision.type === 'safety-car-pitstop' ? '🚨 SAFETY CAR' :
+                                        gameData.pendingDecision.type === 'weather-change-tires' ? '🌧️ CAMBIO CLIMÁTICO' :
+                                        gameData.pendingDecision.type === 'damage-repair' ? '⚠️ DAÑO DETECTADO' :
+                                        '💨 OPORTUNIDAD DE ADELANTAMIENTO'}
+                                    </h3>
+                                    
+                                    ${gameData.pendingDecision.type === 'safety-car-pitstop' ? `
+                                        <p class="text-gray-300 mb-4">
+                                            Hay Safety Car en pista. Actualmente estás en <span class="text-yellow-400 font-bold">P${gameData.pendingDecision.data.position}</span> con neumáticos <span class="text-blue-400">${tireCompounds[gameData.pendingDecision.data.currentTire].name}</span>.
+                                        </p>
+                                        <p class="text-sm text-gray-400 mb-6">
+                                            Vuelta ${gameData.pendingDecision.data.lap}/${gameData.totalLaps}
+                                        </p>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <button onclick="makeDecision('pit')" class="bg-green-600 hover:bg-green-700 p-4 rounded-lg font-bold">
+                                                ENTRAR A BOXES
+                                                <div class="text-xs font-normal mt-1">Cambiar a ${tireCompounds[gameData.pendingDecision.data.recommendedTire].name}</div>
+                                            </button>
+                                            <button onclick="makeDecision('stay')" class="bg-red-600 hover:bg-red-700 p-4 rounded-lg font-bold">
+                                                QUEDARSE FUERA
+                                                <div class="text-xs font-normal mt-1">Mantener posición</div>
+                                            </button>
+                                        </div>
+                                    ` : gameData.pendingDecision.type === 'weather-change-tires' ? `
+                                        <p class="text-gray-300 mb-4">
+                                            El clima ha cambiado a <span class="text-yellow-400 font-bold">${gameData.pendingDecision.data.weather}</span>. Llevas neumáticos <span class="text-blue-400">${tireCompounds[gameData.pendingDecision.data.currentTire].name}</span>.
+                                        </p>
+                                        <p class="text-sm text-gray-400 mb-6">
+                                            Vuelta ${gameData.pendingDecision.data.lap}/${gameData.totalLaps}
+                                        </p>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <button onclick="makeDecision('change')" class="bg-blue-600 hover:bg-blue-700 p-4 rounded-lg font-bold">
+                                                CAMBIAR NEUMÁTICOS
+                                                <div class="text-xs font-normal mt-1">A ${tireCompounds[gameData.pendingDecision.data.recommendedTire].name}</div>
+                                            </button>
+                                            <button onclick="makeDecision('risk')" class="bg-orange-600 hover:bg-orange-700 p-4 rounded-lg font-bold">
+                                                ARRIESGAR
+                                                <div class="text-xs font-normal mt-1">Mantener actuales</div>
+                                            </button>
+                                        </div>
+                                    ` : gameData.pendingDecision.type === 'damage-repair' ? `
+                                        <p class="text-gray-300 mb-4">
+                                            Has sufrido daño en <span class="text-red-400 font-bold">${damageTypes[gameData.pendingDecision.data.damageType].name}</span> con severidad del <span class="text-yellow-400 font-bold">${gameData.pendingDecision.data.severity}%</span>.
+                                        </p>
+                                        <p class="text-sm text-gray-400 mb-6">
+                                            Reparación: ${gameData.pendingDecision.data.repairTime} segundos | Vuelta ${gameData.pendingDecision.data.lap}/${gameData.totalLaps}
+                                        </p>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <button onclick="makeDecision('repair')" class="bg-green-600 hover:bg-green-700 p-4 rounded-lg font-bold">
+                                                REPARAR DAÑO
+                                                <div class="text-xs font-normal mt-1">-${gameData.pendingDecision.data.repairTime}s tiempo</div>
+                                            </button>
+                                            <button onclick="makeDecision('continue-damaged')" class="bg-red-600 hover:bg-red-700 p-4 rounded-lg font-bold">
+                                                CONTINUAR DAÑADO
+                                                <div class="text-xs font-normal mt-1">Bajo rendimiento</div>
+                                            </button>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             </div>
-                        </div>
-                    </div>                    
+                        ` : ''}
+
+                        ${gameData.raceMode === 'interactive' && gameData.racePhase === 'race' && gameData.isProcessing && !gameData.pendingDecision ? `
+                            <div class="fixed bottom-6 left-6 right-6 md:left-auto md:w-96 bg-gray-900/95 border-2 border-blue-500 rounded-lg p-4 max-h-96 animate-fade-in z-40 overflow-hidden flex flex-col">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div>
+                                        <div class="text-sm font-bold text-blue-300">CARRERA EN PROGRESO</div>
+                                        <div class="text-2xl font-bold text-white">Vuelta ${gameData.currentLapView || 0}/${gameData.totalLaps || 0}</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-400">Posición actual</div>
+                                        <div class="text-xl font-bold text-yellow-400">
+                                            P${(() => {
+                                                const classification = gameData.raceClassification || [];
+                                                const playerIdx = classification.findIndex(d => d.isPlayer);
+                                                return playerIdx >= 0 ? playerIdx + 1 : '-';
+                                            })()}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="w-full bg-gray-700 rounded-full h-2 mb-3">
+                                    <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${((gameData.currentLapView || 0) / (gameData.totalLaps || 1)) * 100}%"></div>
+                                </div>
+                                
+                                <div class="flex-1 overflow-y-auto space-y-1 min-h-0">
+                                    <div class="text-xs font-bold text-yellow-400 mb-2 sticky top-0 bg-gray-900 pb-1">
+                                        EVENTOS DE CARRERA
+                                    </div>
+                                    ${gameData.raceEvents && gameData.raceEvents.length > 0 ? 
+                                        gameData.raceEvents.slice().reverse().slice(0, 10).map(event => `
+                                            <div class="flex items-center gap-2 text-xs p-2 bg-gray-800 rounded ${
+                                                event.type === 'player-decision' ? 'border-l-2 border-blue-400' :
+                                                event.type === 'damage' ? 'border-l-2 border-red-400' :
+                                                event.type === 'safety-car' ? 'border-l-2 border-yellow-400' : ''
+                                            }">
+                                                <span class="text-lg flex-shrink-0">${event.icon}</span>
+                                                <span class="text-gray-500 flex-shrink-0">V${event.lap}</span>
+                                                <span class="text-gray-300 flex-1 text-xs leading-tight">${event.text}</span>
+                                            </div>
+                                        `).join('') 
+                                        : '<div class="text-gray-500 text-xs text-center py-2">Sin eventos aún...</div>'
+                                    }
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                    </div> <!-- Cierre de max-w-7xl -->
 
                 </div>
                 
                 `;
-            }else if (gameData.state === 'season-end') {
+            } else if (gameData.state === 'season-end') {
                 const standings = gameData.finalStandings || [];
                 const playerPos = gameData.seasonPlayerPosition || 1;
                 const isChampion = playerPos === 1;
@@ -4141,7 +5430,7 @@
                     </div>
                 </div>
                 `;
-            }else if (gameData.state === 'team-offers') {
+            } else if (gameData.state === 'team-offers') {
                 const offers = generateTeamOffers(gameData.player.reputation, gameData.selectedTeam);
                 
                 app.innerHTML = `
@@ -4216,7 +5505,7 @@
                 `;
             }
         }
-        
+
         document.addEventListener('DOMContentLoaded', () => {
             loadAudioSettings();
             loadTheme();
