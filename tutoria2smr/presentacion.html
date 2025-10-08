@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación 2º SMYR - Curso 2025/2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+            color: white;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .slide-inner {
+            width: 100%;
+            max-width: 1400px;
+            height: 100%;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInBottom {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .animate-fadeIn { animation: fadeIn 0.6s ease-out; }
+        .animate-slideInBottom { animation: slideInBottom 0.6s ease-out; }
+        .animate-slideInLeft { animation: slideInLeft 0.6s ease-out; }
+        .animate-slideInRight { animation: slideInRight 0.6s ease-out; }
+        .animate-scaleIn { animation: scaleIn 0.6s ease-out; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        .portada {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            gap: 1.5rem;
+        }
+
+        .portada-emoji {
+            font-size: 6rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .portada-title {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #60a5fa, #22d3ee, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .portada-subtitle {
+            font-size: 2.5rem;
+            color: #67e8f9;
+            animation: slideInBottom 0.6s ease-out 0.1s both;
+        }
+
+        .portada-divider {
+            width: 12rem;
+            height: 0.25rem;
+            background: linear-gradient(to right, transparent, #22d3ee, transparent);
+            animation: scaleIn 0.6s ease-out 0.2s both;
+        }
+
+        .portada-tutor {
+            font-size: 1.75rem;
+            color: #cbd5e1;
+            animation: slideInBottom 0.6s ease-out 0.3s both;
+        }
+
+        .portada-extra {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            animation: slideInBottom 0.6s ease-out 0.4s both;
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #22d3ee;
+            margin-bottom: 2rem;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .card {
+            background: rgba(51, 65, 85, 0.5);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-highlight {
+            background: #0891b2;
+            box-shadow: 0 10px 30px rgba(8, 145, 178, 0.4);
+        }
+
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-1 { grid-template-columns: 1fr; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+        .image-placeholder {
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        .controls {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #0891b2;
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #0e7490;
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .btn-home {
+            padding: 0.75rem;
+            background: #475569;
+            border-radius: 0.75rem;
+        }
+
+        .btn-home:hover {
+            background: #334155;
+        }
+
+        .progress-bar {
+            height: 0.5rem;
+            background: #0f172a;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #22d3ee, #3b82f6);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .portada-title { font-size: 2rem; }
+            .portada-subtitle { font-size: 1.1rem; }
+            .portada-tutor { font-size: 0.9rem; }
+            .portada-emoji { font-size: 3rem; }
+            .portada-extra { font-size: 0.9rem; }
+            .slide-title { font-size: 1.5rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .btn span { display: none; }
+            
+            /* Reducir tamaños de texto inline en móviles */
+            .card span[style*="font-size: 2.5rem"] { font-size: 1.75rem !important; }
+            .card span[style*="font-size: 1.5rem"] { font-size: 1.05rem !important; }
+            .card span[style*="font-size: 1.25rem"] { font-size: 0.875rem !important; }
+            .card span[style*="font-size: 2rem"] { font-size: 1.4rem !important; }
+            .card p[style*="font-size: 1.5rem"] { font-size: 1.05rem !important; }
+            div[style*="font-size: 4rem"] { font-size: 2.8rem !important; }
+            div[style*="font-size: 3rem"] { font-size: 2.1rem !important; }
+            div[style*="font-size: 2rem"] { font-size: 1.4rem !important; }
+            div[style*="font-size: 1.5rem"] { font-size: 1.05rem !important; }
+            h2[style*="font-size: 4rem"] { font-size: 2.8rem !important; }
+            h3[style*="font-size: 2rem"] { font-size: 1.4rem !important; }
+            p[style*="font-size: 2rem"] { font-size: 1.4rem !important; }
+            p[style*="font-size: 1.5rem"] { font-size: 1.05rem !important; }
+            li span[style*="font-size: 1.25rem"] { font-size: 0.875rem !important; }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .portada-title { font-size: 3.5rem; }
+            .portada-subtitle { font-size: 2rem; }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1025px) {
+            .portada-title { font-size: 5rem; }
+            .portada-subtitle { font-size: 3rem; }
+            .portada-tutor { font-size: 2.2rem; }
+        }
+
+        @media (min-width: 1400px) {
+            .portada-title { font-size: 6rem; }
+            .portada-subtitle { font-size: 4rem; }
+            .portada-tutor { font-size: 2.5rem; }
+            .portada-extra { font-size: 1.5rem; }
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Modal/Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: white;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: transform 0.2s;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-content">
+            <div class="slide-inner" id="slideContainer"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prevBtn" onclick="prevSlide()">
+                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span>Anterior</span>
+            </button>
+
+            <div class="counter">
+                <span id="currentSlide">1</span>
+                <span>/</span>
+                <span id="totalSlides">19</span>
+                <button class="btn btn-home" onclick="goToSlide(0)" title="Ir al inicio">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </button>
+            </div>
+
+            <button class="btn" id="nextBtn" onclick="nextSlide()">
+                <span>Siguiente</span>
+                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="close-btn" onclick="closeLightbox()">&times;</button>
+        <img id="lightbox-img" src="" alt="Imagen ampliada">
+    </div>
+
+    <script>
+        var currentSlide = 0;
+        var totalSlides = 12;
+
+        function createSlideElement(content, isActive) {
+            var div = document.createElement('div');
+            div.className = isActive ? 'slide active' : 'slide';
+            div.innerHTML = content;
+            return div;
+        }
+
+        function initSlides() {
+            var container = document.getElementById('slideContainer');
+            
+            var slide0 = '<div class="portada"><div class="portada-emoji">📚</div><h1 class="portada-title">Sistemas Microinformáticos y Redes</h1><h2 class="portada-subtitle">2º de SMYR - Curso 2025/2026</h2><div class="portada-divider"></div><p class="portada-tutor">Tutor: Moisés Fernández Ruiz</p><p class="portada-extra">Reunión Informativa Padres/Tutores</p></div>';
+            container.appendChild(createSlideElement(slide0, true));
+
+            var slide1 = '<h2 class="slide-title">Comunicación y Contacto</h2><div class="grid grid-1" style="flex: 1;"><div class="card card-highlight animate-slideInRight stagger-1 flex-center"><span style="font-size: 2.5rem;">📱</span><span style="font-size: 1.5rem;">Plataforma oficial: iPasen</span></div><div class="card animate-slideInRight stagger-2 flex-center"><span style="font-size: 2.5rem;">✉️</span><span style="font-size: 1.5rem;">Comunicación directa con el tutor</span></div><div class="card animate-slideInRight stagger-3 flex-center"><span style="font-size: 2.5rem;">📊</span><span style="font-size: 1.5rem;">Seguimiento de asistencia y calificaciones</span></div><div class="card animate-slideInRight stagger-4 flex-center"><span style="font-size: 2.5rem;">🔔</span><span style="font-size: 1.5rem;">Notificaciones importantes del centro</span></div></div><p class="text-center animate-fadeIn stagger-4" style="color: #67e8f9; font-style: italic; margin-top: 2rem;">Por favor, asegúrense de tener iPasen instalado y configurado</p>';
+            container.appendChild(createSlideElement(slide1, false));
+
+            var slide2 = '<h2 class="slide-title">¿Qué es la FP Dual?</h2><div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2rem;"><div class="card animate-scaleIn" style="background: linear-gradient(to right, #0891b2, #1e40af); padding: 2rem;"><p style="font-size: 1.5rem; line-height: 1.6;">Formación que combina el aprendizaje en el centro educativo con la experiencia en empresas reales del sector</p></div><div class="grid grid-2"><div class="card animate-slideInBottom stagger-1 flex-center"><span style="font-size: 2rem; color: #4ade80;">✓</span><span style="font-size: 1.25rem;">Experiencia profesional real</span></div><div class="card animate-slideInBottom stagger-2 flex-center"><span style="font-size: 2rem; color: #4ade80;">✓</span><span style="font-size: 1.25rem;">Contacto con el mundo laboral</span></div><div class="card animate-slideInBottom stagger-3 flex-center"><span style="font-size: 2rem; color: #4ade80;">✓</span><span style="font-size: 1.25rem;">Aplicación práctica de conocimientos</span></div><div class="card animate-slideInBottom stagger-4 flex-center"><span style="font-size: 2rem; color: #4ade80;">✓</span><span style="font-size: 1.25rem;">Mayor empleabilidad</span></div></div></div>';
+            container.appendChild(createSlideElement(slide2, false));
+
+            var slide3 = '<h2 class="slide-title">Formación en Empresas</h2><div style="flex: 1; display: flex; align-items: center; justify-content: center;"><div class="grid grid-2" style="width: 100%;"><div class="card animate-slideInLeft stagger-1 text-center" style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 3rem;"><div style="font-size: 1.5rem; margin-bottom: 1rem;">1º Curso</div><div style="font-size: 4rem; font-weight: bold; margin-bottom: 1rem;">120h</div><div style="font-size: 1.25rem; color: #bfdbfe;">en empresa</div></div><div class="card animate-slideInRight stagger-2 text-center" style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 3rem;"><div style="font-size: 1.5rem; margin-bottom: 1rem;">2º Curso</div><div style="font-size: 4rem; font-weight: bold; margin-bottom: 1rem;">380h</div><div style="font-size: 1.25rem; color: #a5f3fc;">en empresa</div></div></div></div><div class="card animate-slideInBottom stagger-3 text-center" style="font-size: 1.5rem; margin-top: 2rem;"><span style="color: #22d3ee; font-weight: bold;">Total: 500 horas</span> de formación práctica en empresa</div>';
+            container.appendChild(createSlideElement(slide3, false));
+
+            var slide4 = '<h2 class="slide-title text-center">Horario Semanal 2º SMYR</h2><img src="./horario.png" style="max-width: 100%; height: auto; border-radius: 10px;" onclick=openLightbox(this.src)>';
+            container.appendChild(createSlideElement(slide4, false));
+
+            var slide5 = '<h2 class="slide-title text-center">Módulos Formativos</h2><img src="./modulos1.png" style="max-width: 100%; height: auto; border-radius: 10px;" onclick=openLightbox(this.src)>';
+            container.appendChild(createSlideElement(slide5, false));
+
+            var slide6 = '<h2 class="slide-title text-center">Distribución de Horas</h2><img src="./modulos2.png" style="max-width: 100%; height: auto; border-radius: 10px;" onclick=openLightbox(this.src)>';
+            container.appendChild(createSlideElement(slide6, false));
+
+            var slide8 = '<h2 class="slide-title">Composición del Grupo</h2><div style="flex: 1; display: flex; align-items: center; justify-content: center;"><div style="width: 100%; display: flex; flex-direction: column; gap: 2rem;"><div class="card animate-scaleIn text-center" style="background: linear-gradient(to right, #9333ea, #7c3aed); padding: 3rem;"><div style="font-size: 1.5rem; margin-bottom: 1rem;">Total de estudiantes</div><div style="font-size: 6rem; font-weight: bold;">16</div></div><div class="grid grid-3"><div class="card animate-slideInLeft stagger-1 text-center" style="background: #16a34a; padding: 2rem;"><div style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;">8</div><div style="font-size: 1.25rem;">Matrícula completa</div></div><div class="card animate-slideInBottom stagger-2 text-center" style="background: #ea580c; padding: 2rem;"><div style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;">3</div><div style="font-size: 1.25rem;">Repetidores</div></div><div class="card animate-slideInRight stagger-3 text-center" style="background: #2563eb; padding: 2rem;"><div style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;">5</div><div style="font-size: 1.25rem;">Matrícula parcial</div></div></div></div></div>';
+            container.appendChild(createSlideElement(slide8, false));
+
+            var slide7 = '<h2 class="slide-title">Expectativas y Normas</h2><div class="grid grid-3" style="flex: 1;"><div class="card animate-slideInBottom stagger-1" style="background: linear-gradient(135deg, #475569, #334155); padding: 2rem;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 1.5rem;">Asistencia</h3><ul style="list-style: none; padding: 0;"><li style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Obligatoria y fundamental</span></li><li style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Crítica en prácticas de empresa</span></li><li style="display: flex; gap: 0.5rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Justificar ausencias</span></li></ul></div><div class="card animate-slideInBottom stagger-2" style="background: linear-gradient(135deg, #475569, #334155); padding: 2rem;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 1.5rem;">Evaluación</h3><ul style="list-style: none; padding: 0;"><li style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Continua</span></li><li style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Exámenes y proyectos prácticos</span></li><li style="display: flex; gap: 0.5rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Evaluación en empresa</span></li></ul></div><div class="card animate-slideInBottom stagger-3" style="background: linear-gradient(135deg, #475569, #334155); padding: 2rem;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 1.5rem;">Actitud Profesional</h3><ul style="list-style: none; padding: 0;"><li style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Comportamiento profesional</span></li><li style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Respeto y responsabilidad</span></li><li style="display: flex; gap: 0.5rem;"><span style="color: #22d3ee; font-size: 1.5rem;">•</span><span style="font-size: 1.25rem;">Representan al centro</span></li></ul></div></div>';
+            container.appendChild(createSlideElement(slide7, false));
+
+            var slide9 = '<h2 class="slide-title">Salidas Profesionales</h2><div style="flex: 1; display: flex; flex-direction: column; gap: 2rem;"><div class="card animate-scaleIn text-center" style="background: linear-gradient(to right, #16a34a, #059669); padding: 2rem;"><div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎓</div><p style="font-size: 1.5rem; font-weight: bold;">Título de Técnico en Sistemas Microinformáticos y Redes</p></div><div class="grid grid-2"><div class="card animate-slideInLeft stagger-1" style="background: rgba(51, 65, 85, 0.7); padding: 2rem;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;"><span>💼</span><span>Mundo Laboral</span></h3><ul style="list-style: none; padding: 0;"><li style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;"><span style="color: #4ade80; font-size: 1.5rem;">✓</span><span style="font-size: 1.25rem;">Técnico en sistemas microinformáticos</span></li><li style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;"><span style="color: #4ade80; font-size: 1.5rem;">✓</span><span style="font-size: 1.25rem;">Técnico de soporte informático</span></li><li style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;"><span style="color: #4ade80; font-size: 1.5rem;">✓</span><span style="font-size: 1.25rem;">Técnico de redes</span></li><li style="display: flex; gap: 0.5rem;"><span style="color: #4ade80; font-size: 1.5rem;">✓</span><span style="font-size: 1.25rem;">Instalador de sistemas y redes</span></li></ul></div><div class="card animate-slideInRight stagger-2" style="background: rgba(51, 65, 85, 0.7); padding: 2rem;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;"><span>📚</span><span>Continuar Estudios</span></h3><ul style="list-style: none; padding: 0;"><li style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;"><span style="color: #60a5fa; font-size: 1.5rem;">✓</span><span style="font-size: 1.25rem;">Ciclos Superiores de FP</span></li><li style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;"><span style="color: #60a5fa; font-size: 1.5rem;">✓</span><span style="font-size: 1.25rem;">Bachillerato (con prueba)</span></li><li style="display: flex; gap: 0.5rem;"><span style="color: #60a5fa; font-size: 1.5rem;">✓</span><span style="font-size: 1.25rem;">Cursos de especialización</span></li></ul></div></div></div>';
+            container.appendChild(createSlideElement(slide9, false));
+
+            var slide10 = '<h2 class="slide-title text-center">Mensajes Clave</h2><div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2rem;"><div class="card animate-slideInRight stagger-1" style="display: flex; align-items: center; gap: 2rem; padding: 2rem;"><div style="font-size: 4rem; font-weight: bold; color: #22d3ee; background: #1e293b; width: 5rem; height: 5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div><div style="flex: 1;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 0.5rem;">Comunicación</h3><p style="font-size: 1.5rem;">iPasen disponible - No duden en contactar</p></div></div><div class="card animate-slideInRight stagger-2" style="display: flex; align-items: center; gap: 2rem; padding: 2rem;"><div style="font-size: 4rem; font-weight: bold; color: #22d3ee; background: #1e293b; width: 5rem; height: 5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</div><div style="flex: 1;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 0.5rem;">Apoyo en Casa</h3><p style="font-size: 1.5rem;">Su seguimiento es fundamental</p></div></div><div class="card animate-slideInRight stagger-3" style="display: flex; align-items: center; gap: 2rem; padding: 2rem;"><div style="font-size: 4rem; font-weight: bold; color: #22d3ee; background: #1e293b; width: 5rem; height: 5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div><div style="flex: 1;"><h3 style="font-size: 2rem; font-weight: bold; color: #22d3ee; margin-bottom: 0.5rem;">Oportunidad Única</h3><p style="font-size: 1.5rem;">La FP Dual es una gran oportunidad</p></div></div></div>';
+            container.appendChild(createSlideElement(slide10, false));
+
+            var slide11 = '<div class="portada"><div class="portada-emoji">❓</div><h2 class="animate-scaleIn" style="font-size: 4rem; font-weight: bold; color: #22d3ee;">¿Preguntas?</h2><p class="animate-slideInBottom stagger-1" style="font-size: 2rem; color: #cbd5e1; margin-top: 2rem;">Gracias por su atención y colaboración</p><div class="animate-slideInBottom stagger-2" style="font-size: 3rem; margin-top: 3rem;">🙏</div></div>';
+            container.appendChild(createSlideElement(slide11, false));
+    
+            var slide12 = '<div class="portada"><div class="portada-emoji">❓</div><h2 class="animate-scaleIn" style="font-size: 4rem; font-weight: bold; color: #22d3ee;">¿Preguntas?</h2><p class="animate-slideInBottom stagger-1" style="font-size: 2rem; color: #cbd5e1; margin-top: 2rem;">Gracias por su atención y colaboración</p><div class="animate-slideInBottom stagger-2" style="font-size: 3rem; margin-top: 3rem;">🙏</div></div>';
+            container.appendChild(createSlideElement(slide12, false));
+
+            updateControls();
+        }
+
+        function showSlide(index) {
+            var slides = document.querySelectorAll('.slide');
+            for (var i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            slides[index].classList.add('active');
+            currentSlide = index;
+            updateControls();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+        }
+
+        function updateControls() {
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('totalSlides').textContent = totalSlides;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            
+            var progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            } else if (e.key === 'Home') {
+                goToSlide(0);
+            } else if (e.key === 'End') {
+                goToSlide(totalSlides - 1);
+            }
+        });
+
+        window.onload = function() {
+            initSlides();
+        };
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+        }
+
+        // Cerrar con la tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
+</body>
+</html>
