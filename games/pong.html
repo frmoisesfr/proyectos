@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PONG (1972)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at center, #1a0033 0%, #000000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            align-items: flex-start;
+        }
+
+        .game-section {
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(255, 0, 128, 0.5);
+            letter-spacing: 6px;
+            text-align: center;
+            font-weight: bold;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            color: #40e0d0;
+            letter-spacing: 3px;
+            text-align: center;
+        }
+
+        .game-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #ff0080;
+            border-radius: 10px;
+            box-shadow: 
+                0 0 40px rgba(255, 0, 128, 0.5),
+                inset 0 0 50px rgba(255, 0, 128, 0.1);
+            padding: 20px;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #000;
+            border: 2px solid #40e0d0;
+            box-shadow: 
+                0 0 30px rgba(64, 224, 208, 0.4),
+                inset 0 0 30px rgba(64, 224, 208, 0.1);
+            cursor: none;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            margin: 20px 0;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .score-item {
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 2px solid;
+        }
+
+        .score-item:first-child {
+            border-color: #ff0080;
+        }
+
+        .score-item:last-child {
+            border-color: #40e0d0;
+        }
+
+        .player1-score {
+            color: #ff0080;
+            text-shadow: 0 0 20px #ff0080;
+        }
+
+        .player2-score {
+            color: #40e0d0;
+            text-shadow: 0 0 20px #40e0d0;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-panel {
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(64, 224, 208, 0.2));
+            border: 2px solid #ff0080;
+            padding: 15px 20px;
+            border-radius: 10px;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .control-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 0, 128, 0.3);
+        }
+
+        .control-panel h3 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            color: #ff8c00;
+        }
+
+        .control-panel p {
+            font-size: 0.85rem;
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+
+        button {
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.3), rgba(64, 224, 208, 0.3));
+            color: #fff;
+            border: 2px solid #ff0080;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            backdrop-filter: blur(10px);
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #ff0080, #40e0d0);
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.8);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.active {
+            background: linear-gradient(135deg, #ff0080, #ff8c00);
+            border-color: #ff8c00;
+            box-shadow: 0 0 25px rgba(255, 140, 0, 0.6);
+        }
+
+        .game-status {
+            font-size: 1.5rem;
+            margin: 15px 0;
+            min-height: 35px;
+            color: #ff8c00;
+            text-shadow: 0 0 20px #ff8c00;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .info-panel {
+            background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(0, 0, 0, 0.9));
+            border: 2px solid #40e0d0;
+            border-radius: 10px;
+            padding: 20px;
+            width: 350px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(64, 224, 208, 0.3);
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .info-panel h2 {
+            color: #ff0080;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 15px #ff0080;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-section h3 {
+            color: #ff8c00;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ff0080;
+            padding-bottom: 5px;
+        }
+
+        .info-section p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .fun-fact {
+            background: rgba(255, 0, 128, 0.1);
+            border-left: 3px solid #ff8c00;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+
+        .fun-fact strong {
+            color: #ff8c00;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .difficulty-selector button {
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        .touch-hint {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            color: #ff8c00;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .touch-hint {
+                display: block;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .info-panel {
+                width: 100%;
+                max-width: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 2.5rem;
+                letter-spacing: 4px;
+            }
+            .subtitle {
+                font-size: 0.75rem;
+                letter-spacing: 2px;
+            }
+            .score-display {
+                gap: 40px;
+                font-size: 2rem;
+                margin: 15px 0;
+            }
+            .score-item {
+                padding: 8px 15px;
+            }
+            .score-item div:first-child {
+                font-size: 0.9rem !important;
+            }
+            .game-status {
+                font-size: 1.2rem;
+            }
+            .control-panel {
+                min-width: 150px;
+                padding: 12px 15px;
+            }
+            .control-panel h3 {
+                font-size: 1rem;
+            }
+            .control-panel p {
+                font-size: 0.8rem;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            .winner-overlay h2 {
+                font-size: 2rem;
+            }
+            canvas {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+                letter-spacing: 3px;
+            }
+            .subtitle {
+                font-size: 0.7rem;
+            }
+            .score-display {
+                gap: 30px;
+                font-size: 1.8rem;
+            }
+            .game-status {
+                font-size: 1rem;
+            }
+            .controls {
+                gap: 10px;
+            }
+            .mode-selector {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .difficulty-selector {
+                flex-direction: column;
+                gap: 8px;
+            }
+            button {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+
+        .info-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: #ff0080;
+            border-radius: 10px;
+        }
+
+        .winner-overlay {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #ff8c00;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 0 50px rgba(255, 140, 0, 0.8);
+        }
+
+        .winner-overlay.show {
+            display: block;
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .winner-overlay h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ff8c00;
+            text-shadow: 0 0 30px #ff8c00;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="game-section">
+            <h1>PONG</h1>
+            <div class="subtitle">ATARI • 1972 • THE LEGEND</div>
+            
+            <div class="mode-selector">
+                <button id="vsPlayerBtn" class="active">VS JUGADOR</button>
+                <button id="vsAIBtn">VS COMPUTADORA</button>
+            </div>
+
+            <div id="difficultySelector" class="difficulty-selector" style="display: none;">
+                <button id="easyBtn">FÁCIL</button>
+                <button id="mediumBtn" class="active">NORMAL</button>
+                <button id="hardBtn">DIFÍCIL</button>
+            </div>
+
+            <div class="game-status" id="gameStatus">¡Primer jugador en llegar a 11 gana!</div>
+
+            <div class="game-container">
+                <canvas id="gameCanvas" width="600" height="450"></canvas>
+                <div id="winnerOverlay" class="winner-overlay">
+                    <h2 id="winnerText">¡VICTORIA!</h2>
+                    <button onclick="resetGame()" style="font-size: 1.2rem; padding: 15px 40px;">NUEVA PARTIDA</button>
+                </div>
+            </div>
+
+            <div class="score-display">
+                <div class="score-item">
+                    <div style="color: #ff0080; font-size: 1.2rem;">JUGADOR 1</div>
+                    <div class="player1-score" id="score1">0</div>
+                </div>
+                <div class="score-item">
+                    <div style="color: #40e0d0; font-size: 1.2rem;" id="player2Label">JUGADOR 2</div>
+                    <div class="player2-score" id="score2">0</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-panel">
+                    <h3 style="color: #ff0080;">⬅️ Jugador 1</h3>
+                    <p><strong>W</strong> - Mover arriba</p>
+                    <p><strong>S</strong> - Mover abajo</p>
+                </div>
+                <div class="control-panel">
+                    <h3 style="color: #40e0d0;" id="player2Title">➡️ Jugador 2</h3>
+                    <p><strong>↑</strong> - Mover arriba</p>
+                    <p><strong>↓</strong> - Mover abajo</p>
+                </div>
+            </div>
+
+            <div class="touch-hint">
+                📱 Toca y desliza la pantalla para mover las paletas
+            </div>
+
+            <div style="text-align: center;">
+                <button id="resetBtn">🔄 NUEVA PARTIDA</button>
+                <button id="pauseBtn">⏸️ PAUSAR</button>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h2>🕹️ LA LEYENDA DE PONG</h2>
+            
+            <div class="info-section">
+                <h3>El Nacimiento (1972)</h3>
+                <p>Pong fue creado por Allan Alcorn como ejercicio de entrenamiento asignado por Nolan Bushnell en Atari. Bushnell le dijo que era un proyecto para General Electric, pero era mentira: solo quería ver si Alcorn podía hacerlo.</p>
+            </div>
+
+            <div class="fun-fact">
+                <strong>🎮 El Prototipo:</strong> El primer prototipo de Pong fue instalado en un bar local llamado Andy Capp's Tavern en Sunnyvale, California. A la semana, la máquina dejó de funcionar. Cuando fueron a repararla, descubrieron que ¡estaba tan llena de monedas que se había atascado!
+            </div>
+
+            <div class="info-section">
+                <h3>Innovaciones Técnicas</h3>
+                <p>Pong fue revolucionario por su simplicidad. No usaba microprocesador ni software: era todo circuitos TTL (lógica transistor-transistor). La "inteligencia" del juego estaba cableada en el hardware.</p>
+            </div>
+
+            <div class="fun-fact">
+                <strong>🔊 El Sonido:</strong> Los efectos de sonido de Pong fueron creados usando circuitos de sincronización que generaban tonos diferentes según dónde golpeaba la pelota. Fue uno de los primeros juegos en tener audio, y el sonido "bip" se volvió icónico.
+            </div>
+
+            <div class="info-section">
+                <h3>El Éxito Comercial</h3>
+                <p>Atari vendió más de 8,000 unidades de Pong arcade. El éxito fue tan grande que inspiró innumerables clones y estableció la industria del videojuego arcade. En 1975, Atari lanzó Home Pong, vendiendo 150,000 unidades solo en Navidad.</p>
+            </div>
+
+            <div class="fun-fact">
+                <strong>💰 Clones Everywhere:</strong> El éxito de Pong generó más de 100 clones ilegales. Empresas de todo el mundo copiaron el diseño, causando pérdidas millonarias a Atari pero también popularizando masivamente los videojuegos.
+            </div>
+
+            <div class="info-section">
+                <h3>Detalles del Diseño</h3>
+                <p>Allan Alcorn añadió características no solicitadas: dividió las paletas en 8 segmentos, cada uno afectando el ángulo de rebote de la pelota. También hizo que la pelota acelerara gradualmente para aumentar la dificultad.</p>
+            </div>
+
+            <div class="fun-fact">
+                <strong>🎯 Física Peculiar:</strong> La física de Pong es deliberadamente "incorrecta". La pelota no rebota de forma realista - Alcorn quería que fuera divertido, no realista. El ángulo de rebote depende de qué parte de la paleta golpea la pelota.
+            </div>
+
+            <div class="info-section">
+                <h3>Impacto Cultural</h3>
+                <p>Pong demostró que los videojuegos podían ser un negocio lucrativo. Estableció a Atari como líder de la industria y abrió el camino para la era dorada de los arcades en los años 70 y 80.</p>
+            </div>
+
+            <div class="fun-fact">
+                <strong>🏆 Legado:</strong> Pong aparece en el Smithsonian Institution como uno de los objetos que definieron América. En 2009, Guinness World Records lo nombró el videojuego arcade de mayor influencia de todos los tiempos.
+            </div>
+
+            <div class="info-section">
+                <h3>Anécdota Personal</h3>
+                <p>Nolan Bushnell intentó vender Pong a otras compañías antes de Atari, incluyendo Bally y Midway. Todos lo rechazaron. Bushnell decidió fabricarlo él mismo, fundando Atari con solo $500. Siete años después, vendió Atari a Warner Communications por $28 millones.</p>
+            </div>
+
+            <div class="fun-fact">
+                <strong>🎨 Simplicidad Genial:</strong> Las instrucciones en la máquina original de Pong decían simplemente: "Avoid missing ball for high score" (Evita perder la pelota para una puntuación alta). Perfectamente minimalista, como el juego mismo.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameStatus = document.getElementById('gameStatus');
+        const winnerOverlay = document.getElementById('winnerOverlay');
+        const winnerText = document.getElementById('winnerText');
+
+        // Audio Context
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Variables de juego
+        let isAIMode = false;
+        let isPaused = false;
+        let score1 = 0;
+        let score2 = 0;
+        let aiDifficulty = 0.7; // 0.5 = fácil, 0.7 = normal, 0.9 = difícil
+        const WINNING_SCORE = 11;
+        let particles = [];
+        let gameStarted = false;
+
+        // Reproducir sonido
+        function playSound(frequency, duration) {
+            if (!audioCtx) return;
+            try {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log('Audio error:', e);
+            }
+        }
+
+        // Clase Partícula
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 4 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.color = color;
+                this.life = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+                this.size = Math.random() * 3 + 1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.97;
+                this.vy *= 0.97;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // Crear partículas
+        function createParticles(x, y, color, count = 15) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // Pelota
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 8,
+            vx: 0,
+            vy: 0,
+            speed: 4,
+            maxSpeed: 12,
+            trail: [],
+            
+            reset() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2;
+                this.speed = 4;
+                this.trail = [];
+                
+                // Esperar un momento antes de lanzar
+                setTimeout(() => {
+                    const angle = (Math.random() - 0.5) * Math.PI / 4;
+                    const direction = Math.random() < 0.5 ? 1 : -1;
+                    this.vx = Math.cos(angle) * this.speed * direction;
+                    this.vy = Math.sin(angle) * this.speed;
+                    gameStarted = true;
+                }, 1000);
+            },
+            
+            update() {
+                if (isPaused || !gameStarted) return;
+
+                this.trail.push({x: this.x, y: this.y});
+                if (this.trail.length > 12) this.trail.shift();
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Colisión con paredes superior e inferior
+                if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
+                    this.vy = -this.vy;
+                    this.y = this.y < canvas.height / 2 ? this.radius : canvas.height - this.radius;
+                    playSound(350, 0.08);
+                    createParticles(this.x, this.y, '#ff8c00', 8);
+                }
+
+                // Colisión con paleta izquierda
+                if (this.x - this.radius < paddle1.x + paddle1.width &&
+                    this.x - this.radius > paddle1.x &&
+                    this.y > paddle1.y && this.y < paddle1.y + paddle1.height) {
+                    
+                    const hitPos = (this.y - paddle1.y) / paddle1.height;
+                    const angle = (hitPos - 0.5) * (Math.PI * 2 / 3);
+                    this.speed = Math.min(this.speed * 1.08, this.maxSpeed);
+                    this.vx = Math.abs(Math.cos(angle) * this.speed);
+                    this.vy = Math.sin(angle) * this.speed;
+                    this.x = paddle1.x + paddle1.width + this.radius;
+                    playSound(450, 0.08);
+                    createParticles(this.x, this.y, '#ff0080', 20);
+                }
+
+                // Colisión con paleta derecha
+                if (this.x + this.radius > paddle2.x &&
+                    this.x + this.radius < paddle2.x + paddle2.width &&
+                    this.y > paddle2.y && this.y < paddle2.y + paddle2.height) {
+                    
+                    const hitPos = (this.y - paddle2.y) / paddle2.height;
+                    const angle = (hitPos - 0.5) * (Math.PI * 2 / 3);
+                    this.speed = Math.min(this.speed * 1.08, this.maxSpeed);
+                    this.vx = -Math.abs(Math.cos(angle) * this.speed);
+                    this.vy = Math.sin(angle) * this.speed;
+                    this.x = paddle2.x - this.radius;
+                    playSound(450, 0.08);
+                    createParticles(this.x, this.y, '#40e0d0', 20);
+                }
+
+                // Puntuación
+                if (this.x < -20) {
+                    score2++;
+                    updateScore();
+                    playSound(200, 0.3);
+                    createParticles(paddle1.x + paddle1.width / 2, paddle1.y + paddle1.height / 2, '#ff0080', 40);
+                    gameStarted = false;
+                    this.reset();
+                    checkWinner();
+                }
+                if (this.x > canvas.width + 20) {
+                    score1++;
+                    updateScore();
+                    playSound(200, 0.3);
+                    createParticles(paddle2.x + paddle2.width / 2, paddle2.y + paddle2.height / 2, '#40e0d0', 40);
+                    gameStarted = false;
+                    this.reset();
+                    checkWinner();
+                }
+            },
+            
+            draw() {
+                // Dibujar rastro
+                this.trail.forEach((pos, i) => {
+                    ctx.globalAlpha = (i / this.trail.length) * 0.6;
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#fff';
+                    const size = (i / this.trail.length) * this.radius;
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+
+                // Dibujar pelota
+                ctx.fillStyle = '#fff';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#fff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        };
+
+        // Paletas
+        const paddle1 = {
+            x: 30,
+            y: canvas.height / 2 - 60,
+            width: 12,
+            height: 120,
+            speed: 7,
+            color: '#ff0080',
+            
+            update() {
+                if (isPaused) return;
+                if (keys['KeyW'] && this.y > 0) {
+                    this.y -= this.speed;
+                }
+                if (keys['KeyS'] && this.y < canvas.height - this.height) {
+                    this.y += this.speed;
+                }
+                // Limitar posición
+                this.y = Math.max(0, Math.min(this.y, canvas.height - this.height));
+            },
+            
+            draw() {
+                // Segmentos para efecto visual
+                const segments = 8;
+                const segmentHeight = this.height / segments;
+                
+                for (let i = 0; i < segments; i++) {
+                    const gradient = ctx.createLinearGradient(
+                        this.x, this.y + i * segmentHeight,
+                        this.x + this.width, this.y + i * segmentHeight
+                    );
+                    gradient.addColorStop(0, this.color);
+                    gradient.addColorStop(1, '#ff4da6');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = this.color;
+                    ctx.fillRect(
+                        this.x,
+                        this.y + i * segmentHeight + 1,
+                        this.width,
+                        segmentHeight - 2
+                    );
+                }
+                ctx.shadowBlur = 0;
+            }
+        };
+
+        const paddle2 = {
+            x: canvas.width - 42,
+            y: canvas.height / 2 - 60,
+            width: 12,
+            height: 120,
+            speed: 7,
+            color: '#40e0d0',
+            
+            update() {
+                if (isPaused) return;
+                if (isAIMode) {
+                    // IA mejorada con predicción
+                    const predictedY = ball.y + ball.vy * 5;
+                    const targetY = predictedY - this.height / 2;
+                    const centerY = this.y + this.height / 2;
+                    const diff = targetY - this.y;
+                    
+                    // Solo moverse si está lo suficientemente cerca
+                    if (ball.vx > 0 && Math.abs(diff) > 10) {
+                        if (diff > 0 && this.y < canvas.height - this.height) {
+                            this.y += this.speed * aiDifficulty;
+                        } else if (diff < 0 && this.y > 0) {
+                            this.y -= this.speed * aiDifficulty;
+                        }
+                    }
+                } else {
+                    if (keys['ArrowUp'] && this.y > 0) {
+                        this.y -= this.speed;
+                    }
+                    if (keys['ArrowDown'] && this.y < canvas.height - this.height) {
+                        this.y += this.speed;
+                    }
+                }
+                // Limitar posición
+                this.y = Math.max(0, Math.min(this.y, canvas.height - this.height));
+            },
+            
+            draw() {
+                const segments = 8;
+                const segmentHeight = this.height / segments;
+                
+                for (let i = 0; i < segments; i++) {
+                    const gradient = ctx.createLinearGradient(
+                        this.x, this.y + i * segmentHeight,
+                        this.x + this.width, this.y + i * segmentHeight
+                    );
+                    gradient.addColorStop(0, this.color);
+                    gradient.addColorStop(1, '#7fffd4');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = this.color;
+                    ctx.fillRect(
+                        this.x,
+                        this.y + i * segmentHeight + 1,
+                        this.width,
+                        segmentHeight - 2
+                    );
+                }
+                ctx.shadowBlur = 0;
+            }
+        };
+
+        // Control de teclado
+        const keys = {};
+        
+        window.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            initAudio();
+            if(['ArrowUp', 'ArrowDown', 'Space'].includes(e.code)) {
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
+
+        // Click para iniciar audio
+        canvas.addEventListener('click', initAudio);
+
+        // Soporte táctil para móviles
+        let touchStartY = 0;
+        let isTouching = false;
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            initAudio();
+            isTouching = true;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isTouching) return;
+            
+            const touchY = e.touches[0].clientY;
+            const rect = canvas.getBoundingClientRect();
+            const canvasY = touchY - rect.top;
+            const relativeY = (canvasY / rect.height) * canvas.height;
+            
+            // Controlar la paleta del jugador 1 con el toque
+            if (!isAIMode) {
+                // En modo 2 jugadores, decidir qué paleta controlar según posición X
+                const touchX = e.touches[0].clientX - rect.left;
+                if (touchX < rect.width / 2) {
+                    paddle1.y = relativeY - paddle1.height / 2;
+                } else {
+                    paddle2.y = relativeY - paddle2.height / 2;
+                }
+            } else {
+                // En modo vs IA, solo controlar jugador 1
+                paddle1.y = relativeY - paddle1.height / 2;
+            }
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isTouching = false;
+        });
+
+        function updateScore() {
+            document.getElementById('score1').textContent = score1;
+            document.getElementById('score2').textContent = score2;
+        }
+
+        function checkWinner() {
+            if (score1 >= WINNING_SCORE) {
+                winnerText.textContent = '¡JUGADOR 1 GANA!';
+                winnerOverlay.classList.add('show');
+                isPaused = true;
+                playSound(600, 0.5);
+            } else if (score2 >= WINNING_SCORE) {
+                winnerText.textContent = isAIMode ? '¡LA COMPUTADORA GANA!' : '¡JUGADOR 2 GANA!';
+                winnerOverlay.classList.add('show');
+                isPaused = true;
+                playSound(600, 0.5);
+            }
+        }
+
+        function drawBackground() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Línea central punteada con glow
+            ctx.strokeStyle = 'rgba(255, 140, 0, 0.4)';
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ff8c00';
+            ctx.setLineDash([20, 20]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.shadowBlur = 0;
+        }
+
+        function gameLoop() {
+            drawBackground();
+            
+            paddle1.update();
+            paddle2.update();
+            ball.update();
+            
+            // Actualizar y dibujar partículas
+            particles = particles.filter(p => {
+                p.update();
+                if (p.life > 0) {
+                    p.draw();
+                    return true;
+                }
+                return false;
+            });
+            
+            paddle1.draw();
+            paddle2.draw();
+            ball.draw();
+
+            // Mostrar mensaje si no ha empezado
+            if (!gameStarted && !isPaused) {
+                ctx.font = 'bold 24px Courier New';
+                ctx.fillStyle = '#ff8c00';
+                ctx.textAlign = 'center';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ff8c00';
+                ctx.fillText('PREPARADO...', canvas.width / 2, canvas.height / 2);
+                ctx.shadowBlur = 0;
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Botones de modo
+        document.getElementById('vsPlayerBtn').addEventListener('click', () => {
+            isAIMode = false;
+            document.getElementById('vsPlayerBtn').classList.add('active');
+            document.getElementById('vsAIBtn').classList.remove('active');
+            document.getElementById('difficultySelector').style.display = 'none';
+            document.getElementById('player2Label').textContent = 'JUGADOR 2';
+            document.getElementById('player2Title').textContent = '➡️ Jugador 2';
+            gameStatus.textContent = '¡Primer jugador en llegar a 11 gana!';
+            resetGame();
+        });
+
+        document.getElementById('vsAIBtn').addEventListener('click', () => {
+            isAIMode = true;
+            document.getElementById('vsAIBtn').classList.add('active');
+            document.getElementById('vsPlayerBtn').classList.remove('active');
+            document.getElementById('difficultySelector').style.display = 'flex';
+            document.getElementById('player2Label').textContent = 'COMPUTADORA';
+            document.getElementById('player2Title').textContent = '🤖 Computadora';
+            gameStatus.textContent = '¡Derrota a la computadora!';
+            resetGame();
+        });
+
+        // Botones de dificultad
+        document.getElementById('easyBtn').addEventListener('click', () => {
+            aiDifficulty = 0.5;
+            document.getElementById('easyBtn').classList.add('active');
+            document.getElementById('mediumBtn').classList.remove('active');
+            document.getElementById('hardBtn').classList.remove('active');
+        });
+
+        document.getElementById('mediumBtn').addEventListener('click', () => {
+            aiDifficulty = 0.7;
+            document.getElementById('mediumBtn').classList.add('active');
+            document.getElementById('easyBtn').classList.remove('active');
+            document.getElementById('hardBtn').classList.remove('active');
+        });
+
+        document.getElementById('hardBtn').addEventListener('click', () => {
+            aiDifficulty = 0.95;
+            document.getElementById('hardBtn').classList.add('active');
+            document.getElementById('easyBtn').classList.remove('active');
+            document.getElementById('mediumBtn').classList.remove('active');
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (winnerOverlay.classList.contains('show')) return;
+            isPaused = !isPaused;
+            document.getElementById('pauseBtn').textContent = isPaused ? '▶️ REANUDAR' : '⏸️ PAUSAR';
+            gameStatus.textContent = isPaused ? '⏸️ PAUSA' : (isAIMode ? '¡Derrota a la computadora!' : '¡Primer jugador en llegar a 11 gana!');
+        });
+
+        function resetGame() {
+            score1 = 0;
+            score2 = 0;
+            updateScore();
+            ball.reset();
+            paddle1.y = canvas.height / 2 - 60;
+            paddle2.y = canvas.height / 2 - 60;
+            particles = [];
+            isPaused = false;
+            gameStarted = false;
+            winnerOverlay.classList.remove('show');
+            document.getElementById('pauseBtn').textContent = '⏸️ PAUSAR';
+            gameStatus.textContent = isAIMode ? '¡Derrota a la computadora!' : '¡Primer jugador en llegar a 11 gana!';
+        }
+
+        // Iniciar juego
+        ball.reset();
+        gameLoop();
+    </script>
+</body>
+</html>
