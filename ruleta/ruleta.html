@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Ruleta de la Suerte</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            color: #fff;
+            font-size: 3.5em;
+            text-shadow: 
+                3px 3px 0 #2980b9,
+                6px 6px 0 #3498db,
+                9px 9px 20px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transform: rotate(-2deg);
+        }
+
+        h4 {
+            font-family: 'Quicksand', sans-serif;
+            color: #fff;
+            font-size: 1.3em;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        canvas#confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1400px;
+            width: 100%;
+            animation: fadeInUp 1s ease-out;
+            border: 5px solid #fff;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px dashed #2196f3;
+        }
+
+        label {
+            display: block;
+            font-size: 1.3em;
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 3px solid #2196f3;
+            border-radius: 15px;
+            resize: vertical;
+            font-family: 'Quicksand', sans-serif;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #0d47a1;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+            transform: scale(1.02);
+        }
+
+        .ruleta-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        @media (min-width: 800px) {
+            .ruleta-section {
+                grid-template-columns: 1fr 400px 1fr;
+            }
+            
+            .input-section {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .columna-izquierda {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-restantes {
+            background: linear-gradient(135deg, #fff9c4 0%, #ffeb3b 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #fbc02d;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .info-restantes h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: #f57f17;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .info-restantes .numero {
+            font-size: 3em;
+            font-weight: 700;
+            color: #e65100;
+            font-family: 'Fredoka', sans-serif;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        }
+
+        .instrucciones {
+            background: linear-gradient(135deg, #f3e5f5 0%, #ce93d8 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #ab47bc;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .instrucciones h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: #6a1b9a;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .instrucciones ol {
+            padding-left: 25px;
+            color: #4a148c;
+            font-weight: 600;
+        }
+
+        .instrucciones li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .ruleta-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ruleta-wrapper {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin: 20px 0;
+        }
+
+        .ruleta {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #ff6b6b 0deg 45deg,
+                #4ecdc4 45deg 90deg,
+                #ffe66d 90deg 135deg,
+                #95e1d3 135deg 180deg,
+                #f38181 180deg 225deg,
+                #aa96da 225deg 270deg,
+                #fcbad3 270deg 315deg,
+                #a8e6cf 315deg 360deg
+            );
+            box-shadow: 
+                0 0 0 15px #fff,
+                0 0 0 18px #2196f3,
+                0 15px 50px rgba(0,0,0,0.3);
+            position: relative;
+            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .ruleta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: repeating-conic-gradient(
+                from 0deg,
+                transparent 0deg 44deg,
+                rgba(255,255,255,0.3) 44deg 45deg
+            );
+        }
+
+        .ruleta.spinning {
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+
+        .flecha {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-top: 60px solid #e53935;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+            z-index: 10;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        .flecha::after {
+            content: '▼';
+            position: absolute;
+            top: -55px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            color: #fff;
+        }
+
+        .centro-ruleta {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 0 8px #fff,
+                0 0 0 12px #2196f3,
+                0 8px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 2.5em;
+            z-index: 5;
+        }
+
+        .btn-girar {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.4em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 
+                0 0 0 5px #fff,
+                0 0 0 8px #43a047,
+                0 10px 30px rgba(67, 160, 71, 0.5);
+            transition: all 0.3s ease;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 25px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .btn-girar:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 0 0 5px #fff,
+                0 0 0 8px #43a047,
+                0 15px 40px rgba(67, 160, 71, 0.7);
+        }
+
+        .btn-girar:active:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-girar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, #bdbdbd, #9e9e9e);
+        }
+
+        .lista-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .lista-exposicion {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 3px solid #66bb6a;
+        }
+
+        .lista-exposicion h3 {
+            font-family: 'Fredoka', sans-serif;
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            text-align: center;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
+        }
+
+        .lista-exposicion ul {
+            list-style: none;
+        }
+
+        .lista-exposicion li {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.5s ease-out;
+            transition: all 0.3s ease;
+            border-left: 5px solid #66bb6a;
+        }
+
+        .lista-exposicion li:hover {
+            transform: translateX(8px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .numero-orden {
+            background: linear-gradient(135deg, #ff7043, #f4511e);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 1.3em;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .ganador-actual {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 0 5px #fff,
+                0 0 0 10px #ff9800,
+                0 15px 40px rgba(0,0,0,0.3);
+            animation: ganadorAppear 0.8s ease-out;
+            border: 5px solid #fff;
+        }
+
+        .ganador-actual h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: white;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+
+        .ganador-actual p {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            font-family: 'Fredoka', sans-serif;
+            background: rgba(255,255,255,0.2);
+            padding: 15px 30px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .alerta {
+            background: linear-gradient(135deg, #ef5350, #e53935);
+            color: white;
+            padding: 18px 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+            animation: shake 0.5s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            border: 3px solid #fff;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        @keyframes ganadorAppear {
+            0% {
+                transform: scale(0.5) rotate(-10deg);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.1) rotate(5deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @media (max-width: 799px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .ruleta-wrapper {
+                width: 280px;
+                height: 280px;
+            }
+
+            .ruleta-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .columna-izquierda {
+                order: 2;
+            }
+            
+            .ruleta-container {
+                order: 1;
+            }
+            
+            .lista-section {
+                order: 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confetti"></canvas>
+    
+    <div class="header">
+        <h1>📚 La Ruleta de la Suerte 🎓</h1>
+        <h4>por frMoisesfr</h4>
+    </div>
+
+    <div class="container">
+        <div class="input-section">
+            <label for="alumnos">✏️ Lista de Alumnos (uno por línea):</label>
+            <textarea id="alumnos" placeholder="Escribe el nombre de cada alumno en una línea...&#10;Ejemplo:&#10;Juan Pérez&#10;María García&#10;Pedro López"></textarea>
+        </div>
+
+        <div id="alerta" class="alerta" style="display: none;"></div>
+
+        <div class="ruleta-section">
+            <div class="columna-izquierda">
+                <div class="info-restantes">
+                    <h3>👥 Alumnos Restantes</h3>
+                    <div class="numero" id="numRestantes">0</div>
+                </div>
+                
+                <div class="instrucciones">
+                    <h3>📖 Instrucciones</h3>
+                    <ol>
+                        <li>Introduce los nombres de los alumnos</li>
+                        <li>Haz clic en "Girar la Ruleta"</li>
+                        <li>La ruleta seleccionará un alumno</li>
+                        <li>El alumno se añade al orden de exposición</li>
+                        <li>Continúa hasta seleccionar a todos</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="ruleta-container">
+                <div class="ruleta-wrapper">
+                    <div class="flecha"></div>
+                    <div class="ruleta" id="ruleta">
+                        <div class="centro-ruleta">🎯</div>
+                    </div>
+                </div>
+                <button class="btn-girar" id="btnGirar">🎲 Girar la Ruleta</button>
+            </div>
+
+            <div class="lista-section">
+                <div class="lista-exposicion">
+                    <h3>📋 Orden de Exposición</h3>
+                    <ul id="listaExposicion"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="ganadorActual" class="ganador-actual" style="display: none;">
+            <h2>🎉 ¡Alumno Seleccionado! 🎉</h2>
+            <p id="nombreGanador"></p>
+        </div>
+    </div>
+
+    <script>
+        let alumnosDisponibles = [];
+        let alumnosSeleccionados = [];
+        let girando = false;
+
+        const textarea = document.getElementById('alumnos');
+        const btnGirar = document.getElementById('btnGirar');
+        const ruleta = document.getElementById('ruleta');
+        const listaExposicion = document.getElementById('listaExposicion');
+        const ganadorActual = document.getElementById('ganadorActual');
+        const nombreGanador = document.getElementById('nombreGanador');
+        const alerta = document.getElementById('alerta');
+        const numRestantes = document.getElementById('numRestantes');
+
+        // Configuración del confeti
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let confettiParticles = [];
+
+        class ConfettiParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -10;
+                this.size = Math.random() * 8 + 5;
+                this.speedY = Math.random() * 3 + 2;
+                this.speedX = Math.random() * 2 - 1;
+                this.color = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#95e1d3', '#f38181', '#aa96da'][Math.floor(Math.random() * 6)];
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+                
+                if (this.y > canvas.height) {
+                    return false;
+                }
+                return true;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function lanzarConfeti() {
+            for (let i = 0; i < 150; i++) {
+                confettiParticles.push(new ConfettiParticle());
+            }
+            animarConfeti();
+        }
+
+        function animarConfeti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            confettiParticles = confettiParticles.filter(particle => {
+                particle.update();
+                particle.draw();
+                return particle.y <= canvas.height;
+            });
+
+            if (confettiParticles.length > 0) {
+                requestAnimationFrame(animarConfeti);
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        btnGirar.addEventListener('click', girarRuleta);
+
+        textarea.addEventListener('input', actualizarContador);
+
+        function actualizarContador() {
+            const texto = textarea.value.trim();
+            if (!texto) {
+                numRestantes.textContent = '0';
+                return;
+            }
+
+            const todosAlumnos = texto.split('\n')
+                .map(nombre => nombre.trim())
+                .filter(nombre => nombre.length > 0);
+
+            const restantes = todosAlumnos.filter(
+                alumno => !alumnosSeleccionados.includes(alumno)
+            ).length;
+
+            numRestantes.textContent = restantes;
+        }
+
+        function mostrarAlerta(mensaje) {
+            alerta.textContent = mensaje;
+            alerta.style.display = 'block';
+            setTimeout(() => {
+                alerta.style.display = 'none';
+            }, 3000);
+        }
+
+        function girarRuleta() {
+            if (girando) return;
+
+            // Obtener alumnos del textarea
+            const texto = textarea.value.trim();
+            if (!texto) {
+                mostrarAlerta('⚠️ Por favor, añade nombres de alumnos primero');
+                return;
+            }
+
+            // Actualizar lista de alumnos disponibles
+            const todosAlumnos = texto.split('\n')
+                .map(nombre => nombre.trim())
+                .filter(nombre => nombre.length > 0);
+
+            // Filtrar alumnos que ya fueron seleccionados
+            alumnosDisponibles = todosAlumnos.filter(
+                alumno => !alumnosSeleccionados.includes(alumno)
+            );
+
+            if (alumnosDisponibles.length === 0) {
+                mostrarAlerta('🎉 ¡Todos los alumnos han sido seleccionados!');
+                return;
+            }
+
+            girando = true;
+            btnGirar.disabled = true;
+            ganadorActual.style.display = 'none';
+
+            // Animación de giro
+            const vueltas = 5 + Math.random() * 3; // Entre 5 y 8 vueltas
+            const grados = vueltas * 360;
+            
+            ruleta.classList.add('spinning');
+            ruleta.style.transform = `rotate(${grados}deg)`;
+
+            // Después de 3 segundos, seleccionar ganador
+            setTimeout(() => {
+                const indiceGanador = Math.floor(Math.random() * alumnosDisponibles.length);
+                const ganador = alumnosDisponibles[indiceGanador];
+
+                // Añadir a la lista de seleccionados
+                alumnosSeleccionados.push(ganador);
+
+                // Lanzar confeti
+                lanzarConfeti();
+
+                // Mostrar ganador
+                nombreGanador.textContent = ganador;
+                ganadorActual.style.display = 'block';
+
+                // Añadir a la lista de exposición
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="numero-orden">${alumnosSeleccionados.length}</div>
+                    <span>${ganador}</span>
+                `;
+                listaExposicion.appendChild(li);
+
+                // Actualizar contador
+                actualizarContador();
+
+                // Resetear estado
+                girando = false;
+                btnGirar.disabled = false;
+                ruleta.classList.remove('spinning');
+
+                // Resetear la rotación para la próxima vez
+                setTimeout(() => {
+                    ruleta.style.transition = 'none';
+                    ruleta.style.transform = 'rotate(0deg)';
+                    setTimeout(() => {
+                        ruleta.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+                    }, 50);
+                }, 100);
+
+                // Comprobar si quedan alumnos
+                if (alumnosSeleccionados.length === todosAlumnos.length) {
+                    setTimeout(() => {
+                        mostrarAlerta('🎊 ¡Todos los alumnos han sido seleccionados!');
+                    }, 500);
+                }
+            }, 3000);
+        }
+
+        // Inicializar contador
+        actualizarContador();
+    </script>
+</body>
+</html>
