@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OXO (1952)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #00ff00;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .crt-screen {
+            background: #000;
+            border: 20px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 
+                0 0 50px rgba(0, 255, 0, 0.3),
+                inset 0 0 30px rgba(0, 255, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crt-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff00;
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            opacity: 0.7;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            margin: 30px auto;
+            justify-content: center;
+        }
+
+        .cell {
+            background: #001100;
+            border: 3px solid #00ff00;
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .cell:hover:not(.taken) {
+            background: #002200;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+        }
+
+        .cell.winning {
+            background: #003300;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .status {
+            font-size: 1.3rem;
+            margin: 20px 0;
+            min-height: 30px;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        button {
+            background: #001100;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        button:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+        }
+
+        .info {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            opacity: 0.6;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .score {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            font-size: 1rem;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="crt-screen">
+            <h1>OXO</h1>
+            <div class="subtitle">EDSAC Computer (1952)</div>
+            
+            <div class="status" id="status">Tu turno - Juega como X</div>
+            
+            <div class="game-board" id="board">
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+            </div>
+
+            <div class="score">
+                <div class="score-item">
+                    <div>Jugador (X)</div>
+                    <div class="score-value" id="playerScore">0</div>
+                </div>
+                <div class="score-item">
+                    <div>EDSAC (O)</div>
+                    <div class="score-value" id="computerScore">0</div>
+                </div>
+                <div class="score-item">
+                    <div>Empates</div>
+                    <div class="score-value" id="drawScore">0</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="resetBtn">Nueva Partida</button>
+                <button id="resetScoreBtn">Reiniciar Marcador</button>
+            </div>
+
+            <div class="info">
+                OXO fue el primer juego de ordenador con gráficos, creado por Alexander S. Douglas en 1952 
+                para el ordenador EDSAC de la Universidad de Cambridge como parte de su tesis doctoral sobre 
+                interacción humano-computadora.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameActive = true;
+        let scores = { player: 0, computer: 0, draw: 0 };
+
+        const statusDisplay = document.getElementById('status');
+        const cells = document.querySelectorAll('.cell');
+        const resetBtn = document.getElementById('resetBtn');
+        const resetScoreBtn = document.getElementById('resetScoreBtn');
+        const playerScoreDisplay = document.getElementById('playerScore');
+        const computerScoreDisplay = document.getElementById('computerScore');
+        const drawScoreDisplay = document.getElementById('drawScore');
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function handleCellClick(e) {
+            const clickedCell = e.target;
+            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (board[clickedCellIndex] !== '' || !gameActive || currentPlayer === 'O') {
+                return;
+            }
+
+            handleCellPlayed(clickedCell, clickedCellIndex);
+            handleResultValidation();
+
+            if (gameActive && currentPlayer === 'O') {
+                setTimeout(computerMove, 500);
+            }
+        }
+
+        function handleCellPlayed(clickedCell, clickedCellIndex) {
+            board[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+            clickedCell.classList.add('taken');
+        }
+
+        function handleResultValidation() {
+            let roundWon = false;
+            let winningCombination = null;
+
+            for (let i = 0; i < winningConditions.length; i++) {
+                const winCondition = winningConditions[i];
+                const a = board[winCondition[0]];
+                const b = board[winCondition[1]];
+                const c = board[winCondition[2]];
+
+                if (a === '' || b === '' || c === '') {
+                    continue;
+                }
+
+                if (a === b && b === c) {
+                    roundWon = true;
+                    winningCombination = winCondition;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                if (winningCombination) {
+                    winningCombination.forEach(index => {
+                        cells[index].classList.add('winning');
+                    });
+                }
+                
+                if (currentPlayer === 'X') {
+                    statusDisplay.textContent = '¡Has ganado!';
+                    scores.player++;
+                    playerScoreDisplay.textContent = scores.player;
+                } else {
+                    statusDisplay.textContent = 'EDSAC gana';
+                    scores.computer++;
+                    computerScoreDisplay.textContent = scores.computer;
+                }
+                gameActive = false;
+                return;
+            }
+
+            const roundDraw = !board.includes('');
+            if (roundDraw) {
+                statusDisplay.textContent = 'Empate';
+                scores.draw++;
+                drawScoreDisplay.textContent = scores.draw;
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusDisplay.textContent = currentPlayer === 'X' ? 'Tu turno - Juega como X' : 'Turno de EDSAC...';
+        }
+
+        function computerMove() {
+            if (!gameActive) return;
+
+            // IA simple: primero intenta ganar, luego bloquear, luego movimiento aleatorio
+            let move = findWinningMove('O');
+            if (move === -1) move = findWinningMove('X');
+            if (move === -1) move = findBestMove();
+
+            if (move !== -1) {
+                const cell = cells[move];
+                handleCellPlayed(cell, move);
+                handleResultValidation();
+            }
+        }
+
+        function findWinningMove(player) {
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                const values = [board[a], board[b], board[c]];
+                const playerCount = values.filter(v => v === player).length;
+                const emptyCount = values.filter(v => v === '').length;
+
+                if (playerCount === 2 && emptyCount === 1) {
+                    if (board[a] === '') return a;
+                    if (board[b] === '') return b;
+                    if (board[c] === '') return c;
+                }
+            }
+            return -1;
+        }
+
+        function findBestMove() {
+            // Preferir centro, luego esquinas, luego lados
+            if (board[4] === '') return 4;
+            
+            const corners = [0, 2, 6, 8];
+            const availableCorners = corners.filter(i => board[i] === '');
+            if (availableCorners.length > 0) {
+                return availableCorners[Math.floor(Math.random() * availableCorners.length)];
+            }
+
+            const availableCells = board.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
+            return availableCells.length > 0 ? availableCells[Math.floor(Math.random() * availableCells.length)] : -1;
+        }
+
+        function handleResetGame() {
+            gameActive = true;
+            currentPlayer = 'X';
+            board = ['', '', '', '', '', '', '', '', ''];
+            statusDisplay.textContent = 'Tu turno - Juega como X';
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('taken', 'winning');
+            });
+        }
+
+        function handleResetScore() {
+            scores = { player: 0, computer: 0, draw: 0 };
+            playerScoreDisplay.textContent = '0';
+            computerScoreDisplay.textContent = '0';
+            drawScoreDisplay.textContent = '0';
+            handleResetGame();
+        }
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        resetBtn.addEventListener('click', handleResetGame);
+        resetScoreBtn.addEventListener('click', handleResetScore);
+    </script>
+</body>
+</html>
