@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python - Tutorial Práctico desde Cero</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 3rem 4rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .slide::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .slide::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .slide::-webkit-scrollbar-thumb {
+            background: rgba(255, 212, 59, 0.5);
+            border-radius: 4px;
+        }
+
+        .slide::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 212, 59, 0.7);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            z-index: 10;
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        /* Headers */
+        .slide-header {
+            background: linear-gradient(90deg, #306998 0%, #4B8BBE 100%);
+            padding: 2.5rem 3rem 2rem 3rem;
+            margin: -3rem -4rem 2rem -4rem;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .slide-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            padding-top: 0.5rem;
+        }
+
+        .slide-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid #FFD43B;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block::before {
+            content: 'Python';
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            color: #FFD43B;
+            font-family: 'Fira Code', monospace;
+            opacity: 0.6;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            line-height: 2.2;
+            display: block;
+            color: #d4d4d4;
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .number { color: #b5cea8; }
+        .function { color: #dcdcaa; }
+        .comment { color: #6a9955; font-style: italic; }
+        .operator { color: #d4d4d4; }
+
+        /* Output blocks */
+        .output-block {
+            background: #0d1117;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid #4CAF50;
+            font-family: 'Fira Code', monospace;
+            color: #4CAF50;
+        }
+
+        .output-block::before {
+            content: 'Salida';
+            display: block;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.7;
+        }
+
+        /* Content sections */
+        .content-section {
+            margin-bottom: 2rem;
+        }
+
+        .content-section h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            color: #FFD43B;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .content-section h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            color: #4B8BBE;
+            margin: 1.5rem 0 0.8rem 0;
+            font-weight: 600;
+        }
+
+        .content-section p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background: rgba(75, 139, 190, 0.1);
+            border-left: 4px solid #4B8BBE;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .info-box.tip {
+            background: rgba(76, 175, 80, 0.1);
+            border-left-color: #4CAF50;
+        }
+
+        .info-box.warning {
+            background: rgba(255, 152, 0, 0.1);
+            border-left-color: #FF9800;
+        }
+
+        .info-box strong {
+            color: #FFD43B;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Example grids */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 212, 59, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .example-card:hover {
+            transform: translateY(-5px);
+            border-color: #FFD43B;
+            box-shadow: 0 10px 30px rgba(255, 212, 59, 0.2);
+        }
+
+        .example-card h4 {
+            font-family: 'Poppins', sans-serif;
+            color: #FFD43B;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Table styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #306998;
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table code {
+            font-family: 'Fira Code', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: #FFD43B;
+        }
+
+        /* Slide 1 - Title */
+        .slide-1 {
+            background: linear-gradient(135deg, #1a1a2e 0%, #306998 50%, #4B8BBE 100%);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-1 .logo {
+            width: 180px;
+            height: 180px;
+            background: #FFD43B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5.5rem;
+            font-weight: 900;
+            color: #306998;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 20px 60px rgba(255, 212, 59, 0.3);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .slide-1 h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #FFD43B;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 0.05em;
+        }
+
+        .slide-1 h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            color: #ffffff;
+            font-weight: 300;
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.03em;
+        }
+
+        .slide-1 .stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .slide-1 .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.1rem;
+        }
+
+        /* Different slide backgrounds */
+        .slide-2 { background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%); }
+        .slide-3 { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
+        .slide-4 { background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%); }
+        .slide-5 { background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); }
+        .slide-6 { background: linear-gradient(135deg, #141E30 0%, #243B55 100%); }
+        .slide-7 { background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%); }
+        .slide-8 { background: linear-gradient(135deg, #1a1a2e 0%, #2c3e50 100%); }
+        .slide-9 { background: linear-gradient(135deg, #16213e 0%, #1e3a5f 100%); }
+        .slide-10 { 
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%); 
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Final slide styles */
+        .slide-10 h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: #FFD43B;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .final-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            max-width: 800px;
+            border: 2px solid rgba(255, 212, 59, 0.3);
+        }
+
+        .final-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            color: #FFD43B;
+            margin-bottom: 1.5rem;
+        }
+
+        .final-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .next-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .next-step {
+            background: rgba(48, 105, 152, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #4B8BBE;
+        }
+
+        .next-step h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #FFD43B;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Navigation */
+        .slide-counter {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FFD43B;
+            z-index: 100;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-buttons {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-button {
+            width: 50px;
+            height: 50px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #FFD43B;
+            font-size: 1.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: #FFD43B;
+            color: #1a1a2e;
+            transform: scale(1.1);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Ejercicios prácticos */
+        .exercise-section {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%);
+            border: 2px solid rgba(255, 152, 0, 0.5);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .exercise-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .exercise-title {
+            flex: 1;
+        }
+
+        .exercise-title h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            color: #FFC107;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .exercise-title p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .exercise-problem {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #FF9800;
+        }
+
+        .exercise-problem h4 {
+            font-family: 'Poppins', sans-serif;
+            color: #FFC107;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .exercise-problem p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-problem ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .exercise-problem li {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+            margin-bottom: 0.3rem;
+        }
+
+        .exercise-solution {
+            position: relative;
+        }
+
+        .solution-toggle {
+            background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+            color: #1a1a2e;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .solution-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .solution-toggle span {
+            font-size: 1.2rem;
+        }
+
+        .solution-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .solution-content.show {
+            max-height: 2000px;
+        }
+
+        .solution-explanation {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid #4CAF50;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .solution-explanation h5 {
+            font-family: 'Poppins', sans-serif;
+            color: #4CAF50;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .solution-explanation p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+
+        /* Menu desplegable */
+        .menu-toggle {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255, 212, 59, 0.2);
+            border-color: #FFD43B;
+        }
+
+        .menu-toggle span {
+            color: #FFD43B;
+            font-size: 1.5rem;
+        }
+
+        .slide-menu {
+            position: fixed;
+            top: 0;
+            left: -350px;
+            width: 350px;
+            height: 100vh;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(20px);
+            border-right: 2px solid rgba(255, 212, 59, 0.3);
+            transition: left 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 999;
+            overflow-y: auto;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .slide-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .slide-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .slide-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 212, 59, 0.5);
+            border-radius: 3px;
+        }
+
+        .slide-menu.open {
+            left: 0;
+        }
+
+        .menu-header {
+            padding: 2rem;
+            background: linear-gradient(90deg, #306998 0%, #4B8BBE 100%);
+            border-bottom: 2px solid rgba(255, 212, 59, 0.3);
+        }
+
+        .menu-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            color: #FFD43B;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-header p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .menu-items {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 212, 59, 0.1);
+            border-left-color: #FFD43B;
+        }
+
+        .menu-item.active {
+            background: rgba(75, 139, 190, 0.2);
+            border-left-color: #4B8BBE;
+        }
+
+        .menu-item-number {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 212, 59, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #FFD43B;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .menu-item.active .menu-item-number {
+            background: #4B8BBE;
+            color: #fff;
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        .menu-item-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.2rem;
+        }
+
+        .menu-item-subtitle {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Overlay para cerrar el menú */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 998;
+        }
+
+        .menu-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .slide-header h1 {
+                font-size: 2.3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 2rem;
+            }
+
+            .slide-header {
+                margin: -2rem -2rem 1.5rem -2rem;
+                padding: 2rem 2rem 1.5rem 2rem;
+            }
+
+            .slide-1 h1 {
+                font-size: 2.5rem;
+            }
+
+            .next-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .slide-menu {
+                width: 280px;
+                left: -280px;
+            }
+
+            .menu-toggle {
+                top: 1.5rem;
+                left: 1.5rem;
+                width: 45px;
+                height: 45px;
+            }
+
+            .menu-header {
+                padding: 1.5rem;
+            }
+
+            .menu-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .menu-item {
+                padding: 0.8rem 1.5rem;
+            }
+
+            .menu-item-number {
+                width: 26px;
+                height: 26px;
+                font-size: 0.8rem;
+            }
+
+            .menu-item-title {
+                font-size: 0.95rem;
+            }
+
+            .menu-item-subtitle {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-1 active">
+            <div class="logo">Py</div>
+            <h1>PYTHON</h1>
+            <h2>Tutorial Práctico desde Cero</h2>
+            <div class="stats">
+                <div class="stat-box">💻 PyCharm Listo</div>
+                <div class="stat-box">🚀 Comenzamos Ya</div>
+                <div class="stat-box">📚 Ejemplos Prácticos</div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Hello World & Print -->
+        <div class="slide slide-2">
+            <div class="slide-header">
+                <h1>Primeros Pasos: Hello World</h1>
+                <p>El comando más importante: print()</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Tu Primer Programa</h2>
+                <p>La función <code>print()</code> muestra información en la pantalla.</p>
+                
+                <div class="code-block">
+                    <code><span class="function">print</span>(<span class="string">"¡Hola, Mundo!"</span>)</code>
+                </div>
+                
+                <div class="output-block">
+                    ¡Hola, Mundo!
+                </div>
+            </div>
+
+            <div class="examples-grid">
+                <div class="example-card">
+                    <h4>Múltiples líneas</h4>
+                    <div class="code-block">
+                        <code><span class="function">print</span>(<span class="string">"Línea 1"</span>)<br>
+<span class="function">print</span>(<span class="string">"Línea 2"</span>)<br>
+<span class="function">print</span>(<span class="string">"Línea 3"</span>)</code>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <h4>Números y cálculos</h4>
+                    <div class="code-block">
+                        <code><span class="function">print</span>(<span class="number">42</span>)<br>
+<span class="function">print</span>(<span class="number">10</span> <span class="operator">+</span> <span class="number">5</span>)<br>
+<span class="function">print</span>(<span class="number">7</span> <span class="operator">*</span> <span class="number">6</span>)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <strong>💡 Tip:</strong>
+                En PyCharm, escribe tu código y presiona <strong>Shift + F10</strong> para ejecutarlo.
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico</h3>
+                        <p>Pon en práctica lo aprendido</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea un programa que muestre tu tarjeta de presentación con:</p>
+                    <ul>
+                        <li>Tu nombre completo</li>
+                        <li>Tu edad</li>
+                        <li>Tu ciudad</li>
+                        <li>Una frase motivacional que te guste</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution2')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution2">
+                        <div class="code-block">
+                            <code><span class="function">print</span>(<span class="string">"==============================="</span>)<br>
+<span class="function">print</span>(<span class="string">"    TARJETA DE PRESENTACIÓN"</span>)<br>
+<span class="function">print</span>(<span class="string">"==============================="</span>)<br>
+<span class="function">print</span>(<span class="string">"Nombre: Ana García López"</span>)<br>
+<span class="function">print</span>(<span class="string">"Edad: 25 años"</span>)<br>
+<span class="function">print</span>(<span class="string">"Ciudad: Barcelona"</span>)<br>
+<span class="function">print</span>(<span class="string">"Frase: El éxito es la suma de pequeños esfuerzos"</span>)<br>
+<span class="function">print</span>(<span class="string">"==============================="</span>)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Usamos múltiples llamadas a print() para mostrar cada línea de información. Los símbolos "=" ayudan a crear un marco visual atractivo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Variables -->
+        <div class="slide slide-3">
+            <div class="slide-header">
+                <h1>Variables: Guardando Información</h1>
+                <p>Las variables son como cajas donde guardamos datos</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Crear Variables</h2>
+                <p>En Python no necesitas declarar el tipo de variable.</p>
+                
+                <div class="code-block">
+                    <code><span class="comment"># Variables de texto</span><br>
+nombre <span class="operator">=</span> <span class="string">"Ana"</span><br>
+apellido <span class="operator">=</span> <span class="string">"García"</span><br>
+<br>
+<span class="comment"># Variables numéricas</span><br>
+edad <span class="operator">=</span> <span class="number">25</span><br>
+altura <span class="operator">=</span> <span class="number">1.65</span><br>
+<br>
+<span class="comment"># Mostrar variables</span><br>
+<span class="function">print</span>(nombre)<br>
+<span class="function">print</span>(edad)</code>
+                </div>
+
+                <div class="output-block">
+                    Ana<br>
+                    25
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Tipos de Datos Básicos</h2>
+                <table class="data-table">
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                    <tr>
+                        <td><code>str</code></td>
+                        <td>Texto (strings)</td>
+                        <td><code>"Hola"</code>, <code>'Python'</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>int</code></td>
+                        <td>Números enteros</td>
+                        <td><code>42</code>, <code>-10</code>, <code>0</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>float</code></td>
+                        <td>Números decimales</td>
+                        <td><code>3.14</code>, <code>-0.5</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>bool</code></td>
+                        <td>Verdadero/Falso</td>
+                        <td><code>True</code>, <code>False</code></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="info-box">
+                <strong>📌 Reglas para nombres de variables:</strong>
+                Solo letras, números y guión bajo (_). No pueden empezar con número. Son case-sensitive (edad ≠ Edad).
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico</h3>
+                        <p>Pon en práctica lo aprendido</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea un programa que calcule y muestre información de un estudiante:</p>
+                    <ul>
+                        <li>Guarda el nombre del estudiante en una variable</li>
+                        <li>Guarda su nota del primer examen (por ejemplo: 8.5)</li>
+                        <li>Guarda su nota del segundo examen (por ejemplo: 9.0)</li>
+                        <li>Calcula el promedio de las dos notas</li>
+                        <li>Muestra toda la información usando print()</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution3')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution3">
+                        <div class="code-block">
+                            <code><span class="comment"># Datos del estudiante</span><br>
+nombre_estudiante <span class="operator">=</span> <span class="string">"Carlos Martínez"</span><br>
+nota_examen1 <span class="operator">=</span> <span class="number">8.5</span><br>
+nota_examen2 <span class="operator">=</span> <span class="number">9.0</span><br>
+<br>
+<span class="comment"># Calcular promedio</span><br>
+promedio <span class="operator">=</span> (nota_examen1 <span class="operator">+</span> nota_examen2) <span class="operator">/</span> <span class="number">2</span><br>
+<br>
+<span class="comment"># Mostrar resultados</span><br>
+<span class="function">print</span>(<span class="string">"Estudiante:"</span>, nombre_estudiante)<br>
+<span class="function">print</span>(<span class="string">"Nota Examen 1:"</span>, nota_examen1)<br>
+<span class="function">print</span>(<span class="string">"Nota Examen 2:"</span>, nota_examen2)<br>
+<span class="function">print</span>(<span class="string">"Promedio:"</span>, promedio)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Creamos variables para almacenar datos (strings para texto, float para decimales). Luego calculamos el promedio dividiendo la suma entre 2 y lo guardamos en una nueva variable.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Operadores -->
+        <div class="slide slide-4">
+            <div class="slide-header">
+                <h1>Operadores Matemáticos</h1>
+                <p>Realiza cálculos con Python</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Operadores Aritméticos</h2>
+                
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h4>Suma y Resta</h4>
+                        <div class="code-block">
+                            <code>a <span class="operator">=</span> <span class="number">10</span> <span class="operator">+</span> <span class="number">5</span>  <span class="comment"># 15</span><br>
+b <span class="operator">=</span> <span class="number">20</span> <span class="operator">-</span> <span class="number">8</span>  <span class="comment"># 12</span><br>
+<span class="function">print</span>(a, b)</code>
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Multiplicación y División</h4>
+                        <div class="code-block">
+                            <code>c <span class="operator">=</span> <span class="number">7</span> <span class="operator">*</span> <span class="number">6</span>   <span class="comment"># 42</span><br>
+d <span class="operator">=</span> <span class="number">15</span> <span class="operator">/</span> <span class="number">3</span>  <span class="comment"># 5.0</span><br>
+<span class="function">print</span>(c, d)</code>
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>División Entera</h4>
+                        <div class="code-block">
+                            <code>e <span class="operator">=</span> <span class="number">17</span> <span class="operator">//</span> <span class="number">5</span>  <span class="comment"># 3</span>
+<span class="function">print</span>(e)</code>
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Módulo (Resto)</h4>
+                        <div class="code-block">
+                            <code>f <span class="operator">=</span> <span class="number">17</span> <span class="operator">%</span> <span class="number">5</span>   <span class="comment"># 2</span>
+<span class="function">print</span>(f)</code>
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Potencia</h4>
+                        <div class="code-block">
+                            <code>g <span class="operator">=</span> <span class="number">2</span> <span class="operator">**</span> <span class="number">3</span>   <span class="comment"># 8</span>
+<span class="function">print</span>(g)</code>
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Ejemplo Práctico</h4>
+                        <div class="code-block">
+                            <code>precio <span class="operator">=</span> <span class="number">19.99</span><br>
+cantidad <span class="operator">=</span> <span class="number">3</span><br>
+total <span class="operator">=</span> precio <span class="operator">*</span> cantidad<br>
+<span class="function">print</span>(total)</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <strong>🎯 Práctica:</strong>
+                Crea un programa que calcule el área de un rectángulo (base * altura).
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico</h3>
+                        <p>Pon en práctica lo aprendido</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea una calculadora de compras que calcule:</p>
+                    <ul>
+                        <li>Precio unitario de un producto: €15.99</li>
+                        <li>Cantidad a comprar: 4 unidades</li>
+                        <li>Calcula el subtotal (precio × cantidad)</li>
+                        <li>Aplica un descuento del 10% (subtotal × 0.10)</li>
+                        <li>Calcula el total final (subtotal - descuento)</li>
+                        <li>Calcula el IVA 21% sobre el total (total × 0.21)</li>
+                        <li>Muestra todos los valores</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution4')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution4">
+                        <div class="code-block">
+                            <code><span class="comment"># Datos de la compra</span><br>
+precio_unitario <span class="operator">=</span> <span class="number">15.99</span><br>
+cantidad <span class="operator">=</span> <span class="number">4</span><br>
+<br>
+<span class="comment"># Cálculos</span><br>
+subtotal <span class="operator">=</span> precio_unitario <span class="operator">*</span> cantidad<br>
+descuento <span class="operator">=</span> subtotal <span class="operator">*</span> <span class="number">0.10</span><br>
+total_con_descuento <span class="operator">=</span> subtotal <span class="operator">-</span> descuento<br>
+iva <span class="operator">=</span> total_con_descuento <span class="operator">*</span> <span class="number">0.21</span><br>
+total_final <span class="operator">=</span> total_con_descuento <span class="operator">+</span> iva<br>
+<br>
+<span class="comment"># Mostrar resultados</span><br>
+<span class="function">print</span>(<span class="string">"Subtotal:"</span>, subtotal, <span class="string">"€"</span>)<br>
+<span class="function">print</span>(<span class="string">"Descuento (10%):"</span>, descuento, <span class="string">"€"</span>)<br>
+<span class="function">print</span>(<span class="string">"Total con descuento:"</span>, total_con_descuento, <span class="string">"€"</span>)<br>
+<span class="function">print</span>(<span class="string">"IVA (21%):"</span>, iva, <span class="string">"€"</span>)<br>
+<span class="function">print</span>(<span class="string">"TOTAL FINAL:"</span>, total_final, <span class="string">"€"</span>)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Utilizamos operadores aritméticos (* para multiplicar, - para restar, + para sumar) y almacenamos cada resultado en variables para luego mostrarlos. Es un ejemplo práctico de cómo Python puede hacer cálculos del mundo real.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Strings -->
+        <div class="slide slide-5">
+            <div class="slide-header">
+                <h1>Trabajando con Texto (Strings)</h1>
+                <p>Manipula y formatea texto fácilmente</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Concatenación y F-Strings</h2>
+                
+                <div class="code-block">
+                    <code><span class="comment"># Concatenación simple</span><br>
+nombre <span class="operator">=</span> <span class="string">"María"</span><br>
+saludo <span class="operator">=</span> <span class="string">"Hola, "</span> <span class="operator">+</span> nombre <span class="operator">+</span> <span class="string">"!"</span><br>
+<span class="function">print</span>(saludo)<br>
+<br>
+<span class="comment"># F-strings (¡Recomendado!)</span><br>
+edad <span class="operator">=</span> <span class="number">30</span><br>
+mensaje <span class="operator">=</span> <span class="string">f"<span class="operator">{</span>nombre<span class="operator">}</span> tiene <span class="operator">{</span>edad<span class="operator">}</span> años"</span><br>
+<span class="function">print</span>(mensaje)</code>
+                </div>
+
+                <div class="output-block">
+                    Hola, María!<br>
+                    María tiene 30 años
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Métodos Útiles de Strings</h2>
+                
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h4>Mayúsculas/Minúsculas</h4>
+                        <div class="code-block">
+                            <code>texto <span class="operator">=</span> <span class="string">"Python"</span><br>
+<span class="function">print</span>(texto.<span class="function">upper</span>())<br>
+<span class="function">print</span>(texto.<span class="function">lower</span>())</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            PYTHON<br>python
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Reemplazar</h4>
+                        <div class="code-block">
+                            <code>frase <span class="operator">=</span> <span class="string">"Hola mundo"</span><br>
+nueva <span class="operator">=</span> frase.<span class="function">replace</span>(<span class="string">"mundo"</span>, <span class="string">"Python"</span>)<br>
+<span class="function">print</span>(nueva)</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            Hola Python
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Dividir texto</h4>
+                        <div class="code-block">
+                            <code>palabras <span class="operator">=</span> <span class="string">"uno dos tres"</span><br>
+lista <span class="operator">=</span> palabras.<span class="function">split</span>()<br>
+<span class="function">print</span>(lista)</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            ['uno', 'dos', 'tres']
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Longitud</h4>
+                        <div class="code-block">
+                            <code>nombre <span class="operator">=</span> <span class="string">"Python"</span><br>
+longitud <span class="operator">=</span> <span class="function">len</span>(nombre)<br>
+<span class="function">print</span>(longitud)</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            6
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Input del usuario:</strong>
+                <div class="code-block" style="margin-top: 0.5rem;">
+                    <code>nombre <span class="operator">=</span> <span class="function">input</span>(<span class="string">"¿Cómo te llamas? "</span>)<br>
+<span class="function">print</span>(<span class="string">f"Hola, <span class="operator">{</span>nombre<span class="operator">}</span>!"</span>)</code>
+                </div>
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico</h3>
+                        <p>Pon en práctica lo aprendido</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea un programa que procese un email:</p>
+                    <ul>
+                        <li>Guarda un email en una variable: "USUARIO@EJEMPLO.COM"</li>
+                        <li>Convierte el email a minúsculas</li>
+                        <li>Separa el email en usuario y dominio (usa split con "@")</li>
+                        <li>Cuenta cuántos caracteres tiene el usuario</li>
+                        <li>Muestra toda la información formateada</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution5')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution5">
+                        <div class="code-block">
+                            <code><span class="comment"># Email original</span><br>
+email <span class="operator">=</span> <span class="string">"USUARIO@EJEMPLO.COM"</span><br>
+<br>
+<span class="comment"># Procesar email</span><br>
+email_minusculas <span class="operator">=</span> email.<span class="function">lower</span>()<br>
+partes <span class="operator">=</span> email_minusculas.<span class="function">split</span>(<span class="string">"@"</span>)<br>
+usuario <span class="operator">=</span> partes[<span class="number">0</span>]<br>
+dominio <span class="operator">=</span> partes[<span class="number">1</span>]<br>
+longitud_usuario <span class="operator">=</span> <span class="function">len</span>(usuario)<br>
+<br>
+<span class="comment"># Mostrar resultados</span><br>
+<span class="function">print</span>(<span class="string">f"Email procesado: <span class="operator">{</span>email_minusculas<span class="operator">}</span>"</span>)<br>
+<span class="function">print</span>(<span class="string">f"Usuario: <span class="operator">{</span>usuario<span class="operator">}</span>"</span>)<br>
+<span class="function">print</span>(<span class="string">f"Dominio: <span class="operator">{</span>dominio<span class="operator">}</span>"</span>)<br>
+<span class="function">print</span>(<span class="string">f"Longitud del usuario: <span class="operator">{</span>longitud_usuario<span class="operator">}</span> caracteres"</span>)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Usamos lower() para convertir a minúsculas, split("@") para separar el email en una lista de 2 elementos, accedemos a ellos con [0] y [1], y len() para contar caracteres. Los F-strings facilitan la visualización formateada.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Listas -->
+        <div class="slide slide-6">
+            <div class="slide-header">
+                <h1>Listas: Colecciones de Datos</h1>
+                <p>Almacena múltiples valores en una sola variable</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Crear y Acceder a Listas</h2>
+                
+                <div class="code-block">
+                    <code><span class="comment"># Crear listas</span><br>
+frutas <span class="operator">=</span> [<span class="string">"manzana"</span>, <span class="string">"banana"</span>, <span class="string">"naranja"</span>]<br>
+numeros <span class="operator">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]<br>
+<br>
+<span class="comment"># Acceder a elementos (índice empieza en 0)</span><br>
+<span class="function">print</span>(frutas[<span class="number">0</span>])   <span class="comment"># manzana</span><br>
+<span class="function">print</span>(frutas[<span class="number">1</span>])   <span class="comment"># banana</span><br>
+<span class="function">print</span>(frutas[<span class="number">-1</span>])  <span class="comment"># naranja (último elemento)</span></code>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Operaciones con Listas</h2>
+                
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h4>Añadir elementos</h4>
+                        <div class="code-block">
+                            <code>lista <span class="operator">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]<br>
+lista.<span class="function">append</span>(<span class="number">4</span>)<br>
+<span class="function">print</span>(lista)</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            [1, 2, 3, 4]
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Eliminar elementos</h4>
+                        <div class="code-block">
+                            <code>lista <span class="operator">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]<br>
+lista.<span class="function">remove</span>(<span class="number">2</span>)<br>
+<span class="function">print</span>(lista)</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            [1, 3, 4]
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Longitud de lista</h4>
+                        <div class="code-block">
+                            <code>colores <span class="operator">=</span> [<span class="string">"rojo"</span>, <span class="string">"azul"</span>, <span class="string">"verde"</span>]<br>
+cantidad <span class="operator">=</span> <span class="function">len</span>(colores)<br>
+<span class="function">print</span>(cantidad)</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            3
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h4>Ordenar listas</h4>
+                        <div class="code-block">
+                            <code>numeros <span class="operator">=</span> [<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">2</span>]<br>
+numeros.<span class="function">sort</span>()<br>
+<span class="function">print</span>(numeros)</code>
+                        </div>
+                        <div class="output-block" style="font-size: 0.9rem;">
+                            [1, 2, 3, 4]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <strong>🎯 Slicing (Rebanadas):</strong>
+                <div class="code-block" style="margin-top: 0.5rem;">
+                    <code>lista <span class="operator">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]<br>
+<span class="function">print</span>(lista[<span class="number">1</span>:<span class="number">4</span>])  <span class="comment"># [1, 2, 3]</span><br>
+<span class="function">print</span>(lista[:<span class="number">3</span>])   <span class="comment"># [0, 1, 2]</span><br>
+<span class="function">print</span>(lista[<span class="number">3</span>:])   <span class="comment"># [3, 4, 5]</span></code>
+                </div>
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico</h3>
+                        <p>Pon en práctica lo aprendido</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea un gestor de tareas (to-do list):</p>
+                    <ul>
+                        <li>Crea una lista vacía llamada "tareas"</li>
+                        <li>Añade 3 tareas: "Estudiar Python", "Hacer ejercicio", "Leer un libro"</li>
+                        <li>Añade una tarea más: "Preparar cena"</li>
+                        <li>Marca la primera tarea como completada (elimínala)</li>
+                        <li>Muestra cuántas tareas quedan pendientes</li>
+                        <li>Muestra la lista de tareas restantes</li>
+                        <li>Ordena las tareas alfabéticamente</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution6')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution6">
+                        <div class="code-block">
+                            <code><span class="comment"># Crear lista de tareas</span><br>
+tareas <span class="operator">=</span> []<br>
+<br>
+<span class="comment"># Añadir tareas</span><br>
+tareas.<span class="function">append</span>(<span class="string">"Estudiar Python"</span>)<br>
+tareas.<span class="function">append</span>(<span class="string">"Hacer ejercicio"</span>)<br>
+tareas.<span class="function">append</span>(<span class="string">"Leer un libro"</span>)<br>
+tareas.<span class="function">append</span>(<span class="string">"Preparar cena"</span>)<br>
+<br>
+<span class="comment"># Completar primera tarea</span><br>
+tarea_completada <span class="operator">=</span> tareas[<span class="number">0</span>]<br>
+tareas.<span class="function">remove</span>(tarea_completada)<br>
+<span class="function">print</span>(<span class="string">f"✓ Completada: <span class="operator">{</span>tarea_completada<span class="operator">}</span>"</span>)<br>
+<br>
+<span class="comment"># Mostrar tareas pendientes</span><br>
+<span class="function">print</span>(<span class="string">f"\nTareas pendientes: <span class="operator">{</span><span class="function">len</span>(tareas)<span class="operator">}</span>"</span>)<br>
+<span class="function">print</span>(<span class="string">"Lista de tareas:"</span>)<br>
+<span class="function">print</span>(tareas)<br>
+<br>
+<span class="comment"># Ordenar alfabéticamente</span><br>
+tareas.<span class="function">sort</span>()<br>
+<span class="function">print</span>(<span class="string">"\nTareas ordenadas:"</span>)<br>
+<span class="function">print</span>(tareas)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Creamos una lista vacía y usamos append() para añadir elementos. Usamos indexación [0] para acceder al primer elemento, remove() para eliminarlo, len() para contar elementos y sort() para ordenar alfabéticamente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Condicionales -->
+        <div class="slide slide-7">
+            <div class="slide-header">
+                <h1>Condicionales: Tomar Decisiones</h1>
+                <p>Ejecuta código según condiciones</p>
+            </div>
+
+            <div class="content-section">
+                <h2>If, Elif, Else</h2>
+                
+                <div class="code-block">
+                    <code>edad <span class="operator">=</span> <span class="number">18</span><br>
+<br>
+<span class="keyword">if</span> edad <span class="operator">&lt;</span> <span class="number">18</span>:<br>
+    <span class="function">print</span>(<span class="string">"Eres menor de edad"</span>)<br>
+<span class="keyword">elif</span> edad <span class="operator">==</span> <span class="number">18</span>:<br>
+    <span class="function">print</span>(<span class="string">"Acabas de cumplir la mayoría de edad"</span>)<br>
+<span class="keyword">else</span>:<br>
+    <span class="function">print</span>(<span class="string">"Eres mayor de edad"</span>)</code>
+                </div>
+
+                <div class="output-block">
+                    Acabas de cumplir la mayoría de edad
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Operadores de Comparación</h2>
+                <table class="data-table">
+                    <tr>
+                        <th>Operador</th>
+                        <th>Significado</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                    <tr>
+                        <td><code>==</code></td>
+                        <td>Igual a</td>
+                        <td><code>5 == 5</code> → True</td>
+                    </tr>
+                    <tr>
+                        <td><code>!=</code></td>
+                        <td>Diferente de</td>
+                        <td><code>5 != 3</code> → True</td>
+                    </tr>
+                    <tr>
+                        <td><code>&gt;</code></td>
+                        <td>Mayor que</td>
+                        <td><code>7 &gt; 5</code> → True</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;</code></td>
+                        <td>Menor que</td>
+                        <td><code>3 &lt; 8</code> → True</td>
+                    </tr>
+                    <tr>
+                        <td><code>&gt;=</code></td>
+                        <td>Mayor o igual</td>
+                        <td><code>5 &gt;= 5</code> → True</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;=</code></td>
+                        <td>Menor o igual</td>
+                        <td><code>4 &lt;= 6</code> → True</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="examples-grid">
+                <div class="example-card">
+                    <h4>Múltiples condiciones (AND)</h4>
+                    <div class="code-block">
+                        <code>edad <span class="operator">=</span> <span class="number">20</span><br>
+tiene_permiso <span class="operator">=</span> <span class="keyword">True</span><br>
+<br>
+<span class="keyword">if</span> edad <span class="operator">&gt;=</span> <span class="number">18</span> <span class="keyword">and</span> tiene_permiso:<br>
+    <span class="function">print</span>(<span class="string">"Puedes conducir"</span>)</code>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <h4>Condición alternativa (OR)</h4>
+                    <div class="code-block">
+                        <code>dia <span class="operator">=</span> <span class="string">"Sábado"</span><br>
+<br>
+<span class="keyword">if</span> dia <span class="operator">==</span> <span class="string">"Sábado"</span> <span class="keyword">or</span> dia <span class="operator">==</span> <span class="string">"Domingo"</span>:<br>
+    <span class="function">print</span>(<span class="string">"Es fin de semana"</span>)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <strong>⚠️ Importante:</strong>
+                En Python, la indentación (sangría) es obligatoria. Usa 4 espacios o Tab.
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico</h3>
+                        <p>Pon en práctica lo aprendido</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea un sistema de calificaciones que evalúe notas:</p>
+                    <ul>
+                        <li>Pide una nota numérica (0-10)</li>
+                        <li>Si la nota es >= 9: "Sobresaliente"</li>
+                        <li>Si la nota es >= 7: "Notable"</li>
+                        <li>Si la nota es >= 5: "Aprobado"</li>
+                        <li>Si la nota es < 5: "Suspenso"</li>
+                        <li>Si la nota es 10: añade "¡Perfecto!"</li>
+                        <li>Si la nota es < 0 o > 10: "Nota inválida"</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution7')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution7">
+                        <div class="code-block">
+                            <code><span class="comment"># Nota del estudiante</span><br>
+nota <span class="operator">=</span> <span class="number">8.5</span><br>
+<br>
+<span class="comment"># Validar nota</span><br>
+<span class="keyword">if</span> nota <span class="operator">&lt;</span> <span class="number">0</span> <span class="keyword">or</span> nota <span class="operator">&gt;</span> <span class="number">10</span>:<br>
+    <span class="function">print</span>(<span class="string">"⚠️ Nota inválida. Debe estar entre 0 y 10"</span>)<br>
+<span class="keyword">else</span>:<br>
+    <span class="comment"># Evaluar calificación</span><br>
+    <span class="keyword">if</span> nota <span class="operator">==</span> <span class="number">10</span>:<br>
+        <span class="function">print</span>(<span class="string">"🌟 Sobresaliente - ¡Perfecto!"</span>)<br>
+    <span class="keyword">elif</span> nota <span class="operator">&gt;=</span> <span class="number">9</span>:<br>
+        <span class="function">print</span>(<span class="string">"🌟 Sobresaliente"</span>)<br>
+    <span class="keyword">elif</span> nota <span class="operator">&gt;=</span> <span class="number">7</span>:<br>
+        <span class="function">print</span>(<span class="string">"📘 Notable"</span>)<br>
+    <span class="keyword">elif</span> nota <span class="operator">&gt;=</span> <span class="number">5</span>:<br>
+        <span class="function">print</span>(<span class="string">"✓ Aprobado"</span>)<br>
+    <span class="keyword">else</span>:<br>
+        <span class="function">print</span>(<span class="string">"✗ Suspenso"</span>)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Usamos condicionales anidados: primero validamos que la nota esté en rango válido, luego evaluamos la calificación de mayor a menor. El operador 'or' permite verificar múltiples condiciones. La indentación es crucial para que Python entienda la estructura.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Bucles -->
+        <div class="slide slide-8">
+            <div class="slide-header">
+                <h1>Bucles: Repetir Acciones</h1>
+                <p>Automatiza tareas repetitivas</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Bucle FOR</h2>
+                <p>Itera sobre secuencias (listas, rangos, etc.)</p>
+                
+                <div class="code-block">
+                    <code><span class="comment"># Iterar sobre una lista</span><br>
+frutas <span class="operator">=</span> [<span class="string">"manzana"</span>, <span class="string">"banana"</span>, <span class="string">"naranja"</span>]<br>
+<span class="keyword">for</span> fruta <span class="keyword">in</span> frutas:<br>
+    <span class="function">print</span>(fruta)<br>
+<br>
+<span class="comment"># Usando range()</span><br>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">5</span>):<br>
+    <span class="function">print</span>(i)  <span class="comment"># Imprime 0, 1, 2, 3, 4</span></code>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Bucle WHILE</h2>
+                <p>Se ejecuta mientras una condición sea verdadera</p>
+                
+                <div class="code-block">
+                    <code>contador <span class="operator">=</span> <span class="number">0</span><br>
+<span class="keyword">while</span> contador <span class="operator">&lt;</span> <span class="number">5</span>:<br>
+    <span class="function">print</span>(contador)<br>
+    contador <span class="operator">+=</span> <span class="number">1</span>  <span class="comment"># Equivale a: contador = contador + 1</span></code>
+                </div>
+
+                <div class="output-block">
+                    0<br>1<br>2<br>3<br>4
+                </div>
+            </div>
+
+            <div class="examples-grid">
+                <div class="example-card">
+                    <h4>Suma de números</h4>
+                    <div class="code-block">
+                        <code>suma <span class="operator">=</span> <span class="number">0</span><br>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="number">6</span>):<br>
+    suma <span class="operator">+=</span> i<br>
+<span class="function">print</span>(suma)  <span class="comment"># 15</span></code>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <h4>Tabla de multiplicar</h4>
+                    <div class="code-block">
+                        <code>numero <span class="operator">=</span> <span class="number">5</span><br>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="number">11</span>):<br>
+    resultado <span class="operator">=</span> numero <span class="operator">*</span> i<br>
+    <span class="function">print</span>(<span class="string">f"<span class="operator">{</span>numero<span class="operator">}</span> x <span class="operator">{</span>i<span class="operator">}</span> = <span class="operator">{</span>resultado<span class="operator">}</span>"</span>)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <strong>🎯 Break y Continue:</strong>
+                <div class="code-block" style="margin-top: 0.5rem;">
+                    <code><span class="comment"># break: Sale del bucle</span><br>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">10</span>):<br>
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">5</span>:<br>
+        <span class="keyword">break</span><br>
+    <span class="function">print</span>(i)  <span class="comment"># Imprime 0, 1, 2, 3, 4</span><br>
+<br>
+<span class="comment"># continue: Salta a la siguiente iteración</span><br>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">5</span>):<br>
+    <span class="keyword">if</span> i <span class="operator">==</span> <span class="number">2</span>:<br>
+        <span class="keyword">continue</span><br>
+    <span class="function">print</span>(i)  <span class="comment"># Imprime 0, 1, 3, 4</span></code>
+                </div>
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico</h3>
+                        <p>Pon en práctica lo aprendido</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea un juego de adivinar números:</p>
+                    <ul>
+                        <li>El número secreto es 7</li>
+                        <li>El usuario tiene 5 intentos máximo</li>
+                        <li>Usa un bucle while para los intentos</li>
+                        <li>Si adivina: muestra "¡Correcto!" y sal del bucle</li>
+                        <li>Si es mayor: muestra "El número es menor"</li>
+                        <li>Si es menor: muestra "El número es mayor"</li>
+                        <li>Si se acaban los intentos: muestra "Perdiste"</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution8')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution8">
+                        <div class="code-block">
+                            <code><span class="comment"># Configuración del juego</span><br>
+numero_secreto <span class="operator">=</span> <span class="number">7</span><br>
+intentos_maximos <span class="operator">=</span> <span class="number">5</span><br>
+intentos <span class="operator">=</span> <span class="number">0</span><br>
+<br>
+<span class="function">print</span>(<span class="string">"🎮 Juego: Adivina el número (1-10)"</span>)<br>
+<span class="function">print</span>(<span class="string">f"Tienes <span class="operator">{</span>intentos_maximos<span class="operator">}</span> intentos"</span>)<br>
+<br>
+<span class="comment"># Bucle del juego</span><br>
+<span class="keyword">while</span> intentos <span class="operator">&lt;</span> intentos_maximos:<br>
+    intentos <span class="operator">+=</span> <span class="number">1</span><br>
+    <span class="function">print</span>(<span class="string">f"\nIntento <span class="operator">{</span>intentos<span class="operator">}</span>/<span class="operator">{</span>intentos_maximos<span class="operator">}</span>"</span>)<br>
+    <br>
+    <span class="comment"># Simular entrada (en tu programa usa input)</span><br>
+    adivinanza <span class="operator">=</span> <span class="number">5</span>  <span class="comment"># Puedes probar con diferentes números</span><br>
+    <br>
+    <span class="keyword">if</span> adivinanza <span class="operator">==</span> numero_secreto:<br>
+        <span class="function">print</span>(<span class="string">"🎉 ¡Correcto! Adivinaste el número"</span>)<br>
+        <span class="keyword">break</span><br>
+    <span class="keyword">elif</span> adivinanza <span class="operator">&gt;</span> numero_secreto:<br>
+        <span class="function">print</span>(<span class="string">"📉 El número secreto es menor"</span>)<br>
+    <span class="keyword">else</span>:<br>
+        <span class="function">print</span>(<span class="string">"📈 El número secreto es mayor"</span>)<br>
+<span class="keyword">else</span>:<br>
+    <span class="function">print</span>(<span class="string">f"\n😢 Perdiste. El número era <span class="operator">{</span>numero_secreto<span class="operator">}</span>"</span>)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Usamos while con un contador de intentos. El break sale del bucle cuando se adivina. El else del while se ejecuta solo si el bucle termina sin break (cuando se agotan los intentos). Combinamos bucles con condicionales para crear lógica de juego.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Funciones -->
+        <div class="slide slide-9">
+            <div class="slide-header">
+                <h1>Funciones: Código Reutilizable</h1>
+                <p>Organiza y reutiliza tu código</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Crear Funciones</h2>
+                
+                <div class="code-block">
+                    <code><span class="comment"># Función simple</span><br>
+<span class="keyword">def</span> <span class="function">saludar</span>():<br>
+    <span class="function">print</span>(<span class="string">"¡Hola!"</span>)<br>
+<br>
+<span class="comment"># Llamar a la función</span><br>
+<span class="function">saludar</span>()<br>
+<br>
+<span class="comment"># Función con parámetros</span><br>
+<span class="keyword">def</span> <span class="function">saludar_persona</span>(nombre):<br>
+    <span class="function">print</span>(<span class="string">f"¡Hola, <span class="operator">{</span>nombre<span class="operator">}</span>!"</span>)<br>
+<br>
+<span class="function">saludar_persona</span>(<span class="string">"Ana"</span>)</code>
+                </div>
+
+                <div class="output-block">
+                    ¡Hola!<br>
+                    ¡Hola, Ana!
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>Funciones que Retornan Valores</h2>
+                
+                <div class="code-block">
+                    <code><span class="keyword">def</span> <span class="function">sumar</span>(a, b):<br>
+    resultado <span class="operator">=</span> a <span class="operator">+</span> b<br>
+    <span class="keyword">return</span> resultado<br>
+<br>
+<span class="comment"># Usar el valor retornado</span><br>
+total <span class="operator">=</span> <span class="function">sumar</span>(<span class="number">5</span>, <span class="number">3</span>)<br>
+<span class="function">print</span>(total)  <span class="comment"># 8</span><br>
+<br>
+<span class="comment"># Función con múltiples parámetros</span><br>
+<span class="keyword">def</span> <span class="function">calcular_area_rectangulo</span>(base, altura):<br>
+    <span class="keyword">return</span> base <span class="operator">*</span> altura<br>
+<br>
+area <span class="operator">=</span> <span class="function">calcular_area_rectangulo</span>(<span class="number">5</span>, <span class="number">10</span>)<br>
+<span class="function">print</span>(<span class="string">f"El área es: <span class="operator">{</span>area<span class="operator">}</span>"</span>)</code>
+                </div>
+            </div>
+
+            <div class="examples-grid">
+                <div class="example-card">
+                    <h4>Función con valor por defecto</h4>
+                    <div class="code-block">
+                        <code><span class="keyword">def</span> <span class="function">saludar</span>(nombre<span class="operator">=</span><span class="string">"amigo"</span>):<br>
+    <span class="function">print</span>(<span class="string">f"Hola, <span class="operator">{</span>nombre<span class="operator">}</span>"</span>)<br>
+<br>
+<span class="function">saludar</span>()          <span class="comment"># Hola, amigo</span><br>
+<span class="function">saludar</span>(<span class="string">"Carlos"</span>)  <span class="comment"># Hola, Carlos</span></code>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <h4>Función para par/impar</h4>
+                    <div class="code-block">
+                        <code><span class="keyword">def</span> <span class="function">es_par</span>(numero):<br>
+    <span class="keyword">if</span> numero <span class="operator">%</span> <span class="number">2</span> <span class="operator">==</span> <span class="number">0</span>:<br>
+        <span class="keyword">return</span> <span class="keyword">True</span><br>
+    <span class="keyword">else</span>:<br>
+        <span class="keyword">return</span> <span class="keyword">False</span><br>
+<br>
+<span class="function">print</span>(<span class="function">es_par</span>(<span class="number">4</span>))  <span class="comment"># True</span><br>
+<span class="function">print</span>(<span class="function">es_par</span>(<span class="number">7</span>))  <span class="comment"># False</span></code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Buenas prácticas:</strong>
+                Dale nombres descriptivos a tus funciones. Usa verbos (calcular, obtener, mostrar). Una función debe hacer una sola cosa bien.
+            </div>
+
+            <!-- Ejercicio Práctico -->
+            <div class="exercise-section">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🎯</div>
+                    <div class="exercise-title">
+                        <h3>Ejercicio Práctico Final</h3>
+                        <p>¡Combina todo lo aprendido!</p>
+                    </div>
+                </div>
+
+                <div class="exercise-problem">
+                    <h4>📝 Enunciado:</h4>
+                    <p>Crea una calculadora de IMC (Índice de Masa Corporal) con funciones:</p>
+                    <ul>
+                        <li>Función <code>calcular_imc(peso, altura)</code> que retorne el IMC</li>
+                        <li>Función <code>clasificar_imc(imc)</code> que retorne la categoría:
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Bajo peso: IMC < 18.5</li>
+                                <li>Normal: IMC 18.5-24.9</li>
+                                <li>Sobrepeso: IMC 25-29.9</li>
+                                <li>Obesidad: IMC >= 30</li>
+                            </ul>
+                        </li>
+                        <li>Función <code>mostrar_resultado(nombre, imc, categoria)</code></li>
+                        <li>Prueba con: nombre="Juan", peso=75, altura=1.75</li>
+                    </ul>
+                </div>
+
+                <div class="exercise-solution">
+                    <button class="solution-toggle" onclick="toggleSolution('solution9')">
+                        <span>👁️</span> Ver Solución
+                    </button>
+                    <div class="solution-content" id="solution9">
+                        <div class="code-block">
+                            <code><span class="comment"># Función para calcular IMC</span><br>
+<span class="keyword">def</span> <span class="function">calcular_imc</span>(peso, altura):<br>
+    imc <span class="operator">=</span> peso <span class="operator">/</span> (altura <span class="operator">**</span> <span class="number">2</span>)<br>
+    <span class="keyword">return</span> <span class="function">round</span>(imc, <span class="number">2</span>)<br>
+<br>
+<span class="comment"># Función para clasificar IMC</span><br>
+<span class="keyword">def</span> <span class="function">clasificar_imc</span>(imc):<br>
+    <span class="keyword">if</span> imc <span class="operator">&lt;</span> <span class="number">18.5</span>:<br>
+        <span class="keyword">return</span> <span class="string">"Bajo peso"</span><br>
+    <span class="keyword">elif</span> imc <span class="operator">&lt;</span> <span class="number">25</span>:<br>
+        <span class="keyword">return</span> <span class="string">"Peso normal"</span><br>
+    <span class="keyword">elif</span> imc <span class="operator">&lt;</span> <span class="number">30</span>:<br>
+        <span class="keyword">return</span> <span class="string">"Sobrepeso"</span><br>
+    <span class="keyword">else</span>:<br>
+        <span class="keyword">return</span> <span class="string">"Obesidad"</span><br>
+<br>
+<span class="comment"># Función para mostrar resultado</span><br>
+<span class="keyword">def</span> <span class="function">mostrar_resultado</span>(nombre, imc, categoria):<br>
+    <span class="function">print</span>(<span class="string">"="</span> <span class="operator">*</span> <span class="number">40</span>)<br>
+    <span class="function">print</span>(<span class="string">f"Paciente: <span class="operator">{</span>nombre<span class="operator">}</span>"</span>)<br>
+    <span class="function">print</span>(<span class="string">f"IMC: <span class="operator">{</span>imc<span class="operator">}</span>"</span>)<br>
+    <span class="function">print</span>(<span class="string">f"Categoría: <span class="operator">{</span>categoria<span class="operator">}</span>"</span>)<br>
+    <span class="function">print</span>(<span class="string">"="</span> <span class="operator">*</span> <span class="number">40</span>)<br>
+<br>
+<span class="comment"># Programa principal</span><br>
+nombre <span class="operator">=</span> <span class="string">"Juan"</span><br>
+peso <span class="operator">=</span> <span class="number">75</span>  <span class="comment"># kg</span><br>
+altura <span class="operator">=</span> <span class="number">1.75</span>  <span class="comment"># metros</span><br>
+<br>
+<span class="comment"># Calcular y mostrar</span><br>
+mi_imc <span class="operator">=</span> <span class="function">calcular_imc</span>(peso, altura)<br>
+mi_categoria <span class="operator">=</span> <span class="function">clasificar_imc</span>(mi_imc)<br>
+<span class="function">mostrar_resultado</span>(nombre, mi_imc, mi_categoria)</code>
+                        </div>
+                        <div class="solution-explanation">
+                            <h5>📚 Explicación:</h5>
+                            <p>Este ejercicio integra todo: variables, operadores (división, potencia), condicionales (if/elif/else), funciones con parámetros y return, y formato de strings. Cada función tiene una responsabilidad única, lo que hace el código más limpio y reutilizable. La función round() redondea el IMC a 2 decimales.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Final -->
+        <div class="slide slide-10">
+            <h1>¡Felicidades! 🎉</h1>
+            <div class="final-content">
+                <h2>Has Aprendido los Fundamentos</h2>
+                <p>Ya conoces las bases de Python:</p>
+                <p>✓ Variables y tipos de datos<br>
+                   ✓ Operadores y strings<br>
+                   ✓ Listas y estructuras de datos<br>
+                   ✓ Condicionales y bucles<br>
+                   ✓ Funciones</p>
+                
+                <div class="next-steps">
+                    <div class="next-step">
+                        <h3>📚 Practica</h3>
+                        <p>Resuelve ejercicios diarios</p>
+                    </div>
+                    <div class="next-step">
+                        <h3>🚀 Proyectos</h3>
+                        <p>Crea tus propios programas</p>
+                    </div>
+                    <div class="next-step">
+                        <h3>🌐 Comunidad</h3>
+                        <p>Únete a foros y grupos</p>
+                    </div>
+                </div>
+
+                <p style="margin-top: 2rem; font-size: 1.1rem;">
+                    <strong>Siguiente paso:</strong> Crea un pequeño proyecto (calculadora, juego de adivinanzas, lista de tareas)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <span>☰</span>
+    </button>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" onclick="closeMenu()"></div>
+
+    <!-- Slide Menu -->
+    <div class="slide-menu" id="slideMenu">
+        <div class="menu-header">
+            <h2>📚 Índice de Contenidos</h2>
+            <p>Navega directamente a cualquier sección</p>
+        </div>
+        <div class="menu-items">
+            <div class="menu-item active" onclick="goToSlide(0)">
+                <div class="menu-item-number">1</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Bienvenida</div>
+                    <div class="menu-item-subtitle">Introducción al tutorial</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(1)">
+                <div class="menu-item-number">2</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Hello World & Print</div>
+                    <div class="menu-item-subtitle">Tu primer programa</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(2)">
+                <div class="menu-item-number">3</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Variables</div>
+                    <div class="menu-item-subtitle">Guardar información</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(3)">
+                <div class="menu-item-number">4</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Operadores</div>
+                    <div class="menu-item-subtitle">Matemáticas y cálculos</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(4)">
+                <div class="menu-item-number">5</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Strings</div>
+                    <div class="menu-item-subtitle">Trabajar con texto</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(5)">
+                <div class="menu-item-number">6</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Listas</div>
+                    <div class="menu-item-subtitle">Colecciones de datos</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(6)">
+                <div class="menu-item-number">7</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Condicionales</div>
+                    <div class="menu-item-subtitle">If, elif, else</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(7)">
+                <div class="menu-item-number">8</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Bucles</div>
+                    <div class="menu-item-subtitle">For y While</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(8)">
+                <div class="menu-item-number">9</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Funciones</div>
+                    <div class="menu-item-subtitle">Código reutilizable</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="goToSlide(9)">
+                <div class="menu-item-number">10</div>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Conclusión</div>
+                    <div class="menu-item-subtitle">Próximos pasos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">10</span>
+    </div>
+    <div class="nav-buttons">
+        <button class="nav-button" id="prevBtn" onclick="previousSlide()">←</button>
+        <button class="nav-button" id="nextBtn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 10;
+        const slides = document.querySelectorAll('.slide');
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.add('prev');
+            
+            currentSlide = n;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            
+            slides.forEach(slide => slide.classList.remove('active', 'prev'));
+            slides[currentSlide].classList.add('active');
+            
+            // Scroll to top when changing slides
+            slides[currentSlide].scrollTop = 0;
+            
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            // Update menu active state
+            updateMenuActiveState();
+        }
+
+        function updateMenuActiveState() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach((item, index) => {
+                if (index === currentSlide) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('slideMenu');
+            const overlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        function closeMenu() {
+            const menu = document.getElementById('slideMenu');
+            const overlay = document.querySelector('.menu-overlay');
+            menu.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+
+        function goToSlide(slideIndex) {
+            showSlide(slideIndex);
+            closeMenu();
+        }
+
+        // Toggle solution visibility
+        function toggleSolution(solutionId) {
+            const solution = document.getElementById(solutionId);
+            const button = solution.previousElementSibling;
+            
+            if (solution.classList.contains('show')) {
+                solution.classList.remove('show');
+                button.innerHTML = '<span>👁️</span> Ver Solución';
+            } else {
+                solution.classList.add('show');
+                button.innerHTML = '<span>🔒</span> Ocultar Solución';
+            }
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+            if (e.key === 'Escape') closeMenu();
+        });
+
+        // Initialize
+        document.getElementById('totalSlides').textContent = totalSlides;
+        showSlide(0);
+    </script>
+</body>
+</html>
