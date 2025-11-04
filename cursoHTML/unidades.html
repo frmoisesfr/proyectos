@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Units Masterclass - Tutorial Interactivo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #0f172a;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 300;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            margin-top: 1rem;
+            backdrop-filter: blur(10px);
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        /* Navigation - Collapsible */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .nav-title {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .nav-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .nav-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-content.active {
+            max-height: 500px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0 1rem 1rem 1rem;
+        }
+
+        nav a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        nav a::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Sections */
+        section {
+            background: white;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #e2e8f0;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h2::before {
+            content: '▸';
+            color: #667eea;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin: 2rem 0 1rem 0;
+            font-weight: 700;
+        }
+
+        .theory {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 2rem;
+            border-left: 5px solid #667eea;
+            margin: 1.5rem 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .theory h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        /* CODE BLOCK - VS Code Style */
+        .code-block {
+            background: #1e1e1e;
+            padding: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-header {
+            background: #323233;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #1e1e1e;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red { background: #ff5f56; }
+        .code-dot.yellow { background: #ffbd2e; }
+        .code-dot.green { background: #27c93f; }
+
+        .code-title {
+            color: #858585;
+            font-size: 0.85rem;
+            margin-left: auto;
+        }
+
+        .code-content {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .code-content code {
+            display: block;
+            color: #d4d4d4;
+        }
+
+        /* VS Code Syntax Highlighting */
+        .keyword { color: #569cd6; }
+        .property { color: #9cdcfe; }
+        .value { color: #ce9178; }
+        .number { color: #b5cea8; }
+        .selector { color: #d7ba7d; }
+        .comment { color: #6a9955; font-style: italic; }
+        .punctuation { color: #d4d4d4; }
+        .unit { color: #b5cea8; }
+        .string { color: #ce9178; }
+
+        /* PÍXELES - Ejemplos */
+        .px-example {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            align-items: flex-end;
+        }
+
+        .box-container {
+            text-align: center;
+        }
+
+        .box-px-10 {
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            margin: 0 auto 0.5rem;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .box-px-50 {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4ecdc4, #44a3a3);
+            margin: 0 auto 0.5rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(78, 205, 196, 0.3);
+        }
+
+        .box-px-100 {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #45b7d1, #3a9fb8);
+            margin: 0 auto 0.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(69, 183, 209, 0.3);
+        }
+
+        .box-label {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .border-example {
+            padding: 1.5rem;
+            border: 1px solid #667eea;
+            margin: 1rem 0;
+            border-radius: 10px;
+            background: #f7fafc;
+        }
+
+        .border-example-thick {
+            padding: 1.5rem;
+            border: 5px solid #764ba2;
+            margin: 1rem 0;
+            border-radius: 10px;
+            background: #faf5ff;
+        }
+
+        .shadow-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .shadow-card {
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .shadow-1 { box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+        .shadow-2 { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .shadow-3 { box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+
+        /* REM - Ejemplos */
+        .rem-example {
+            margin: 2rem 0;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 2rem;
+            border-radius: 15px;
+        }
+
+        .text-1rem {
+            font-size: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .text-1-5rem {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #764ba2;
+        }
+
+        .text-2rem {
+            font-size: 2rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #9f7aea;
+        }
+
+        .spacing-rem {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Layout Examples with REM */
+        .layout-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .layout-card {
+            background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 2px solid #e2e8f0;
+        }
+
+        .layout-card h4 {
+            font-size: 1.25rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        /* VIEWPORT - Ejemplos */
+        .vh-example {
+            height: 50vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 2rem 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            font-weight: 700;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .vw-text {
+            font-size: 5vw;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .responsive-box {
+            width: 80vw;
+            height: 30vh;
+            max-width: 800px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        .viewport-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .viewport-item {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .vp-10 { height: 10vh; }
+        .vp-20 { height: 20vh; }
+        .vp-30 { height: 30vh; }
+
+        /* Comparación */
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            padding: 2rem;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .comparison-item h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .comparison-item p {
+            line-height: 2;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        tr:hover {
+            background: #edf2f7;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 0.2rem 0.6rem;
+            border-radius: 5px;
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        /* Practical Examples Showcase */
+        .practical-showcase {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        /* Icon sizes with px */
+        .icon-examples {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .icon {
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .icon-16 { width: 16px; height: 16px; font-size: 10px; }
+        .icon-24 { width: 24px; height: 24px; font-size: 14px; }
+        .icon-32 { width: 32px; height: 32px; font-size: 18px; }
+        .icon-48 { width: 48px; height: 48px; font-size: 24px; }
+
+        /* Button examples */
+        .button-examples {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-px {
+            padding: 12px 24px;
+            font-size: 14px;
+        }
+
+        .btn-rem {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: white;
+            margin-top: 2rem;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            section {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hero-content">
+                <div class="logo">📐</div>
+                <h1>CSS Units Masterclass</h1>
+                <p class="subtitle">Domina las unidades de medida en CSS y lleva tus diseños al siguiente nivel</p>
+                <span class="badge">✨ Tutorial Interactivo Completo</span>
+            </div>
+        </header>
+
+        <nav>
+            <div class="nav-header" onclick="toggleNav()">
+                <div class="nav-title">
+                    <span>🧭</span>
+                    Navegación del Tutorial
+                </div>
+                <button class="nav-toggle" id="navToggle">▼</button>
+            </div>
+            <div class="nav-content" id="navContent">
+                <ul>
+                    <li><a href="#pixeles">Píxeles</a></li>
+                    <li><a href="#rem">REM</a></li>
+                    <li><a href="#viewport">Viewport</a></li>
+                    <li><a href="#comparacion">Comparación</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- PÍXELES -->
+        <section id="pixeles">
+            <h2>Píxeles (px) - Unidades Absolutas</h2>
+            
+            <div class="theory">
+                <h3>📖 Teoría</h3>
+                <p><strong>Los píxeles son unidades absolutas y fijas.</strong> 1px siempre mide lo mismo, sin importar el contexto. Son perfectos cuando necesitas precisión exacta y control total sobre el tamaño.</p>
+                <p><span class="highlight">Ventaja:</span> Precisión y predictibilidad total</p>
+                <p><span class="highlight">Desventaja:</span> No respetan las preferencias de accesibilidad del usuario</p>
+            </div>
+
+            <h3>💡 Cuándo usar píxeles:</h3>
+            <ul>
+                <li>✓ Bordes (borders) - especialmente bordes finos de 1px o 2px</li>
+                <li>✓ Sombras (box-shadow, text-shadow) - control preciso del desenfoque</li>
+                <li>✓ Iconos de tamaño fijo - logos, íconos de interfaz</li>
+                <li>✓ Detalles decorativos muy pequeños</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                    <span class="code-title">pixeles-ejemplos.css</span>
+                </div>
+                <div class="code-content">
+<code><span class="comment">/* Bordes precisos */</span>
+<span class="selector">.card</span> <span class="punctuation">{</span>
+    <span class="property">border</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">px</span> <span class="value">solid</span> <span class="string">#e2e8f0</span><span class="punctuation">;</span>
+    <span class="property">border-bottom</span><span class="punctuation">:</span> <span class="number">3</span><span class="unit">px</span> <span class="value">solid</span> <span class="string">#667eea</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Sombras con control exacto */</span>
+<span class="selector">.button</span> <span class="punctuation">{</span>
+    <span class="property">box-shadow</span><span class="punctuation">:</span> <span class="number">0</span> <span class="number">2</span><span class="unit">px</span> <span class="number">4</span><span class="unit">px</span> <span class="value">rgba</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0.1</span><span class="punctuation">);</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.elevated-card</span> <span class="punctuation">{</span>
+    <span class="property">box-shadow</span><span class="punctuation">:</span> <span class="number">0</span> <span class="number">10</span><span class="unit">px</span> <span class="number">30</span><span class="unit">px</span> <span class="value">rgba</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0.15</span><span class="punctuation">);</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Iconos de tamaño fijo */</span>
+<span class="selector">.icon-small</span> <span class="punctuation">{</span>
+    <span class="property">width</span><span class="punctuation">:</span> <span class="number">16</span><span class="unit">px</span><span class="punctuation">;</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">16</span><span class="unit">px</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.icon-medium</span> <span class="punctuation">{</span>
+    <span class="property">width</span><span class="punctuation">:</span> <span class="number">24</span><span class="unit">px</span><span class="punctuation">;</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">24</span><span class="unit">px</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.icon-large</span> <span class="punctuation">{</span>
+    <span class="property">width</span><span class="punctuation">:</span> <span class="number">32</span><span class="unit">px</span><span class="punctuation">;</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">32</span><span class="unit">px</span><span class="punctuation">;</span>
+<span class="punctuation">}</span></code>
+                </div>
+            </div>
+
+            <h3>🎯 Ejemplo 1: Cajas de diferentes tamaños</h3>
+            <div class="px-example">
+                <div class="box-container">
+                    <div class="box-px-10"></div>
+                    <div class="box-label">10px × 10px</div>
+                </div>
+                <div class="box-container">
+                    <div class="box-px-50"></div>
+                    <div class="box-label">50px × 50px</div>
+                </div>
+                <div class="box-container">
+                    <div class="box-px-100"></div>
+                    <div class="box-label">100px × 100px</div>
+                </div>
+            </div>
+
+            <h3>🎯 Ejemplo 2: Bordes con diferentes grosores</h3>
+            <div class="border-example">
+                📦 Borde de <strong>1px</strong> - Perfecto para líneas delgadas y divisores sutiles
+            </div>
+
+            <div class="border-example-thick">
+                📦 Borde de <strong>5px</strong> - Ideal para énfasis y elementos destacados
+            </div>
+
+            <h3>🎯 Ejemplo 3: Sombras con píxeles</h3>
+            <div class="shadow-examples">
+                <div class="shadow-card shadow-1">
+                    <strong>Sombra Sutil</strong>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #718096;">0 1px 3px</p>
+                </div>
+                <div class="shadow-card shadow-2">
+                    <strong>Sombra Media</strong>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #718096;">0 4px 6px</p>
+                </div>
+                <div class="shadow-card shadow-3">
+                    <strong>Sombra Elevada</strong>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #718096;">0 10px 25px</p>
+                </div>
+            </div>
+
+            <h3>🎯 Ejemplo 4: Iconos de tamaño fijo</h3>
+            <div class="icon-examples">
+                <div style="text-align: center;">
+                    <div class="icon icon-16">i</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem;">16px</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="icon icon-24">i</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem;">24px</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="icon icon-32">i</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem;">32px</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="icon icon-48">i</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem;">48px</p>
+                </div>
+            </div>
+
+            <div class="practical-showcase">
+                <h4 style="color: #667eea; margin-bottom: 1rem;">✨ Caso de uso real</h4>
+                <p><strong>Diseño de tarjetas de producto:</strong> Los bordes de 1px mantienen las tarjetas limpias y definidas sin importar el tamaño de fuente del usuario. Los iconos de 24px se ven consistentes en todos los navegadores.</p>
+            </div>
+        </section>
+
+        <!-- REM -->
+        <section id="rem">
+            <h2>REM (Root EM) - Unidades Relativas al Root</h2>
+            
+            <div class="theory">
+                <h3>📖 Teoría</h3>
+                <p><strong>REM es relativo al tamaño de fuente del elemento raíz</strong> (<code>&lt;html&gt;</code>). Por defecto, 1rem = 16px.</p>
+                <p>Si el usuario cambia el tamaño de fuente en su navegador, todos los elementos con rem se ajustan automáticamente. Esto hace que tu sitio sea más accesible para personas con problemas de visión.</p>
+                <p><span class="highlight">Ventaja:</span> Respeta preferencias del usuario, escalado consistente en todo el sitio</p>
+                <p><span class="highlight">Desventaja:</span> Requiere pensar en proporciones en lugar de tamaños fijos</p>
+            </div>
+
+            <h3>💡 Cuándo usar REM:</h3>
+            <ul>
+                <li>✓ Todos los tamaños de fuente (h1, h2, p, etc.)</li>
+                <li>✓ Espaciados principales (padding, margin de secciones)</li>
+                <li>✓ Anchos máximos de contenedores</li>
+                <li>✓ Media queries para breakpoints responsive</li>
+                <li>✓ Alturas y anchos de componentes principales</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                    <span class="code-title">rem-sistema.css</span>
+                </div>
+                <div class="code-content">
+<code><span class="comment">/* Base del sistema */</span>
+<span class="keyword">html</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">16</span><span class="unit">px</span><span class="punctuation">;</span>  <span class="comment">/* Base para todo el sitio */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Sistema de tipografía escalable */</span>
+<span class="selector">h1</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">3</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>      <span class="comment">/* 48px */</span>
+<span class="selector">h2</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">2.5</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>    <span class="comment">/* 40px */</span>
+<span class="selector">h3</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>      <span class="comment">/* 32px */</span>
+<span class="selector">h4</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>    <span class="comment">/* 24px */</span>
+<span class="selector">p</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>       <span class="comment">/* 16px */</span>
+<span class="selector">small</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">0.875</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span> <span class="comment">/* 14px */</span>
+
+<span class="comment">/* Layout con REM */</span>
+<span class="selector">.container</span> <span class="punctuation">{</span>
+    <span class="property">max-width</span><span class="punctuation">:</span> <span class="number">75</span><span class="unit">rem</span><span class="punctuation">;</span>        <span class="comment">/* 1200px */</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>           <span class="comment">/* 32px */</span>
+    <span class="property">margin</span><span class="punctuation">:</span> <span class="number">0</span> <span class="value">auto</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.section</span> <span class="punctuation">{</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">4</span><span class="unit">rem</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>    <span class="comment">/* 64px 32px */</span>
+    <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">3</span><span class="unit">rem</span><span class="punctuation">;</span>   <span class="comment">/* 48px */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Componentes escalables */</span>
+<span class="selector">.card</span> <span class="punctuation">{</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">;</span>
+    <span class="property">border-radius</span><span class="punctuation">:</span> <span class="number">0.5</span><span class="unit">rem</span><span class="punctuation">;</span>
+    <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Media queries con REM */</span>
+<span class="selector">@media</span> <span class="punctuation">(</span><span class="property">max-width</span><span class="punctuation">:</span> <span class="number">48</span><span class="unit">rem</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="comment">/* 768px */</span>
+    <span class="selector">.container</span> <span class="punctuation">{</span>
+        <span class="property">padding</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">rem</span><span class="punctuation">;</span>
+    <span class="punctuation">}</span>
+<span class="punctuation">}</span></code>
+                </div>
+            </div>
+
+            <h3>🎯 Ejemplo 1: Jerarquía tipográfica</h3>
+            <div class="rem-example">
+                <div class="text-2rem">📝 Título H1 con 2rem (32px)</div>
+                <div class="text-1-5rem">📝 Subtítulo H2 con 1.5rem (24px)</div>
+                <div class="text-1rem">📝 Párrafo normal con 1rem (16px)</div>
+            </div>
+
+            <h3>🎯 Ejemplo 2: Sistema de espaciado consistente</h3>
+            <div class="spacing-rem">
+                <strong>🎨 Este contenedor usa REM para todo:</strong>
+                <ul style="margin-top: 1rem; line-height: 1.8;">
+                    <li>padding: 2rem → 32px de espacio interno</li>
+                    <li>margin: 1.5rem → 24px de separación externa</li>
+                    <li>border-radius: 1rem → 16px de esquinas redondeadas</li>
+                    <li>font-size: 1rem → 16px de tamaño de texto</li>
+                </ul>
+                <p style="margin-top: 1rem; background: white; padding: 1rem; border-radius: 0.5rem;">💡 <strong>Prueba esto:</strong> Aumenta el tamaño de fuente en tu navegador (Ctrl/Cmd +) y observa cómo TODO se escala proporcionalmente, manteniendo las proporciones perfectas.</p>
+            </div>
+
+            <h3>🎯 Ejemplo 3: Cards con layout REM</h3>
+            <div class="layout-examples">
+                <div class="layout-card">
+                    <h4>Card Pequeña</h4>
+                    <p>padding: 1rem<br>gap: 0.5rem<br>font-size: 0.875rem</p>
+                </div>
+                <div class="layout-card">
+                    <h4>Card Mediana</h4>
+                    <p>padding: 1.5rem<br>gap: 1rem<br>font-size: 1rem</p>
+                </div>
+                <div class="layout-card">
+                    <h4>Card Grande</h4>
+                    <p>padding: 2rem<br>gap: 1.5rem<br>font-size: 1.125rem</p>
+                </div>
+            </div>
+
+            <h3>🎯 Ejemplo 4: Botones con REM vs PX</h3>
+            <div class="button-examples">
+                <button class="btn btn-px btn-primary">Botón con PX (12px 24px)</button>
+                <button class="btn btn-rem btn-primary">Botón con REM (0.75rem 1.5rem)</button>
+            </div>
+            <p style="margin-top: 1rem; padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                💡 El botón con REM se adapta al cambiar las preferencias de fuente del navegador, mientras que el de PX permanece fijo. Aumenta el zoom para verlo en acción.
+            </p>
+
+            <h3>📊 Tabla de conversión REM a PX:</h3>
+            <table>
+                <tr>
+                    <th>REM</th>
+                    <th>Píxeles (base 16px)</th>
+                    <th>Uso común</th>
+                </tr>
+                <tr>
+                    <td>0.25rem</td>
+                    <td>4px</td>
+                    <td>Espacios mínimos, gaps pequeños</td>
+                </tr>
+                <tr>
+                    <td>0.5rem</td>
+                    <td>8px</td>
+                    <td>Espaciados pequeños entre elementos</td>
+                </tr>
+                <tr>
+                    <td>0.75rem</td>
+                    <td>12px</td>
+                    <td>Padding de botones pequeños</td>
+                </tr>
+                <tr>
+                    <td>1rem</td>
+                    <td>16px</td>
+                    <td>Texto base, espaciado estándar</td>
+                </tr>
+                <tr>
+                    <td>1.5rem</td>
+                    <td>24px</td>
+                    <td>Subtítulos, padding medio</td>
+                </tr>
+                <tr>
+                    <td>2rem</td>
+                    <td>32px</td>
+                    <td>Títulos, secciones, padding grande</td>
+                </tr>
+                <tr>
+                    <td>3rem</td>
+                    <td>48px</td>
+                    <td>Títulos principales, heros</td>
+                </tr>
+                <tr>
+                    <td>4rem</td>
+                    <td>64px</td>
+                    <td>Espaciados entre secciones grandes</td>
+                </tr>
+            </table>
+
+            <div class="practical-showcase">
+                <h4 style="color: #667eea; margin-bottom: 1rem;">✨ Caso de uso real</h4>
+                <p><strong>Sitio web de documentación:</strong> Todo el contenido usa REM. Los usuarios con baja visión pueden aumentar el tamaño de fuente en su navegador y TODO el sitio se escala perfectamente: texto, espaciados, anchos de contenedor. La experiencia permanece consistente y legible.</p>
+            </div>
+        </section>
+
+        <!-- VIEWPORT -->
+        <section id="viewport">
+            <h2>Viewport (vw / vh) - Unidades Relativas a la Ventana</h2>
+            
+            <div class="theory">
+                <h3>📖 Teoría</h3>
+                <p><strong>Las unidades de viewport son relativas al tamaño de la ventana del navegador:</strong></p>
+                <ul style="margin-top: 1rem; line-height: 2;">
+                    <li><strong>1vw</strong> = 1% del ancho del viewport (pantalla)</li>
+                    <li><strong>1vh</strong> = 1% del alto del viewport</li>
+                    <li><strong>100vw</strong> = ancho completo de la pantalla</li>
+                    <li><strong>100vh</strong> = alto completo de la pantalla visible</li>
+                    <li><strong>vmin</strong> = 1% de la dimensión más pequeña</li>
+                    <li><strong>vmax</strong> = 1% de la dimensión más grande</li>
+                </ul>
+                <p style="margin-top: 1rem;"><span class="highlight">Ventaja:</span> Diseños verdaderamente fluidos que se adaptan a cualquier pantalla sin media queries</p>
+                <p><span class="highlight">Desventaja:</span> Puede causar problemas en móviles con barras de navegación dinámicas</p>
+            </div>
+
+            <h3>💡 Cuándo usar Viewport:</h3>
+            <ul>
+                <li>✓ Hero sections y secciones de pantalla completa</li>
+                <li>✓ Tipografía fluida que se ajusta al tamaño de pantalla</li>
+                <li>✓ Modales, overlays y páginas de bienvenida</li>
+                <li>✓ Galerías y portfolios creativos</li>
+                <li>✓ Aplicaciones de una sola página (SPA)</li>
+            </ul>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                    <span class="code-title">viewport-ejemplos.css</span>
+                </div>
+                <div class="code-content">
+<code><span class="comment">/* Hero de pantalla completa */</span>
+<span class="selector">.hero</span> <span class="punctuation">{</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">vh</span><span class="punctuation">;</span>           <span class="comment">/* Altura completa */</span>
+    <span class="property">width</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">vw</span><span class="punctuation">;</span>            <span class="comment">/* Ancho completo */</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">5</span><span class="unit">vh</span> <span class="number">5</span><span class="unit">vw</span><span class="punctuation">;</span>       <span class="comment">/* Espaciado fluido */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Tipografía fluida */</span>
+<span class="selector">h1</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">5</span><span class="unit">vw</span><span class="punctuation">;</span>          <span class="comment">/* Se ajusta al ancho */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Con límites usando clamp() */</span>
+<span class="selector">h2</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="value">clamp</span><span class="punctuation">(</span><span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">,</span> <span class="number">4</span><span class="unit">vw</span><span class="punctuation">,</span> <span class="number">3</span><span class="unit">rem</span><span class="punctuation">);</span>
+    <span class="comment">/* mínimo: 1.5rem, fluido: 4vw, máximo: 3rem */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Secciones proporcionales */</span>
+<span class="selector">.section-half</span> <span class="punctuation">{</span>
+    <span class="property">min-height</span><span class="punctuation">:</span> <span class="number">50</span><span class="unit">vh</span><span class="punctuation">;</span>       <span class="comment">/* Media pantalla */</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.sidebar</span> <span class="punctuation">{</span>
+    <span class="property">width</span><span class="punctuation">:</span> <span class="number">20</span><span class="unit">vw</span><span class="punctuation">;</span>             <span class="comment">/* 20% del ancho */</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">vh</span><span class="punctuation">;</span>           <span class="comment">/* Altura completa */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Solución para móviles */</span>
+<span class="selector">.hero-mobile</span> <span class="punctuation">{</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">dvh</span><span class="punctuation">;</span>          <span class="comment">/* Dynamic viewport */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* Elementos cuadrados responsivos */</span>
+<span class="selector">.square</span> <span class="punctuation">{</span>
+    <span class="property">width</span><span class="punctuation">:</span> <span class="number">30</span><span class="unit">vmin</span><span class="punctuation">;</span>           <span class="comment">/* 30% del lado más pequeño */</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">30</span><span class="unit">vmin</span><span class="punctuation">;</span>
+<span class="punctuation">}</span></code>
+                </div>
+            </div>
+
+            <h3>🎯 Ejemplo 1: Sección de pantalla completa</h3>
+            <div class="vh-example">
+                📱 Esta sección usa <strong>50vh</strong><br>
+                (50% de la altura de tu pantalla)
+            </div>
+
+            <h3>🎯 Ejemplo 2: Tipografía fluida con viewport</h3>
+            <div class="vw-text">
+                Este título usa 5vw
+            </div>
+            <p style="text-align: center; margin-bottom: 2rem;"><em>💡 Redimensiona tu navegador para ver cómo el texto se ajusta automáticamente al ancho de la ventana</em></p>
+
+            <h3>🎯 Ejemplo 3: Caja fluida combinando VW y VH</h3>
+            <div class="responsive-box">
+                80vw × 30vh
+            </div>
+
+            <h3>🎯 Ejemplo 4: Alturas proporcionales</h3>
+            <div class="viewport-grid">
+                <div class="viewport-item vp-10">10vh</div>
+                <div class="viewport-item vp-20">20vh</div>
+                <div class="viewport-item vp-30">30vh</div>
+            </div>
+
+            <h3>⚠️ Problemas comunes y soluciones:</h3>
+            <div class="theory">
+                <h4 style="color: #e53e3e; margin-bottom: 1rem;">Problema 1: 100vh en móviles</h4>
+                <p>En dispositivos móviles, 100vh incluye el espacio de las barras de navegación del navegador, causando scroll indeseado cuando estas barras están visibles.</p>
+                
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span class="code-title">soluciones-viewport.css</span>
+                    </div>
+                    <div class="code-content">
+<code><span class="comment">/* ❌ Problemático en móviles */</span>
+<span class="selector">.hero</span> <span class="punctuation">{</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">vh</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* ✅ Solución 1: Dynamic Viewport Height */</span>
+<span class="selector">.hero</span> <span class="punctuation">{</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">dvh</span><span class="punctuation">;</span>  <span class="comment">/* Se ajusta dinámicamente */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* ✅ Solución 2: Con fallback */</span>
+<span class="selector">.hero</span> <span class="punctuation">{</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">vh</span><span class="punctuation">;</span>  <span class="comment">/* Fallback */</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">dvh</span><span class="punctuation">;</span> <span class="comment">/* Preferido si soportado */</span>
+<span class="punctuation">}</span></code>
+                    </div>
+                </div>
+
+                <h4 style="color: #e53e3e; margin: 2rem 0 1rem 0;">Problema 2: Texto demasiado pequeño o grande</h4>
+                <p>La tipografía con solo vw puede ser ilegible en pantallas muy pequeñas o muy grandes.</p>
+                
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span class="code-title">tipografia-fluida.css</span>
+                    </div>
+                    <div class="code-content">
+<code><span class="comment">/* ❌ Sin límites */</span>
+<span class="selector">h1</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">5</span><span class="unit">vw</span><span class="punctuation">;</span>  <span class="comment">/* Muy pequeño en móvil, muy grande en desktop */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* ✅ Con límites mínimos y máximos */</span>
+<span class="selector">h1</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="value">clamp</span><span class="punctuation">(</span><span class="number">2</span><span class="unit">rem</span><span class="punctuation">,</span> <span class="number">5</span><span class="unit">vw</span><span class="punctuation">,</span> <span class="number">4</span><span class="unit">rem</span><span class="punctuation">);</span>
+    <span class="comment">/* Mínimo 2rem, fluido 5vw, máximo 4rem */</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* ✅ Combinación perfecta para responsive */</span>
+<span class="selector">p</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="value">clamp</span><span class="punctuation">(</span><span class="number">0.875</span><span class="unit">rem</span><span class="punctuation">,</span> <span class="number">2</span><span class="unit">vw</span><span class="punctuation">,</span> <span class="number">1.125</span><span class="unit">rem</span><span class="punctuation">);</span>
+<span class="punctuation">}</span></code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="practical-showcase">
+                <h4 style="color: #667eea; margin-bottom: 1rem;">✨ Casos de uso reales</h4>
+                <p><strong>1. Landing page moderna:</strong> Hero de 100vh con tipografía fluida usando clamp(). El título se adapta perfectamente desde móviles de 320px hasta pantallas 4K sin necesidad de media queries.</p>
+                <p style="margin-top: 1rem;"><strong>2. Dashboard de aplicación:</strong> Sidebar de 20vw, área principal de 80vw. Todo se redimensiona fluidamente. La altura de 100vh asegura que no haya scroll en la interfaz principal.</p>
+                <p style="margin-top: 1rem;"><strong>3. Portfolio creativo:</strong> Galería con elementos de 30vmin × 30vmin. Los elementos siempre son cuadrados perfectos y se adaptan tanto a orientación vertical como horizontal.</p>
+            </div>
+        </section>
+
+        <!-- COMPARACIÓN -->
+        <section id="comparacion">
+            <h2>Comparación y Mejores Prácticas</h2>
+            
+            <div class="comparison">
+                <div class="comparison-item">
+                    <h4>🔲 Píxeles (px)</h4>
+                    <p>✅ Bordes delgados (1px-5px)<br>✅ Sombras precisas<br>✅ Iconos fijos<br>✅ Control exacto<br>❌ No accesible<br>❌ No escala<br><br><strong>Uso: ~10%</strong></p>
+                </div>
+                <div class="comparison-item">
+                    <h4>📏 REM</h4>
+                    <p>✅ Tipografía completa<br>✅ Espaciados globales<br>✅ Layout principal<br>✅ Muy accesible<br>✅ Escalado consistente<br>⚡ Más usado<br><br><strong>Uso: ~70%</strong></p>
+                </div>
+                <div class="comparison-item">
+                    <h4>📺 Viewport (vw/vh)</h4>
+                    <p>✅ Hero sections<br>✅ Diseño fluido<br>✅ Tipografía fluida<br>✅ Sin media queries<br>⚠️ Cuidado en móviles<br>💡 Usa dvh/clamp<br><br><strong>Uso: ~20%</strong></p>
+                </div>
+            </div>
+
+            <h3>🎨 Ejemplo completo: Tarjeta profesional</h3>
+            <div class="practical-showcase" style="background: white; border: 1px solid #e2e8f0;">
+                <div style="padding: 2rem; border-radius: 0.75rem; background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);">
+                    <h4 style="font-size: 1.5rem; color: #667eea; margin-bottom: 1rem;">✨ Tarjeta Perfectamente Diseñada</h4>
+                    <p style="font-size: 1rem; line-height: 1.8; margin-bottom: 1.5rem;">Esta tarjeta demuestra la combinación óptima de unidades CSS para un diseño profesional y accesible.</p>
+                    
+                    <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-bottom: 1rem;">
+                        <h5 style="color: #2d3748; margin-bottom: 0.75rem; font-size: 1.125rem;">🔍 Análisis de unidades usadas:</h5>
+                        <ul style="line-height: 2;">
+                            <li>🔲 <strong>border: 1px</strong> → Píxeles para un borde preciso y delgado</li>
+                            <li>📏 <strong>padding: 2rem</strong> → REM para espaciado accesible y escalable</li>
+                            <li>📏 <strong>font-size: 1.5rem</strong> → REM para tipografía que respeta al usuario</li>
+                            <li>📏 <strong>border-radius: 0.75rem</strong> → REM para esquinas proporcionales</li>
+                            <li>📏 <strong>margin-bottom: 1.5rem</strong> → REM para separaciones consistentes</li>
+                            <li>🔲 <strong>box-shadow: 0 2px 8px</strong> → Píxeles para control exacto de la sombra</li>
+                        </ul>
+                    </div>
+
+                    <button style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; font-weight: 600;">
+                        Botón con REM
+                    </button>
+                </div>
+            </div>
+
+            <h3>📋 La Fórmula Ganadora para CSS Moderno:</h3>
+            <div class="theory">
+                <p><strong>🎯 Estrategia profesional probada en producción:</strong></p>
+                <ol style="margin-top: 1rem; line-height: 2.2;">
+                    <li><strong>REM (70% del CSS)</strong> → Base para: tipografía, espaciados (padding/margin), anchos de contenedores, breakpoints, componentes principales</li>
+                    <li><strong>Viewport (20% del CSS)</strong> → Para: heroes, secciones fullscreen, tipografía fluida con clamp(), diseños creativos sin media queries</li>
+                    <li><strong>Píxeles (10% del CSS)</strong> → Solo para: bordes (1px-5px), sombras, iconos pequeños, detalles decorativos finos</li>
+                </ol>
+                <p style="margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 0.5rem; border-left: 4px solid #667eea;"><strong>💡 Regla de oro:</strong> Si tienes dudas, usa <span class="highlight">REM</span>. Es la opción más segura, accesible y profesional. Solo usa píxeles para detalles súper finos y viewport para diseños fluidos especiales.</p>
+            </div>
+
+            <h3>🚀 Código CSS Completo de Proyecto Real:</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                    <span class="code-title">proyecto-profesional.css</span>
+                </div>
+                <div class="code-content">
+<code><span class="comment">/* ========================================
+   SISTEMA DE DISEÑO PROFESIONAL
+   Combinación óptima de unidades CSS
+   ======================================== */</span>
+
+<span class="comment">/* 1. CONFIGURACIÓN BASE CON REM */</span>
+<span class="keyword">*</span> <span class="punctuation">{</span>
+    <span class="property">margin</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">;</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">;</span>
+    <span class="property">box-sizing</span><span class="punctuation">:</span> <span class="value">border-box</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">html</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">16</span><span class="unit">px</span><span class="punctuation">;</span>  <span class="comment">/* Base para REM */</span>
+<span class="punctuation">}</span>
+
+<span class="keyword">body</span> <span class="punctuation">{</span>
+    <span class="property">font-family</span><span class="punctuation">:</span> <span class="value">system-ui</span><span class="punctuation">,</span> <span class="value">-apple-system</span><span class="punctuation">,</span> <span class="value">sans-serif</span><span class="punctuation">;</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">rem</span><span class="punctuation">;</span>      <span class="comment">/* 16px */</span>
+    <span class="property">line-height</span><span class="punctuation">:</span> <span class="number">1.6</span><span class="punctuation">;</span>
+    <span class="property">color</span><span class="punctuation">:</span> <span class="string">#333</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* 2. TIPOGRAFÍA CON REM */</span>
+<span class="selector">h1</span> <span class="punctuation">{</span> 
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="value">clamp</span><span class="punctuation">(</span><span class="number">2</span><span class="unit">rem</span><span class="punctuation">,</span> <span class="number">5</span><span class="unit">vw</span><span class="punctuation">,</span> <span class="number">3.5</span><span class="unit">rem</span><span class="punctuation">);</span>  <span class="comment">/* Fluido con límites */</span>
+    <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">;</span>
+    <span class="property">font-weight</span><span class="punctuation">:</span> <span class="number">800</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="selector">h2</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">2.5</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">1.25</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+<span class="selector">h3</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+<span class="selector">h4</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">0.875</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+
+<span class="selector">p</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">rem</span><span class="punctuation">;</span>
+    <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">rem</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* 3. LAYOUT PRINCIPAL CON REM */</span>
+<span class="selector">.container</span> <span class="punctuation">{</span>
+    <span class="property">max-width</span><span class="punctuation">:</span> <span class="number">75</span><span class="unit">rem</span><span class="punctuation">;</span>         <span class="comment">/* 1200px */</span>
+    <span class="property">margin</span><span class="punctuation">:</span> <span class="number">0</span> <span class="value">auto</span><span class="punctuation">;</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">0</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>         <span class="comment">/* 32px laterales */</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.section</span> <span class="punctuation">{</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">4</span><span class="unit">rem</span> <span class="number">0</span><span class="punctuation">;</span>          <span class="comment">/* 64px verticales */</span>
+    <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* 4. HERO CON VIEWPORT */</span>
+<span class="selector">.hero</span> <span class="punctuation">{</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">vh</span><span class="punctuation">;</span>             <span class="comment">/* Pantalla completa */</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">100</span><span class="unit">dvh</span><span class="punctuation">;</span>            <span class="comment">/* Fallback móviles */</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">5</span><span class="unit">vh</span> <span class="number">5</span><span class="unit">vw</span><span class="punctuation">;</span>        <span class="comment">/* Espaciado fluido */</span>
+    <span class="property">display</span><span class="punctuation">:</span> <span class="value">flex</span><span class="punctuation">;</span>
+    <span class="property">align-items</span><span class="punctuation">:</span> <span class="value">center</span><span class="punctuation">;</span>
+    <span class="property">justify-content</span><span class="punctuation">:</span> <span class="value">center</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.hero__title</span> <span class="punctuation">{</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="value">clamp</span><span class="punctuation">(</span><span class="number">2.5</span><span class="unit">rem</span><span class="punctuation">,</span> <span class="number">6</span><span class="unit">vw</span><span class="punctuation">,</span> <span class="number">5</span><span class="unit">rem</span><span class="punctuation">);</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* 5. COMPONENTES CON REM */</span>
+<span class="selector">.card</span> <span class="punctuation">{</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>            <span class="comment">/* REM */</span>
+    <span class="property">margin-bottom</span><span class="punctuation">:</span> <span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">;</span>   <span class="comment">/* REM */</span>
+    <span class="property">border-radius</span><span class="punctuation">:</span> <span class="number">0.75</span><span class="unit">rem</span><span class="punctuation">;</span>  <span class="comment">/* REM */</span>
+    <span class="property">border</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">px</span> <span class="value">solid</span> <span class="string">#e2e8f0</span><span class="punctuation">;</span>  <span class="comment">/* PX para precisión */</span>
+    <span class="property">box-shadow</span><span class="punctuation">:</span> <span class="number">0</span> <span class="number">2</span><span class="unit">px</span> <span class="number">8</span><span class="unit">px</span> <span class="value">rgba</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0</span><span class="punctuation">,</span><span class="number">0.1</span><span class="punctuation">);</span>  <span class="comment">/* PX */</span>
+    <span class="property">background</span><span class="punctuation">:</span> <span class="value">white</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.button</span> <span class="punctuation">{</span>
+    <span class="property">padding</span><span class="punctuation">:</span> <span class="number">0.75</span><span class="unit">rem</span> <span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">;</span>  <span class="comment">/* REM */</span>
+    <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">rem</span><span class="punctuation">;</span>            <span class="comment">/* REM */</span>
+    <span class="property">border-radius</span><span class="punctuation">:</span> <span class="number">0.5</span><span class="unit">rem</span><span class="punctuation">;</span>     <span class="comment">/* REM */</span>
+    <span class="property">border</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">px</span> <span class="value">solid</span><span class="punctuation">;</span>          <span class="comment">/* PX */</span>
+    <span class="property">cursor</span><span class="punctuation">:</span> <span class="value">pointer</span><span class="punctuation">;</span>
+    <span class="property">transition</span><span class="punctuation">:</span> <span class="value">all</span> <span class="number">0.3</span><span class="value">s</span> <span class="value">ease</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* 6. DETALLES FINOS CON PÍXELES */</span>
+<span class="selector">.divider</span> <span class="punctuation">{</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">1</span><span class="unit">px</span><span class="punctuation">;</span>
+    <span class="property">background</span><span class="punctuation">:</span> <span class="string">#e2e8f0</span><span class="punctuation">;</span>
+    <span class="property">margin</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span> <span class="number">0</span><span class="punctuation">;</span>           <span class="comment">/* REM para espaciado */</span>
+<span class="punctuation">}</span>
+
+<span class="selector">.icon</span> <span class="punctuation">{</span>
+    <span class="property">width</span><span class="punctuation">:</span> <span class="number">24</span><span class="unit">px</span><span class="punctuation">;</span>
+    <span class="property">height</span><span class="punctuation">:</span> <span class="number">24</span><span class="unit">px</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* 7. RESPONSIVE CON REM EN MEDIA QUERIES */</span>
+<span class="selector">@media</span> <span class="punctuation">(</span><span class="property">max-width</span><span class="punctuation">:</span> <span class="number">64</span><span class="unit">rem</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="comment">/* 1024px */</span>
+    <span class="selector">.container</span> <span class="punctuation">{</span>
+        <span class="property">padding</span><span class="punctuation">:</span> <span class="number">0</span> <span class="number">1.5</span><span class="unit">rem</span><span class="punctuation">;</span>
+    <span class="punctuation">}</span>
+<span class="punctuation">}</span>
+
+<span class="selector">@media</span> <span class="punctuation">(</span><span class="property">max-width</span><span class="punctuation">:</span> <span class="number">48</span><span class="unit">rem</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="comment">/* 768px */</span>
+    <span class="selector">h1</span> <span class="punctuation">{</span> <span class="property">font-size</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+    
+    <span class="selector">.section</span> <span class="punctuation">{</span>
+        <span class="property">padding</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span> <span class="number">0</span><span class="punctuation">;</span>
+    <span class="punctuation">}</span>
+    
+    <span class="selector">.hero</span> <span class="punctuation">{</span>
+        <span class="property">padding</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>        <span class="comment">/* Cambiar a REM en móvil */</span>
+    <span class="punctuation">}</span>
+<span class="punctuation">}</span>
+
+<span class="comment">/* 8. GRID RESPONSIVE SIN MEDIA QUERIES */</span>
+<span class="selector">.grid</span> <span class="punctuation">{</span>
+    <span class="property">display</span><span class="punctuation">:</span> <span class="value">grid</span><span class="punctuation">;</span>
+    <span class="property">grid-template-columns</span><span class="punctuation">:</span> <span class="value">repeat</span><span class="punctuation">(</span>
+        <span class="value">auto-fit</span><span class="punctuation">,</span> 
+        <span class="value">minmax</span><span class="punctuation">(</span><span class="value">min</span><span class="punctuation">(</span><span class="number">20</span><span class="unit">rem</span><span class="punctuation">,</span> <span class="number">100</span><span class="value">%</span><span class="punctuation">),</span> <span class="number">1</span><span class="value">fr</span><span class="punctuation">)</span>
+    <span class="punctuation">);</span>
+    <span class="property">gap</span><span class="punctuation">:</span> <span class="number">2</span><span class="unit">rem</span><span class="punctuation">;</span>               <span class="comment">/* REM para consistencia */</span>
+<span class="punctuation">}</span></code>
+                </div>
+            </div>
+
+            <h3>💡 Checklist de Mejores Prácticas:</h3>
+            <div class="practical-showcase">
+                <h4 style="color: #667eea; margin-bottom: 1rem;">✅ Usa esta checklist en tus proyectos</h4>
+                <ul style="line-height: 2.2;">
+                    <li>✅ Configura <code>html { font-size: 16px; }</code> como base</li>
+                    <li>✅ Toda la tipografía en REM (h1, h2, p, etc.)</li>
+                    <li>✅ Todos los espaciados principales en REM (padding, margin)</li>
+                    <li>✅ Anchos de contenedores en REM (<code>max-width: 75rem</code>)</li>
+                    <li>✅ Breakpoints de media queries en REM (<code>@media (max-width: 48rem)</code>)</li>
+                    <li>✅ Bordes finos en PX (<code>border: 1px solid</code>)</li>
+                    <li>✅ Sombras en PX (<code>box-shadow: 0 2px 8px</code>)</li>
+                    <li>✅ Iconos pequeños en PX (<code>width: 24px</code>)</li>
+                    <li>✅ Heroes y fullscreen en VH (<code>height: 100vh</code> o <code>100dvh</code>)</li>
+                    <li>✅ Tipografía fluida con clamp() (<code>clamp(1.5rem, 4vw, 3rem)</code>)</li>
+                    <li>✅ Nunca uses VW/VH para texto sin límites (siempre con clamp)</li>
+                    <li>✅ Prueba tu sitio aumentando el zoom del navegador (accesibilidad)</li>
+                </ul>
+            </div>
+
+            <h3>🎯 Conversión Rápida:</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #667eea;">
+                    <strong style="color: #667eea;">De PX a REM</strong>
+                    <p style="margin-top: 0.5rem; font-family: monospace;">px ÷ 16 = rem</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">32px ÷ 16 = 2rem</p>
+                </div>
+                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #764ba2;">
+                    <strong style="color: #764ba2;">De REM a PX</strong>
+                    <p style="margin-top: 0.5rem; font-family: monospace;">rem × 16 = px</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">1.5rem × 16 = 24px</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>✨ <strong>CSS Units Masterclass</strong> - Tutorial Interactivo Completo</p>
+            <p>💡 Redimensiona tu navegador y aumenta el zoom para ver los ejemplos en acción</p>
+            <p style="margin-top: 1rem; opacity: 0.8;">Creado con 💜 para desarrolladores que quieren dominar CSS</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleNav() {
+            const navContent = document.getElementById('navContent');
+            const navToggle = document.getElementById('navToggle');
+            
+            navContent.classList.toggle('active');
+            navToggle.textContent = navContent.classList.contains('active') ? '▲' : '▼';
+        }
+    </script>
+</body>
+</html>
