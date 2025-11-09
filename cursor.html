@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipos de Cursores CSS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .category {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .cursor-box {
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .cursor-box span {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .cursor-box .description {
+            font-size: 0.85em;
+            color: #555;
+            line-height: 1.4;
+            font-weight: normal;
+        }
+
+        .cursor-box .code {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            color: #2c3e50;
+            border: 1px dashed rgba(0,0,0,0.1);
+        }
+
+        /* Colores de fondo diferentes para cada cursor */
+        .auto { background: #FFB3BA; }
+        .default { background: #FFDFBA; }
+        .pointer { background: #FFFFBA; }
+        .wait { background: #BAFFC9; }
+        .text { background: #BAE1FF; }
+        .move { background: #D4BAFF; }
+        .help { background: #FFB3E6; }
+        .not-allowed { background: #FFC4C4; }
+        .none { background: #C4E1FF; }
+        .context-menu { background: #FFE4B3; }
+        .progress { background: #D1F5D3; }
+        .cell { background: #F5D1E6; }
+        .crosshair { background: #D1E8F5; }
+        .vertical-text { background: #F5E8D1; }
+        .alias { background: #E8D1F5; }
+        .copy { background: #D1F5F5; }
+        .no-drop { background: #FFD1D1; }
+        .grab { background: #D1FFD1; }
+        .grabbing { background: #D1D1FF; }
+        .all-scroll { background: #FFD1FF; }
+        .col-resize { background: #FFEAA7; }
+        .row-resize { background: #DFE6E9; }
+        .n-resize { background: #74B9FF; }
+        .e-resize { background: #A29BFE; }
+        .s-resize { background: #FD79A8; }
+        .w-resize { background: #FDCB6E; }
+        .ne-resize { background: #6C5CE7; }
+        .nw-resize { background: #00B894; }
+        .se-resize { background: #E17055; }
+        .sw-resize { background: #00CEC9; }
+        .ew-resize { background: #FF7675; }
+        .ns-resize { background: #55EFC4; }
+        .nesw-resize { background: #FAB1A0; }
+        .nwse-resize { background: #81ECEC; }
+        .zoom-in { background: #FEA47F; }
+        .zoom-out { background: #A8E6CF; }
+
+        /* Tipos de cursores */
+        .auto { cursor: auto; }
+        .default { cursor: default; }
+        .pointer { cursor: pointer; }
+        .wait { cursor: wait; }
+        .text { cursor: text; }
+        .move { cursor: move; }
+        .help { cursor: help; }
+        .not-allowed { cursor: not-allowed; }
+        .none { cursor: none; }
+        .context-menu { cursor: context-menu; }
+        .progress { cursor: progress; }
+        .cell { cursor: cell; }
+        .crosshair { cursor: crosshair; }
+        .vertical-text { cursor: vertical-text; }
+        .alias { cursor: alias; }
+        .copy { cursor: copy; }
+        .no-drop { cursor: no-drop; }
+        .grab { cursor: grab; }
+        .grabbing { cursor: grabbing; }
+        .all-scroll { cursor: all-scroll; }
+        .col-resize { cursor: col-resize; }
+        .row-resize { cursor: row-resize; }
+        .n-resize { cursor: n-resize; }
+        .e-resize { cursor: e-resize; }
+        .s-resize { cursor: s-resize; }
+        .w-resize { cursor: w-resize; }
+        .ne-resize { cursor: ne-resize; }
+        .nw-resize { cursor: nw-resize; }
+        .se-resize { cursor: se-resize; }
+        .sw-resize { cursor: sw-resize; }
+        .ew-resize { cursor: ew-resize; }
+        .ns-resize { cursor: ns-resize; }
+        .nesw-resize { cursor: nesw-resize; }
+        .nwse-resize { cursor: nwse-resize; }
+        .zoom-in { cursor: zoom-in; }
+        .zoom-out { cursor: zoom-out; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖱️ Galería de Cursores CSS</h1>
+        
+        <!-- BÁSICOS -->
+        <div class="category">
+            <h2 class="category-title">📌 Cursores Básicos</h2>
+            <div class="grid">
+                <div class="cursor-box auto">
+                    <span>auto</span>
+                    <div class="description">El navegador decide automáticamente según el contexto</div>
+                    <code class="code">cursor: auto;</code>
+                </div>
+                <div class="cursor-box default">
+                    <span>default</span>
+                    <div class="description">Flecha estándar del sistema</div>
+                    <code class="code">cursor: default;</code>
+                </div>
+                <div class="cursor-box pointer">
+                    <span>pointer</span>
+                    <div class="description">Manita que indica un enlace o elemento clicable</div>
+                    <code class="code">cursor: pointer;</code>
+                </div>
+                <div class="cursor-box none">
+                    <span>none</span>
+                    <div class="description">Oculta completamente el cursor</div>
+                    <code class="code">cursor: none;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADO -->
+        <div class="category">
+            <h2 class="category-title">⏳ Cursores de Estado</h2>
+            <div class="grid">
+                <div class="cursor-box wait">
+                    <span>wait</span>
+                    <div class="description">Indica que el usuario debe esperar (reloj de arena)</div>
+                    <code class="code">cursor: wait;</code>
+                </div>
+                <div class="cursor-box progress">
+                    <span>progress</span>
+                    <div class="description">Proceso en curso, pero el usuario puede interactuar</div>
+                    <code class="code">cursor: progress;</code>
+                </div>
+                <div class="cursor-box not-allowed">
+                    <span>not-allowed</span>
+                    <div class="description">Acción no permitida o deshabilitada</div>
+                    <code class="code">cursor: not-allowed;</code>
+                </div>
+                <div class="cursor-box no-drop">
+                    <span>no-drop</span>
+                    <div class="description">El elemento no puede soltarse aquí</div>
+                    <code class="code">cursor: no-drop;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEXTO -->
+        <div class="category">
+            <h2 class="category-title">✏️ Cursores de Texto</h2>
+            <div class="grid">
+                <div class="cursor-box text">
+                    <span>text</span>
+                    <div class="description">Para seleccionar texto horizontal</div>
+                    <code class="code">cursor: text;</code>
+                </div>
+                <div class="cursor-box vertical-text">
+                    <span>vertical-text</span>
+                    <div class="description">Para seleccionar texto vertical</div>
+                    <code class="code">cursor: vertical-text;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- INTERACCIÓN -->
+        <div class="category">
+            <h2 class="category-title">🤚 Cursores de Interacción</h2>
+            <div class="grid">
+                <div class="cursor-box grab">
+                    <span>grab</span>
+                    <div class="description">Indica que se puede agarrar el elemento</div>
+                    <code class="code">cursor: grab;</code>
+                </div>
+                <div class="cursor-box grabbing">
+                    <span>grabbing</span>
+                    <div class="description">Elemento siendo arrastrado (mano cerrada)</div>
+                    <code class="code">cursor: grabbing;</code>
+                </div>
+                <div class="cursor-box move">
+                    <span>move</span>
+                    <div class="description">Mover elemento en cualquier dirección</div>
+                    <code class="code">cursor: move;</code>
+                </div>
+                <div class="cursor-box all-scroll">
+                    <span>all-scroll</span>
+                    <div class="description">Desplazar en todas direcciones</div>
+                    <code class="code">cursor: all-scroll;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="category">
+            <h2 class="category-title">⚡ Cursores de Acción</h2>
+            <div class="grid">
+                <div class="cursor-box help">
+                    <span>help</span>
+                    <div class="description">Ayuda disponible (signo de interrogación)</div>
+                    <code class="code">cursor: help;</code>
+                </div>
+                <div class="cursor-box context-menu">
+                    <span>context-menu</span>
+                    <div class="description">Menú contextual disponible</div>
+                    <code class="code">cursor: context-menu;</code>
+                </div>
+                <div class="cursor-box cell">
+                    <span>cell</span>
+                    <div class="description">Seleccionar celda de tabla</div>
+                    <code class="code">cursor: cell;</code>
+                </div>
+                <div class="cursor-box crosshair">
+                    <span>crosshair</span>
+                    <div class="description">Selección precisa (cruz)</div>
+                    <code class="code">cursor: crosshair;</code>
+                </div>
+                <div class="cursor-box alias">
+                    <span>alias</span>
+                    <div class="description">Se creará un atajo o alias</div>
+                    <code class="code">cursor: alias;</code>
+                </div>
+                <div class="cursor-box copy">
+                    <span>copy</span>
+                    <div class="description">Se copiará el elemento</div>
+                    <code class="code">cursor: copy;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- ZOOM -->
+        <div class="category">
+            <h2 class="category-title">🔍 Cursores de Zoom</h2>
+            <div class="grid">
+                <div class="cursor-box zoom-in">
+                    <span>zoom-in</span>
+                    <div class="description">Ampliar o acercar la vista</div>
+                    <code class="code">cursor: zoom-in;</code>
+                </div>
+                <div class="cursor-box zoom-out">
+                    <span>zoom-out</span>
+                    <div class="description">Reducir o alejar la vista</div>
+                    <code class="code">cursor: zoom-out;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- REDIMENSIÓN BÁSICA -->
+        <div class="category">
+            <h2 class="category-title">↔️ Redimensión Horizontal/Vertical</h2>
+            <div class="grid">
+                <div class="cursor-box col-resize">
+                    <span>col-resize</span>
+                    <div class="description">Redimensionar columna horizontalmente</div>
+                    <code class="code">cursor: col-resize;</code>
+                </div>
+                <div class="cursor-box row-resize">
+                    <span>row-resize</span>
+                    <div class="description">Redimensionar fila verticalmente</div>
+                    <code class="code">cursor: row-resize;</code>
+                </div>
+                <div class="cursor-box ew-resize">
+                    <span>ew-resize</span>
+                    <div class="description">Redimensionar Este-Oeste (horizontal)</div>
+                    <code class="code">cursor: ew-resize;</code>
+                </div>
+                <div class="cursor-box ns-resize">
+                    <span>ns-resize</span>
+                    <div class="description">Redimensionar Norte-Sur (vertical)</div>
+                    <code class="code">cursor: ns-resize;</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- REDIMENSIÓN DIRECCIONAL -->
+        <div class="category">
+            <h2 class="category-title">🧭 Redimensión Direccional</h2>
+            <div class="grid">
+                <div class="cursor-box n-resize">
+                    <span>n-resize</span>
+                    <div class="description">Redimensionar hacia el Norte (arriba)</div>
+                    <code class="code">cursor: n-resize;</code>
+                </div>
+                <div class="cursor-box e-resize">
+                    <span>e-resize</span>
+                    <div class="description">Redimensionar hacia el Este (derecha)</div>
+                    <code class="code">cursor: e-resize;</code>
+                </div>
+                <div class="cursor-box s-resize">
+                    <span>s-resize</span>
+                    <div class="description">Redimensionar hacia el Sur (abajo)</div>
+                    <code class="code">cursor: s-resize;</code>
+                </div>
+                <div class="cursor-box w-resize">
+                    <span>w-resize</span>
+                    <div class="description">Redimensionar hacia el Oeste (izquierda)</div>
+                    <code class="code">cursor: w-resize;</code>
+                </div>
+                <div class="cursor-box ne-resize">
+                    <span>ne-resize</span>
+                    <div class="description">Redimensionar Noreste (arriba-derecha)</div>
+                    <code class="code">cursor: ne-resize;</code>
+                </div>
+                <div class="cursor-box nw-resize">
+                    <span>nw-resize</span>
+                    <div class="description">Redimensionar Noroeste (arriba-izquierda)</div>
+                    <code class="code">cursor: nw-resize;</code>
+                </div>
+                <div class="cursor-box se-resize">
+                    <span>se-resize</span>
+                    <div class="description">Redimensionar Sureste (abajo-derecha)</div>
+                    <code class="code">cursor: se-resize;</code>
+                </div>
+                <div class="cursor-box sw-resize">
+                    <span>sw-resize</span>
+                    <div class="description">Redimensionar Suroeste (abajo-izquierda)</div>
+                    <code class="code">cursor: sw-resize;</code>
+                </div>
+                <div class="cursor-box nesw-resize">
+                    <span>nesw-resize</span>
+                    <div class="description">Redimensionar diagonal NE-SO</div>
+                    <code class="code">cursor: nesw-resize;</code>
+                </div>
+                <div class="cursor-box nwse-resize">
+                    <span>nwse-resize</span>
+                    <div class="description">Redimensionar diagonal NO-SE</div>
+                    <code class="code">cursor: nwse-resize;</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
