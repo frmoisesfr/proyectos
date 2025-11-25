@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adivina el Número</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #764ba2;
+        }
+        
+        .resultado {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-height: 50px;
+            display: none;
+        }
+        
+        .resultado.correcto {
+            background: #4caf50;
+            color: white;
+            display: block;
+        }
+        
+        .resultado.incorrecto {
+            background: #ff9800;
+            color: white;
+            display: block;
+        }
+        
+        .stats {
+            color: #999;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Adivina el Número</h1>
+        <p>Tengo un número entre 1 y 100</p>
+        
+        <input 
+            type="number" 
+            id="input" 
+            placeholder="Escribe tu número" 
+            min="1" 
+            max="100"
+        >
+        <button onclick="verificar()">Verificar</button>
+        
+        <div id="resultado" class="resultado"></div>
+        <div class="stats">
+            <p>Intentos: <span id="intentos">0</span></p>
+        </div>
+        
+        <button onclick="reiniciar()" style="background: #999; margin-top: 15px;">Jugar de Nuevo</button>
+    </div>
+
+    <script>
+        let numeroSecreto = Math.floor(Math.random() * 100) + 1;
+        let intentos = 0;
+
+        function verificar() {
+            const input = document.getElementById('input');
+            const numero = parseInt(input.value);
+            const resultado = document.getElementById('resultado');
+            
+            if (!numero || numero < 1 || numero > 100) {
+                alert('Por favor ingresa un número entre 1 y 100');
+                return;
+            }
+            
+            intentos++;
+            
+            if (numero === numeroSecreto) {
+                resultado.textContent = `¡Correcto! Era ${numeroSecreto}. ¡Lo adivinaste en ${intentos} intentos!`;
+                resultado.className = 'resultado correcto';
+                input.disabled = true;
+            } else if (numero < numeroSecreto) {
+                resultado.textContent = `Demasiado bajo. Intenta con un número mayor.`;
+                resultado.className = 'resultado incorrecto';
+            } else {
+                resultado.textContent = `Demasiado alto. Intenta con un número menor.`;
+                resultado.className = 'resultado incorrecto';
+            }
+            
+            document.getElementById('intentos').textContent = intentos;
+            input.value = '';
+            input.focus();
+        }
+        
+        function reiniciar() {
+            numeroSecreto = Math.floor(Math.random() * 100) + 1;
+            intentos = 0;
+            document.getElementById('input').disabled = false;
+            document.getElementById('input').value = '';
+            document.getElementById('resultado').className = 'resultado';
+            document.getElementById('intentos').textContent = '0';
+            document.getElementById('input').focus();
+        }
+        
+        document.getElementById('input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verificar();
+        });
+    </script>
+</body>
+</html>
