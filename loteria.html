@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotería de Navidad - Estadísticas y Cuentas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef3c7 0%, #fecaca 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #dc2626 0%, #eab308 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            border: 2px solid #2563eb;
+            background: white;
+            color: #2563eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid;
+        }
+
+        .card.blue {
+            border-top-color: #2563eb;
+        }
+
+        .card.green {
+            border-top-color: #16a34a;
+        }
+
+        .card.purple {
+            border-top-color: #a855f7;
+        }
+
+        .card-label {
+            color: #6b7280;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 2.2em;
+            font-weight: bold;
+        }
+
+        .card.blue .card-value {
+            color: #2563eb;
+        }
+
+        .card.green .card-value {
+            color: #16a34a;
+        }
+
+        .card.purple .card-value {
+            color: #a855f7;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            color: #1f2937;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        thead {
+            background: #f3f4f6;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-positive {
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .text-negative {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .probability-item {
+            border-left: 4px solid;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .probability-item.yellow {
+            border-left-color: #eab308;
+            background: #fffbeb;
+        }
+
+        .probability-item.orange {
+            border-left-color: #f97316;
+            background: #fff7ed;
+        }
+
+        .probability-item.blue {
+            border-left-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .probability-item.green {
+            border-left-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .probability-item strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .probability-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .liquidation-box {
+            background: #f0f9ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .liquidation-box.acreedor {
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+        }
+
+        .liquidation-box.deudor {
+            background: #fef2f2;
+            border-left-color: #dc2626;
+        }
+
+        .liquidation-box p {
+            color: #1f2937;
+            font-size: 1em;
+        }
+
+        .amount {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .acreedor .amount {
+            color: #16a34a;
+        }
+
+        .deudor .amount {
+            color: #dc2626;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+
+        .info-box p {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 30px 0;
+        }
+
+        .red-header {
+            background: linear-gradient(90deg, #dc2626 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎲 Lotería de Navidad 2024</h1>
+            <p>Análisis de estadísticas y cuentas de grupo</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="mostrarSeccion('estadisticas', this)">📊 Estadísticas</button>
+            <button class="nav-btn" onclick="mostrarSeccion('deudas', this)">💰 Cuentas</button>
+            <button class="nav-btn" onclick="mostrarSeccion('decimos', this)">🎫 Décimos</button>
+        </div>
+
+        <!-- SECCIÓN ESTADÍSTICAS -->
+        <div id="estadisticas" class="content active">
+            <div class="cards-grid">
+                <div class="card blue">
+                    <div class="card-label">Total de décimos</div>
+                    <div class="card-value">7</div>
+                </div>
+                <div class="card green">
+                    <div class="card-label">Total gastado</div>
+                    <div class="card-value">161€</div>
+                </div>
+                <div class="card purple">
+                    <div class="card-label">Costo por persona</div>
+                    <div class="card-value">11,50€</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Análisis de Probabilidades</h2>
+                <div class="chart-container">
+                    <canvas id="probabilityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Probabilidades de Premios (con 7 décimos)</h2>
+                
+                <div class="probability-item yellow">
+                    <strong>🏆 Primer Premio</strong>
+                    <p>1 en 100.000 — Tu probabilidad: <span class="probability-value">0,007%</span></p>
+                </div>
+
+                <div class="probability-item orange">
+                    <strong>🥈 Aproximación al Primero</strong>
+                    <p>1 en 100.000 — Tu probabilidad: <span class="probability-value">0,0007%</span></p>
+                </div>
+
+                <div class="probability-item blue">
+                    <strong>🥉 Segundo Premio</strong>
+                    <p>1 en 100.000 — Tu probabilidad: <span class="probability-value">0,002%</span></p>
+                </div>
+
+                <div class="probability-item green">
+                    <strong>💵 Reintegro (recuperar inversión)</strong>
+                    <p>1 en 10 — Tu probabilidad: <span class="probability-value">70%</span></p>
+                </div>
+
+                <p style="font-size: 0.9em; color: #6b7280; margin-top: 20px; font-style: italic;">
+                    ⚠️ Las probabilidades de grandes premios son muy bajas. La lotería es un juego de azar para entretenimiento.
+                </p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN CUENTAS -->
+        <div id="deudas" class="content">
+            <div class="section">
+                <h2>Resumen de Gastos</h2>
+                <table>
+                    <thead class="red-header">
+                        <tr>
+                            <th>Persona que pagó</th>
+                            <th class="text-right">Cantidad pagada</th>
+                            <th class="text-right">Le corresponde pagar</th>
+                            <th class="text-right">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gastosTable">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>📋 Liquidaciones a realizar</h2>
+                
+                <h3 style="color: #16a34a; margin-top: 20px; margin-bottom: 15px;">✅ Quiénes deben recibir dinero (Acreedores):</h3>
+                <div id="acreedoresContainer"></div>
+
+                <h3 style="color: #dc2626; margin-top: 30px; margin-bottom: 15px;">❌ Quiénes deben pagar (Deudores):</h3>
+                <div id="deudoresContainer"></div>
+            </div>
+
+            <div class="info-box">
+                <h3>💡 Sugerencia de liquidación</h3>
+                <p>La forma más simple es que todos los deudores paguen a los acreedores en la cantidad indicada arriba.</p>
+                <p style="margin-top: 15px; font-size: 0.9em;">
+                    <strong>Total invertido:</strong> 161€ | <strong>Participantes:</strong> 14 | <strong>Costo equitativo por persona:</strong> 11,50€
+                </p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DÉCIMOS -->
+        <div id="decimos" class="content">
+            <div class="section">
+                <h2>🎫 Décimos Comprados</h2>
+                <table>
+                    <thead class="red-header">
+                        <tr>
+                            <th>Número</th>
+                            <th>Procedencia</th>
+                            <th>Pagado por</th>
+                            <th class="text-right">Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="decimosTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Datos
+        var decimos = [
+            { numero: '07758', procedencia: "Ka' Genaro", pagadoPor: 'Moisés' },
+            { numero: '52130', procedencia: "Ka' Genaro", pagadoPor: 'Moisés' },
+            { numero: '72291', procedencia: 'Peña Madridista', pagadoPor: 'Emilio L.' },
+            { numero: '73624', procedencia: 'Albox', pagadoPor: 'Maldonado' },
+            { numero: '28884', procedencia: 'Vera', pagadoPor: 'Antonio' },
+            { numero: '39777', procedencia: 'Toledo', pagadoPor: 'Amador' },
+            { numero: '30295', procedencia: 'Garrucha', pagadoPor: 'Fran' }
+        ];
+
+        var participantes = [
+            'Moisés', 'Domingo', 'Ginés', 'Fran Matías', 'Amador',
+            'Patricio', 'Morgado', 'Emilio (Música)', 'Fran Maldonado',
+            'Fede', 'Antonio Lozano', 'Antonio Mateo', 'Ángel Martínez', 'Emilio Pastor'
+        ];
+
+        var precioDecimo = 23;
+        var totalGastado = decimos.length * precioDecimo;
+        var porPersona = totalGastado / participantes.length;
+
+        // Función para cambiar de sección
+        function mostrarSeccion(seccion, evt) {
+            var contenidos = document.querySelectorAll('.content');
+            for (var i = 0; i < contenidos.length; i++) {
+                contenidos[i].classList.remove('active');
+            }
+
+            var botones = document.querySelectorAll('.nav-btn');
+            for (var i = 0; i < botones.length; i++) {
+                botones[i].classList.remove('active');
+            }
+
+            document.getElementById(seccion).classList.add('active');
+            evt.classList.add('active');
+
+            if (seccion === 'estadisticas' && window.chart) {
+                setTimeout(function() { 
+                    window.chart.resize(); 
+                }, 100);
+            }
+        }
+
+        // Renderizar décimos
+        function renderizarDecimos() {
+            var tabla = document.getElementById('decimosTable');
+            var html = '';
+
+            for (var i = 0; i < decimos.length; i++) {
+                var d = decimos[i];
+                html += '<tr><td style="font-weight: bold; color: #dc2626; font-size: 1.1em;">' + d.numero + '</td><td>' + d.procedencia + '</td><td>' + d.pagadoPor + '</td><td class="text-right">' + precioDecimo + '€</td></tr>';
+            }
+
+            html += '<tr style="background: #f3f4f6; font-weight: bold;"><td colspan="3">TOTAL</td><td class="text-right">' + totalGastado + '€</td></tr>';
+
+            tabla.innerHTML = html;
+        }
+
+        // Renderizar gastos
+        function renderizarGastos() {
+            var gastos = {};
+            
+            for (var i = 0; i < decimos.length; i++) {
+                var d = decimos[i];
+                gastos[d.pagadoPor] = (gastos[d.pagadoPor] || 0) + precioDecimo;
+            }
+
+            var tabla = document.getElementById('gastosTable');
+            var html = '';
+
+            for (var nombre in gastos) {
+                if (gastos.hasOwnProperty(nombre)) {
+                    var cantidad = gastos[nombre];
+                    var saldo = cantidad - porPersona;
+                    var clase = saldo > 0 ? 'text-positive' : 'text-negative';
+                    var signo = saldo > 0 ? '+' : '';
+
+                    html += '<tr><td>' + nombre + '</td><td class="text-right">' + cantidad + '€</td><td class="text-right">' + porPersona.toFixed(2) + '€</td><td class="text-right ' + clase + '">' + signo + saldo.toFixed(2) + '€</td></tr>';
+                }
+            }
+
+            tabla.innerHTML = html;
+        }
+
+        // Renderizar liquidaciones
+        function renderizarLiquidaciones() {
+            var gastos = {};
+            for (var i = 0; i < decimos.length; i++) {
+                var d = decimos[i];
+                gastos[d.pagadoPor] = (gastos[d.pagadoPor] || 0) + precioDecimo;
+            }
+
+            var acreedores = [];
+            var deudores = [];
+
+            for (var nombre in gastos) {
+                if (gastos.hasOwnProperty(nombre)) {
+                    var diferencia = gastos[nombre] - porPersona;
+                    if (diferencia > 0) {
+                        acreedores.push({ nombre: nombre, cantidad: diferencia });
+                    } else {
+                        deudores.push({ nombre: nombre, cantidad: Math.abs(diferencia) });
+                    }
+                }
+            }
+
+            for (var j = 0; j < participantes.length; j++) {
+                var p = participantes[j];
+                if (!gastos[p]) {
+                    deudores.push({ nombre: p, cantidad: porPersona });
+                }
+            }
+
+            var acreedoresHtml = '';
+            for (var k = 0; k < acreedores.length; k++) {
+                var a = acreedores[k];
+                acreedoresHtml += '<div class="liquidation-box acreedor"><p><strong>' + a.nombre + '</strong> debe recibir: <span class="amount">' + a.cantidad.toFixed(2) + '€</span></p></div>';
+            }
+            document.getElementById('acreedoresContainer').innerHTML = acreedoresHtml;
+
+            var deudoresHtml = '';
+            for (var l = 0; l < deudores.length; l++) {
+                var d = deudores[l];
+                deudoresHtml += '<div class="liquidation-box deudor"><p><strong>' + d.nombre + '</strong> debe pagar: <span class="amount">' + d.cantidad.toFixed(2) + '€</span></p></div>';
+            }
+            document.getElementById('deudoresContainer').innerHTML = deudoresHtml;
+        }
+
+        // Crear gráfico
+        function crearGrafico() {
+            var ctx = document.getElementById('probabilityChart').getContext('2d');
+            
+            window.chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Décimos participantes', 'Décimos no participantes'],
+                    datasets: [{
+                        data: [7, 99993],
+                        backgroundColor: ['#3b82f6', '#e5e7eb'],
+                        borderColor: ['#1e40af', '#d1d5db'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Inicializar cuando carga la página
+        window.addEventListener('load', function() {
+            renderizarDecimos();
+            renderizarGastos();
+            renderizarLiquidaciones();
+            crearGrafico();
+        });
+    </script>
+</body>
+</html>
