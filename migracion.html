@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Migración de Hosting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 50px 40px;
+        }
+        
+        .acceso-section {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 50px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .acceso-section h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+        }
+        
+        .acceso-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+        }
+        
+        .acceso-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .acceso-item a {
+            color: #764ba2;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+        
+        .acceso-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .paso {
+            margin-bottom: 45px;
+            padding: 30px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .paso:hover {
+            transform: translateX(5px);
+        }
+        
+        .paso-numero {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            line-height: 50px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        .paso h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        
+        .tareas-lista {
+            margin-left: 0;
+            padding-left: 0;
+        }
+        
+        .tarea {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .tarea:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        .tarea.problema {
+            color: #d9534f;
+        }
+        
+        .tarea.problema:before {
+            content: "⚠";
+            color: #d9534f;
+        }
+        
+        .tarea.solucion {
+            color: #27ae60;
+        }
+        
+        .tarea.solucion:before {
+            content: "✓";
+            color: #27ae60;
+        }
+        
+        .caracteristicas {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px solid #667eea;
+        }
+        
+        .caracteristicas p {
+            margin: 8px 0;
+            color: #555;
+        }
+        
+        .caracteristica-item {
+            display: inline-block;
+            background: #f0f4ff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 8px 8px 8px 0;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .pendiente {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 50px;
+        }
+        
+        .pendiente h3 {
+            color: #856404;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        
+        .pendiente-item {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            color: #856404;
+            line-height: 1.6;
+        }
+        
+        .pendiente-item:before {
+            content: "○";
+            position: absolute;
+            left: 0;
+            color: #ffc107;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        .nota {
+            background: #e8f4f8;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            color: #0c5460;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+        
+        .nota strong {
+            color: #0c5460;
+        }
+        
+        .footer {
+            background: #f8f9ff;
+            padding: 30px 40px;
+            text-align: center;
+            color: #667eea;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🚀 Migración de Hosting</h1>
+            <h3>EstudiosAlmerienses.com</h3>
+            <br>
+            <p>Informe técnico por Moisés Fernández</p>
+        </div>
+        
+        <!-- CONTENIDO -->
+        <div class="content">
+            <!-- ACCESO -->
+            <div class="acceso-section">
+                <h2>📍 Acceso a los Servicios</h2>
+                <div class="acceso-item">
+                    <strong>Moodle Campus Virtual:</strong>
+                    <a href="https://hosting170182eu-cp527.wordpresstemporal.com/campusvirtual_04/" target="_blank">
+                        https://hosting170182eu-cp527.wordpresstemporal.com/campusvirtual_04/
+                    </a>
+                </div>
+                <div class="acceso-item">
+                    <strong>WordPress Página Web:</strong>
+                    <a href="https://hosting170182eu-cp527.wordpresstemporal.com/estudiosalmerienses/" target="_blank">
+                        https://hosting170182eu-cp527.wordpresstemporal.com/estudiosalmerienses/
+                    </a>
+                </div>
+            </div>
+            
+            <!-- PASO 1 -->
+            <div class="paso">
+                <div class="paso-numero">1</div>
+                <h3>Contratación del Nuevo Hosting</h3>
+                <p style="margin-bottom: 20px; color: #555;">Se ha seleccionado <strong>WebEmpresa</strong> como proveedor de hosting, proporcionando las siguientes características:</p>
+                <div class="caracteristicas">
+                    <div class="caracteristica-item">💾 40 GB Almacenamiento</div>
+                    <div class="caracteristica-item">🧠 2560 MB RAM</div>
+                    <div class="caracteristica-item">⚡ 150% CPU</div>
+                </div>
+            </div>
+            
+            <!-- PASO 2 -->
+            <div class="paso">
+                <div class="paso-numero">2</div>
+                <h3>Migración Completa de WordPress</h3>
+                <ul class="tareas-lista">
+                    <li class="tarea">Creación de múltiples copias de seguridad (backups) y exportación</li>
+                    <li class="tarea">Instalación de WordPress en el nuevo hosting e importación de los datos existentes</li>
+                    <li class="tarea">Actualización de plugins a versiones compatibles</li>
+                    <li class="tarea">Actualización de la plantilla (tema) de WordPress</li>
+                    <li class="tarea problema">Detección de grave problema con el plugin "Caldera Form" - desactivado y eliminado (sin afectar contenido)</li>
+                    <li class="tarea solucion">Eliminación de plugins innecesarios: JetPack, Hello Dolly, Icegram Engage, TranslatePress y Weglot Translate (mejora de rendimiento)</li>
+                    <li class="tarea solucion">Instalación, activación y configuración de WP-Optimize y AutOptimize para optimizar rendimiento web</li>
+                    <li class="tarea">Realización de nueva copia de seguridad de WordPress</li>
+                </ul>
+            </div>
+            
+            <!-- PASO 3 -->
+            <div class="paso">
+                <div class="paso-numero">3</div>
+                <h3>Migración de Moodle</h3>
+                <ul class="tareas-lista">
+                    <li class="tarea">Exportación completa de la base de datos de Moodle</li>
+                    <li class="tarea">Exportación de contenido de la carpeta Moodle 3.9.7</li>
+                    <li class="tarea problema">Exportación de contenido moodledata - Grandes problemas por volumen: más de 120,000 ficheros y más de 28GB de datos (12+ horas de transferencia entre servidores)</li>
+                    <li class="tarea solucion">Eliminación de ficheros residuales en moodledata: temp, cache, localcache, trashdir</li>
+                    <li class="tarea problema">Problema detectado: codificación ASCII en carpeta moodledata requería conversión a Unicode (UTF-8)</li>
+                    <li class="tarea solucion">Ejecución exitosa del script cron.php para reestructurar contenidos (nunca se había ejecutado - fundamental para el funcionamiento)</li>
+                </ul>
+            </div>
+            
+            <!-- PASO 4 -->
+            <div class="paso">
+                <div class="paso-numero">4</div>
+                <h3>Actualización de Moodle</h3>
+                <ul class="tareas-lista">
+                    <li class="tarea">Actualización progresiva a versión 4.1.22+</li>
+                    <li class="tarea">Actualización progresiva a versión 4.5.8+</li>
+                    <li class="tarea">Purga de cachés y eliminación de archivos residuales en moodledata</li>
+                    <li class="tarea">Ejecución de cron.php para optimizar el sistema</li>
+                    <li class="tarea">Prueba de plantillas Moove y Academi</li>
+                    <li class="tarea solucion">Selección final: Plantilla <strong>Moove</strong> con personalización - moderna y sencilla</li>
+                </ul>
+            </div>
+            
+            <!-- PENDIENTE -->
+            <div class="pendiente">
+                <h3>⏳ Tareas Pendientes</h3>
+                <div class="pendiente-item"><strong>Paso 5:</strong> Cambio de dominio a estudiosalmerienses.com</div>
+                <div class="pendiente-item"><strong>Paso 6:</strong> Migración de cuentas email por IMAP:
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>direccion@estudiosalmerienses.com</li>
+                        <li>proyectos@estudiosalmerienses.com</li>
+                        <li>tutor@estudiosalmerienses.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- NOTA IMPORTANTE -->
+            <div class="nota">
+                <strong>📋 Nota importante sobre la duración del proyecto:</strong> La migración se ha extendido considerablemente debido a que se ha trabajado con dos hostings distintos (Hostalia y WebEmpresa), requiriendo la creación de múltiples tickets de soporte para: apertura de puertos, acceso SSH, importación de bases de datos, conversión y trascodificación de ficheros. El volumen significativo de datos (más de 120,000 ficheros y 28GB) ha impactado directamente en los tiempos de transferencia y procesamiento.
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>Informe técnico de migración de hosting realizado profesionalmente</p>
+        </div>
+    </div>
+</body>
+</html>
